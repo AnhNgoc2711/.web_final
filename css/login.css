@@ -1,0 +1,282 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: url('../image/sky.jpg') no-repeat center center/cover;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    width: 100%;
+    max-width: 1100px;
+    min-height: 620px;
+    display: flex;
+    flex-wrap: wrap;
+    overflow: hidden;
+    margin: 1rem;
+}
+
+.home-left {
+    flex: 1 1 50%;
+    position: relative;
+    overflow: hidden;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    min-height: 300px;
+}
+
+.home-left img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    opacity: 0;
+    transition: opacity 1.2s ease-in-out;
+}
+
+.home-left img.active {
+    opacity: 1;
+    position: relative;
+}
+
+.home-right {
+    position: relative;
+    flex: 1 1 50%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(20px);
+    padding: 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+
+.home-right h1 {
+    font-size: 2rem;
+    color: #fbbc04;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 2px;
+    text-shadow: 0 0 8px #fbbc04;
+}
+
+.home-right p {
+    font-size: 1rem;
+    text-align: center;
+    margin-bottom: 1px;
+    color: #ddd;
+}
+.home-right-center {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    padding: 2rem;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+}
+
+.tab-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.tab-btn {
+    border: 2px solid #fbbc04;
+    background: transparent;
+    color: #fbbc04;
+    border-radius: 30px;
+    padding: 0.5rem 1.2rem;
+    cursor: pointer;
+    font-weight: 600;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.tab-btn.active,
+.tab-btn:hover {
+    background: #fbbc04;
+    color: #111;
+    box-shadow: 0 0 12px #fbbc04aa;
+}
+
+form {
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-top: 1rem;
+}
+
+form.active {
+    display: flex;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    padding: 0.7rem 1rem;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #222;
+    outline: none;
+    font-size: 1rem;
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+}
+
+input:focus {
+    box-shadow: 0 0 8px #fbbc04;
+    background: #fff;
+}
+
+.submit-btn {
+    border: none;
+    border-radius: 30px;
+    background: #1a73e8;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 0.7rem 1rem;
+    cursor: pointer;
+    box-shadow: 0 5px 15px #1a73e8aa;
+    transition: 0.3s;
+}
+
+.submit-btn:hover {
+    background: #155ab6;
+    box-shadow: 0 6px 20px #155ab6cc;
+}
+
+.errorMessageLogin,
+.errorMessageRegister {
+    color: #ff6b6b;
+    font-size: 0.9rem;
+    text-align: center;
+    min-height: 1.2em;
+}
+
+.forgot-password{
+    text-align: left;
+    margin-top: -0.5rem;
+    margin-bottom: 0.8rem;
+    font-size: 0.95rem;
+}
+
+.forgot-password a {
+    color: #fbbc04;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.forgot-password a:hover {
+    color: #e6f112;
+    text-decoration: underline;
+}
+
+.create-account {
+    text-align: center;
+    margin: 0.2rem 0;
+    font-size: 0.9rem;
+}
+.create-account a {
+    color: #fbbc04;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+.create-account a:hover {
+    color: #e6f112;
+    text-decoration: underline;
+}
+
+.password-container {
+    position: relative;
+}
+
+.password-container input {
+    width: 100%;
+    padding-right: 2.5rem;
+}
+
+.password-container .toggle-password {
+    position: absolute;
+    right: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #333;
+    font-size: 1.1rem;
+    opacity: 0.7;
+}
+
+.password-container .toggle-password:hover {
+    opacity: 1;
+}
+
+@media (max-width: 1024px) {
+    .container {
+        width: 95%;
+    }
+
+    .home-right {
+        padding: 1.5rem 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        width: 100%;
+        height: auto;
+    }
+
+    .home-left {
+        display: none;
+    }
+
+    .home-right {
+        flex: 1 1 100%;
+        border-radius: 20px;
+        min-height: auto;
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .home-right h1 {
+        font-size: 1.5rem;
+    }
+
+    .home-right p {
+        font-size: 0.9rem;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    .submit-btn {
+        font-size: 0.9rem;
+        padding: 0.6rem 0.8rem;
+    }
+}

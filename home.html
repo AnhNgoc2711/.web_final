@@ -2,280 +2,301 @@
 <html lang="vi">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SkyNote - Trang chủ</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" />
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SkyNote Website</title>
+    <link rel="icon" href="image/icontitle.jpg" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" />
+    <style>
+        :root {
+            --secondary-color: rgba(255, 255, 255, 0.5);
+            --text-color: #5f6368;
+        }
 
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: url('image/sky.jpg') no-repeat center center/cover;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-    }
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
 
-    .container {
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(15px);
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-      width: 80%;
-      min-height: 600px;
-      display: flex;
-      overflow: hidden;
-      flex-wrap: wrap;
-      margin: 1rem;
-    }
+        body {
+            font-family: Arial, sans-serif;
+            background: url('image/sky.jpg') no-repeat center center;
+            background-size: cover;
+            color: var(--text-color);
+        }
 
-    .home-left {
-      flex: 1 1 50%;
-      position: relative;
-      overflow: hidden;
-      border-top-left-radius: 20px;
-      border-bottom-left-radius: 20px;
-    }
 
-    .home-left img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      position: absolute;
-      opacity: 0;
-      transition: opacity 1.2s ease-in-out;
-    }
+        /* Sidebar - ẩn mặc định */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 250px;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  box-shadow: 1px 0 5px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  transform: translateX(-100%); /* Ẩn hoàn toàn ra ngoài màn hình */
+  transition: transform 0.3s ease;
+  z-index: 1000;
+}
 
-    .home-left img.active {
-      opacity: 1;
-      position: relative;
-    }
+.sidebar.active {
+  transform: translateX(0); /* Khi có .active thì hiện ra */
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(15px);
+}
 
-    .home-right {
-      flex: 1 1 50%;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(20px);
-      padding: 2rem 1rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      border-top-right-radius: 20px;
-      border-bottom-right-radius: 20px;
-    }
 
-    .home-right h1 {
-      font-size: 2.2rem;
-      color: #fbbc04;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      margin: 0 0 1rem;
-      text-shadow: 0 0 8px #fbbc04;
-    }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
 
-    .home-right p {
-      font-size: 1rem;
-      text-align: center;
-      margin-bottom: 1.5rem;
-      color: #ddd;
-      line-height: 1.4;
-    }
+        .sidebar li {
+            padding: 0.8rem 1rem;
+            display: flex;
+            align-items: center;
+            color: var(--text-color);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.2s;
+            user-select: none;
+        }
 
-    .tab-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
+        .sidebar li:hover {
+            background: rgba(232, 234, 237, 0.4);
+        }
 
-    .tab-btn {
-      border: 2px solid #fbbc04;
-      background: transparent;
-      color: #fbbc04;
-      border-radius: 30px;
-      padding: 0.5rem 1.2rem;
-      cursor: pointer;
-      font-weight: 600;
-      text-transform: uppercase;
-      transition: all 0.3s ease;
-    }
+        .sidebar li i {
+            margin-right: 0.5rem;
+            font-size: 1.2rem;
+        }
 
-    .tab-btn.active,
-    .tab-btn:hover {
-      background: #fbbc04;
-      color: #111;
-      box-shadow: 0 0 12px #fbbc04aa;
-    }
+        .labels {
+            margin-top: 2rem;
+        }
 
-    form {
-      display: none;
-      flex-direction: column;
-      gap: 0.8rem;
-      margin-top: 1rem;
-    }
+        .labels h4 {
+            margin: 0.5rem 0 1rem;
+            font-size: 1.1rem;
+            color: #202124;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
 
-    form.active {
-      display: flex;
-    }
+        /* Top Bar */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            gap: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 900;
+        }
 
-    input[type="text"],
-    input[type="email"],
-    input[type="password"] {
-      padding: 0.7rem 1rem;
-      border: none;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.9);
-      color: #222;
-      outline: none;
-      font-size: 1rem;
-      box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
-    }
+        .top-bar i {
+            cursor: pointer;
+            font-size: 1.6rem;
+            color: #5f6368;
+            transition: color 0.2s;
+        }
 
-    input:focus {
-      box-shadow: 0 0 8px #fbbc04;
-      background: #fff;
-    }
+        .top-bar i:hover {
+            color: #fa5cbb;
+        }
 
-    .submit-btn {
-      border: none;
-      border-radius: 30px;
-      background: #1a73e8;
-      color: #fff;
-      font-weight: 700;
-      font-size: 1rem;
-      padding: 0.7rem 1rem;
-      cursor: pointer;
-      box-shadow: 0 5px 15px #1a73e8aa;
-      transition: 0.3s;
-    }
+        .top-bar h2 {
+            display: flex;
+            align-items: center;
+            font-size: 1.6rem;
+            color: #202124;
+            margin: 0;
+            user-select: none;
+        }
 
-    .submit-btn:hover {
-      background: #155ab6;
-      box-shadow: 0 6px 20px #155ab6cc;
-    }
+        .top-bar h2 i {
+            font-size: 1.8rem;
+            color: #fa5cbb;
+            margin-right: 0.5rem;
+        }
 
-    .errorMessageLogin,
-    .errorMessageRegister {
-      color: #ff6b6b;
-      font-size: 0.9rem;
-      text-align: center;
-      min-height: 1.2em;
-    }
+        .top-bar input[type="text"] {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 0.6rem 1rem;
+            background: rgba(232, 234, 237, 0.5);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
 
-    .forgot-password {
-      text-align: center;
-      margin-top: 0.5rem;
-      font-size: 0.9rem;
-    }
+        .top-bar input[type="text"]:focus {
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 5px rgba(250, 92, 187, 0.6);
+        }
 
-    .forgot-password a {
-      color: #fbbc04;
-      text-decoration: none;
-      transition: color 0.3s;
-    }
+        .notes {
+            padding: 1rem 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem;
+        }
 
-    .forgot-password a:hover {
-      color: #fff;
-      text-decoration: underline;
-    }
+        .note {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            padding: 0.8rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            position: relative;
+            transition: box-shadow 0.2s;
+            cursor: default;
+            user-select: none;
+        }
 
-    @media (max-width: 768px) {
-      .container {
-        flex-direction: column;
-        width: 90%;
-      }
+        .note:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
 
-      .home-left,
-      .home-right {
-        border-radius: 0;
-      }
+        .note img {
+            width: 100%;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            object-fit: cover;
+            height: 150px;
+        }
 
-      .home-left {
-        border-top-left-radius: 20px;
-        border-top-right-radius: 20px;
-        min-height: 200px;
-      }
+        .note p {
+            margin: 0.3rem 0;
+            color: var(--text-color);
+            line-height: 1.3;
+            font-size: 0.95rem;
+        }
 
-      .home-right {
-        border-bottom-left-radius: 20px;
-        border-bottom-right-radius: 20px;
-      }
+        .note .icons {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 0.5rem;
+        }
 
-      .home-left img {
-        position: relative;
-        height: auto;
-      }
-    }
-  </style>
+        .note .icons i {
+            font-size: 1.2rem;
+            color: #5f6368;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .note .icons i:hover {
+            color: #fa5cbb;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .top-bar {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .top-bar h2 {
+                flex: 1 1 100%;
+                justify-content: center;
+            }
+
+            .top-bar input[type="text"] {
+                flex: 1 1 100%;
+                margin-top: 0.5rem;
+            }
+
+            .notes {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                padding: 1rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
-  <div class="container">
-    <div class="home-left">
-      <img src="image/anh1.png" alt="Hình 1" class="active" loading="lazy" />
-      <img src="image/nen.png" alt="Hình 2" loading="lazy" />
-      <img src="image/sky.jpg" alt="Hình 3" loading="lazy" />
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <ul>
+            <li><i class="bi bi-sticky"></i> Ghi chú</li>
+            <li><i class="bi bi-bell"></i> Lời nhắc</li>
+            <li><i class="bi bi-archive"></i> Lưu trữ</li>
+            <li><i class="bi bi-trash"></i> Thùng rác</li>
+        </ul>
+        <div class="labels">
+            <h4><i class="bi bi-tag"></i> Labels</h4>
+            <ul>
+                <li><i class="bi bi-tag"></i> Học tập</li>
+                <li><i class="bi bi-tag"></i> Công việc</li>
+            </ul>
+        </div>
     </div>
-    <div class="home-right">
-      <h1><i class="bi bi-cloudy"></i> SkyNote</h1>
-      <p>Chào mừng bạn đến với SkyNote - ứng dụng ghi chú thông minh, mượt mà và tiện lợi. Hãy đăng ký hoặc đăng nhập để bắt đầu trải nghiệm ngay nhé!</p>
 
-      <div class="tab-buttons">
-        <button class="tab-btn active" onclick="showTab('login', event)">Log in</button>
-        <button class="tab-btn" onclick="showTab('registerForm', event)">Sign up</button>
-      </div>
+    <!-- Main -->
+    <div class="main" style="margin-left: 0; transition: margin-left 0.3s ease;">
+        <div class="top-bar">
+            <i class="bi bi-list" id="menuToggle" aria-label="Toggle menu" role="button" tabindex="0"></i>
+            <h2><i class="bi bi-cloudy"></i> SkyNote</h2>
+            <input type="text" placeholder="Tìm kiếm..." aria-label="Tìm kiếm ghi chú" />
+            <i class="bi bi-grid-3x3-gap" title="Chế độ xem lưới"></i>
+            <i class="bi bi-person-circle" title="Tài khoản người dùng"></i>
+        </div>
 
-      <form id="login" action="check_login.php" method="POST" novalidate>
-        <div class="errorMessageLogin"></div>
-        <input name="email" type="email" placeholder="Email" required />
-        <input name="password" type="password" placeholder="Password" required />
-        <button type="submit" class="submit-btn">Log in</button>
-        <p class="forgot-password">
-          <a href="forgot_password.php">Quên mật khẩu?</a>
-        </p>
-      </form>
-
-      <form id="registerForm" action="register.php" method="POST" novalidate>
-        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>" />
-        <div class="errorMessageRegister"></div>
-        <input name="email" type="email" placeholder="Email" required />
-        <input name="fullname" type="text" placeholder="Full name" required />
-        <input name="password" type="password" placeholder="Password" required />
-        <input name="confirm" type="password" placeholder="Re-enter the password" required />
-        <button type="submit" class="submit-btn">Sign up</button>
-      </form>
+        <div class="notes" aria-live="polite">
+            <div class="note" tabindex="0" aria-label="Ghi chú tiêu đề">
+                <div class="icons">
+                    <i class="bi bi-pin-angle" title="Ghim"></i>
+                    <i class="bi bi-share" title="Chia sẻ"></i>
+                    <i class="bi bi-lock" title="Khóa"></i>
+                </div>
+                <img src="image/anh1.png" alt="Ảnh minh họa ghi chú" />
+                <p><strong>Tiêu đề ghi chú</strong></p>
+                <p>Nội dung...</p>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <script>
-    const images = document.querySelectorAll('.home-left img');
-    let current = 0;
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const menuToggle = document.getElementById('menuToggle');
+        const mainContent = document.querySelector('.main');
 
-    setInterval(() => {
-      images[current].classList.remove('active');
-      current = (current + 1) % images.length;
-      images[current].classList.add('active');
-    }, 3000);
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
 
-    function showTab(tabId, event) {
-      event.preventDefault();
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
-
-      document.querySelectorAll('form').forEach(form => form.classList.remove('active'));
-      const selectedForm = document.getElementById(tabId);
-      if (selectedForm) {
-        selectedForm.classList.add('active');
-      }
-    }
-  </script>
+            if (sidebar.classList.contains('active')) {
+                mainContent.style.marginLeft = sidebar.offsetWidth + 'px';
+            } else {
+                mainContent.style.marginLeft = '0';
+            }
+        });
+        menuToggle.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                menuToggle.click();
+            }
+        });
+    </script>
 </body>
 
 </html>
