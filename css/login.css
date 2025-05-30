@@ -114,7 +114,6 @@ form {
     display: none;
     flex-direction: column;
     gap: 0.8rem;
-    margin-top: 1rem;
 }
 
 form.active {
@@ -167,7 +166,7 @@ input:focus {
 
 .forgot-password{
     text-align: left;
-    margin-top: -0.5rem;
+    /* margin-top: -0.5rem; */
     margin-bottom: 0.8rem;
     font-size: 0.95rem;
 }
