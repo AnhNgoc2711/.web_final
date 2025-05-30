@@ -33,7 +33,7 @@
           <div class="forgot-password">
               <a onclick="showTab('ForgetPassword', event)">Forgot your password? </a>
           </div>
-          <button type="submit" class="tab-btn active">Login</button>
+          <button type="submit" class="tab-btn ">Login</button>
           <div class="create-account">
             Don't have an account? <a onclick="showTab('registerForm', event)">Sign up.</a>
           </div>
@@ -50,7 +50,10 @@
             <input name="confirm" type="password" placeholder="Re-enter the password" required />
             <i class="bi bi-eye-slash toggle-password"></i>
           </div>
-          <button type="submit" class="submit-btn">Sign up</button>
+          <button type="submit" class="tab-btn ">Sign up</button>
+          <div class="create-account">
+            Already have an account? <a onclick="showTab('loginForm', event)">Login.</a>
+          </div>
         </form>
         <form id="ForgetPassword" action="#" method="POST" novalidate>
           <div class="errorMessageForgetPassword"></div>
@@ -62,7 +65,7 @@
     </div>
   </div>
 
-  <script src="login.js"></script>
+  <script src="js/login.js"></script>
 </body>
 
 </html>
