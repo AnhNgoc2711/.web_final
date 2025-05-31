@@ -1,3 +1,33 @@
+<?php
+session_set_cookie_params(0);
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.html");
+    exit;
+}
+
+if (isset($_SESSION['just_registered'])) {
+    echo "<script>alert('Welcome! You have successfully registered!');</script>";
+    unset($_SESSION['just_registered']);
+}
+
+$is_active = $_SESSION['is_active'] ?? 0;
+?>
+
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+</head>
+<body>
+
+<?php if ($is_active == 0): ?>
+<div style="background: #ffcccc; color: #900; padding: 10px; text-align: center; font-weight: bold; border-bottom: 2px solid red;">
+    Your account has not been activated yet. Please check your email to activate.
+</div>
+<?php endif; ?>
+
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -74,6 +104,20 @@
                 menuToggle.click();
             }
         });
+    </script>
+
+    <script>
+        // Nếu người dùng mở tab mới hoặc reload -> sessionStorage không còn
+        if (!sessionStorage.getItem('home_accessed')) {
+            // Tab này chưa được cấp quyền truy cập → về login
+            window.location.href = 'login.html';
+        } else {
+            // Tab đang hoạt động bình thường
+            console.log('Tab hợp lệ. Tiếp tục truy cập...');
+        }
+
+        // Đánh dấu tab đã truy cập lần đầu (sau khi đăng ký hoặc login)
+        sessionStorage.setItem('home_accessed', 'true');
     </script>
 </body>
 
