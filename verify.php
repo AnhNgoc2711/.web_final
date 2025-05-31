@@ -122,7 +122,9 @@ if ($email && $token) {
         </div>
         <h2><?= $success ? '✅ Verification Successful' : '❌ Verification Failed' ?></h2>
         <p><?= htmlspecialchars($message) ?></p>
-        <a href="login.html"><?= $success ? 'Login Now' : 'Back to Login' ?></a>
+        <a href="<?= $success ? 'home.php' : 'login.html' ?>">
+            <?= $success ? 'Go to SkyNote' : 'Back to Login' ?>
+        </a>
     </div>
 
 </body>
