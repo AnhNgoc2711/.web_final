@@ -1,22 +1,29 @@
 <?php
 session_start();
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.html");
     exit;
 }
-$isActive = $_SESSION['is_active'] ?? 0;
+
+if (isset($_SESSION['just_registered'])) {
+    echo "<script>alert('Welcome! You have successfully registered!');</script>";
+    unset($_SESSION['just_registered']);
+}
+
+$is_active = $_SESSION['is_active'] ?? 0;
 ?>
+
 
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <!-- head content -->
 </head>
 <body>
 
-<?php if ($isActive == 0): ?>
+<?php if ($is_active == 0): ?>
 <div style="background: #ffcccc; color: #900; padding: 10px; text-align: center; font-weight: bold; border-bottom: 2px solid red;">
-    Tài khoản của bạn chưa được kích hoạt. Vui lòng kiểm tra email để kích hoạt.
+    Your account has not been activated yet. Please check your email to activate.
 </div>
 <?php endif; ?>
 
