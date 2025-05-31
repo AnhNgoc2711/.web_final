@@ -21,8 +21,7 @@
     <div class="home-right">
       <div class="home-right-center">
         <h1><i class="bi bi-cloudy"></i> SkyNote</h1>
-        <p>Welcome to SkyNote - a smart, smooth and convenient note-taking application. Register or log in to start
-          experiencing it now!</p>
+        <p>Welcome to SkyNote - a smart, smooth and convenient note-taking application.</p>
         <form id="loginForm" action="#" method="POST" novalidate class="active">
           <div class="errorMessageLogin"></div>
           <input name="email" type="email" placeholder="Email" required />
@@ -31,7 +30,7 @@
             <i class="bi bi-eye-slash toggle-password"></i>
           </div>
           <div class="forgot-password">
-              <a onclick="showTab('ForgetPassword', event)">Forgot your password? </a>
+            <a onclick="showTab('ForgetPassword', event)">Forgot your password? </a>
           </div>
           <button type="submit" class="tab-btn ">Login</button>
           <div class="create-account">
@@ -57,11 +56,21 @@
         </form>
         <form id="ForgetPassword" action="#" method="POST" novalidate>
           <div class="errorMessageForgetPassword"></div>
-          <p>You need to enter email to retrieve password: </p>
           <input name="email" type="email" placeholder="Email" required />
+          <div class="method-group">
+            <label>
+              <input type="radio" name="method" value="otp" required>
+              Verify by OTP sent to email
+            </label>
+            <label >
+              <input type="radio" name="method" value="link" checked>
+              Verify by reset link sent to email
+            </label>
+          </div>
           <button type="submit" class="tab-btn ">Retrieve Password</button>
           <div class="create-account">
-            <a onclick="showTab('loginForm', event)"> < Back to Login</a>
+            <a onclick="showTab('loginForm', event)">
+              < Back to Login</a>
           </div>
         </form>
       </div>
@@ -69,6 +78,8 @@
   </div>
 
   <script src="js/login.js"></script>
+  <script src="js/forgot_password.js"></script>
+
 </body>
 
 </html>
