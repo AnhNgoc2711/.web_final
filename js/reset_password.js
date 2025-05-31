@@ -1,4 +1,3 @@
-
 function getParam(name) {
     const url = new URL(window.location.href);
     return url.searchParams.get(name) || '';
@@ -19,13 +18,21 @@ if (resetForm) {
         }
         let email = getParam('email');
         let otp = getParam('otp');
+        let token = getParam('token');   // LẤY THÊM TOKEN từ URL nếu có
 
         let formData = new FormData();
         formData.append('action', 'reset_password');
         formData.append('new_password', newPassword);
         formData.append('confirm_password', confirmPassword);
-        formData.append('email', email);
-        formData.append('otp', otp);
+        // Nếu có otp, gửi kèm email + otp
+        if (otp) {
+            formData.append('email', email);
+            formData.append('otp', otp);
+        }
+        // Nếu có token (tức là reset qua link)
+        if (token) {
+            formData.append('token', token);
+        }
 
         fetch('forgot_password.php', {
             method: 'POST',
@@ -43,4 +50,3 @@ if (resetForm) {
             });
     }
 }
-
