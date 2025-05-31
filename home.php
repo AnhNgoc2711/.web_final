@@ -1,4 +1,5 @@
 <?php
+session_set_cookie_params(0);
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
@@ -103,6 +104,20 @@ $is_active = $_SESSION['is_active'] ?? 0;
                 menuToggle.click();
             }
         });
+    </script>
+
+    <script>
+        // Nếu người dùng mở tab mới hoặc reload -> sessionStorage không còn
+        if (!sessionStorage.getItem('home_accessed')) {
+            // Tab này chưa được cấp quyền truy cập → về login
+            window.location.href = 'login.html';
+        } else {
+            // Tab đang hoạt động bình thường
+            console.log('Tab hợp lệ. Tiếp tục truy cập...');
+        }
+
+        // Đánh dấu tab đã truy cập lần đầu (sau khi đăng ký hoặc login)
+        sessionStorage.setItem('home_accessed', 'true');
     </script>
 </body>
 
