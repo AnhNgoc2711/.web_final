@@ -7,6 +7,7 @@ $message = '';
 $success = false;
 
 if ($email && $token) {
+<<<<<<< HEAD
     // 1. Tìm user theo email
     $stmtUser = $pdo->prepare("SELECT user_id, is_active FROM `USER` WHERE email = ?");
     $stmtUser->execute([$email]);
@@ -49,6 +50,17 @@ if ($email && $token) {
                 $message = "❌ The verification link is invalid.";
             }
         }
+=======
+    $stmt = $pdo->prepare("SELECT * FROM user WHERE email = ? AND token = ?");
+    $stmt->execute([$email, $token]);
+    $user = $stmt->fetch();
+
+    if ($user) {
+        $stmt = $pdo->prepare("UPDATE user SET is_active = 1, token = NULL WHERE email = ?");
+        $stmt->execute([$email]);
+        $message = "🎉 Your account has been successfully activated!";
+        $success = true;
+>>>>>>> 5a9701d (Reset OTP + link)
     } else {
         $message = "❌ User not found.";
     }
