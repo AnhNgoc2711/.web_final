@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $_SESSION['is_active'] = $user['is_active'];
 
 
-    echo "<script>alert('Login successful!'); window.location.href = 'home.php';</script>";
+    header("Location: home.php");
     exit;
 } else {
     header("Location: login.php");
