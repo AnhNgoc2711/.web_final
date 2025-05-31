@@ -3,9 +3,12 @@ document.getElementById('ForgetPassword').addEventListener('submit', function (e
     e.preventDefault();
     let form = this;
     let emailInput = form.querySelector('input[name="email"]');
-    let method = form.querySelector('input[name="method"]:checked').value;
+    let checkedRadio = form.querySelector('input[name="method"]:checked');
+    let method = checkedRadio ? checkedRadio.value : null;
     let errorDiv = form.querySelector('.errorMessageForgetPassword');
-    errorDiv.textContent = "";
+
+
+    errorDiv.textContent = " ";
     emailInput.classList.remove('input-error');
     let formData = new FormData(form);
 
@@ -24,10 +27,8 @@ document.getElementById('ForgetPassword').addEventListener('submit', function (e
                 errorDiv.textContent = "";
                 emailInput.classList.remove('input-error');
                 if (data.method === 'otp') {
-                    // CHỈ hiện form OTP, không hiện nhập mật khẩu
                     renderOtpOnlySection(form, data.message, emailInput.value);
                 } else if (data.method === 'link') {
-                    // Chỉ hiện thông báo check mail, không có input gì thêm
                     form.innerHTML = `
                   <div class="errorMessageForgetPassword" style="color:#fbbc04;text-align:center;">
                     ${data.message || ""}
@@ -41,7 +42,6 @@ document.getElementById('ForgetPassword').addEventListener('submit', function (e
         });
 });
 
-// HIỂN THỊ GIAO DIỆN OTP (6 ô nhỏ nằm ngang, chưa có nhập mật khẩu)
 function renderOtpOnlySection(form, message, email) {
     form.innerHTML = `
         <div class="errorMessageOTP" style="color:#fbbc04;text-align:center;margin-bottom:0.8em;">
@@ -65,12 +65,15 @@ function renderOtpOnlySection(form, message, email) {
     `;
     setupOtpAutoFocus();
 
-    // Đăng ký lại submit cho form này
     form.onsubmit = function (e) {
         e.preventDefault();
         let otp = getOtpValue();
-        let errorDiv = form.querySelector('.errorMessageOTP');
-        let email = form.querySelector('input[name="email"]').value;
+        let errorDivs = form.querySelectorAll('.errorMessageOTP');
+        let errorDiv = errorDivs[errorDivs.length - 1];
+        if (!errorDiv) {
+            alert("Error field not found in form! Check HTML structure.");
+            return;
+        }
         errorDiv.textContent = "";
 
         if (otp.length !== 6) {
@@ -89,13 +92,17 @@ function renderOtpOnlySection(form, message, email) {
             .then(res => res.json())
             .then(data => {
                 if (!data.success) {
-                    errorDiv.textContent = data.message;
+                    errorDiv.textContent = data.message || "OTP code is incorrect.";
+                    form.querySelectorAll('.otp-input-group input[type="text"]').forEach(input => input.value = '');
+                    form.querySelector('.otp-input-group input[type="text"]').focus();
                 } else {
-                    renderPasswordSection(form, email, otp);
+                    window.location.href = `reset_password.html?email=${encodeURIComponent(email)}&otp=${otp}`;
                 }
             });
     };
 }
+
+
 
 // SAU KHI ĐÚNG OTP, mới hiện nhập mật khẩu mới
 function renderPasswordSection(form, email, otp) {
@@ -153,7 +160,6 @@ function renderPasswordSection(form, email, otp) {
 }
 
 
-// Giữ nguyên các hàm dưới
 function setupOtpAutoFocus() {
     const otpInputs = document.querySelectorAll('.otp-input-group input[type="text"]');
     otpInputs.forEach((input, idx) => {
