@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'db.php';
+require 'config.php';
 require 'vendor/autoload.php'; 
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -17,7 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
     }
 
-    $stmt = $pdo->prepare("SELECT * FROM user WHERE email = ?");
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
     $stmt->execute([$email]);
     if ($stmt->fetch()) {
         echo "This email has already been registered.";
@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $token = bin2hex(random_bytes(16));
 
-    $stmt = $pdo->prepare("INSERT INTO user (email, name, password, is_active, token) VALUES (?, ?, ?, 0, ?)");
+    $stmt = $pdo->prepare("INSERT INTO users (email, fullname, password, is_active, token) VALUES (?, ?, ?, 0, ?)");
     $stmt->execute([$email, $fullname, $hashedPassword, $token]);
 
     $userId = $pdo->lastInsertId();
@@ -40,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $_SESSION['just_registered'] = true;
 
     header("Location: home.php");
-    
+
     $mail = new PHPMailer(true);
     try {
         if (empty($email)) {
