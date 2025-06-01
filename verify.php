@@ -7,7 +7,6 @@ $message = '';
 $success = false;
 
 if ($email && $token) {
-<<<<<<< HEAD
     // 1. Tìm user theo email
     $stmtUser = $pdo->prepare("SELECT user_id, is_active FROM `USER` WHERE email = ?");
     $stmtUser->execute([$email]);
@@ -41,6 +40,12 @@ if ($email && $token) {
                         $stmtUpdateToken->execute([$tokenRow['token_id']]);
 
                         $pdo->commit();
+                        // Nếu user đang login, cập nhật luôn session để tránh phải login lại
+                        session_start();
+                        if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $user['user_id']) {
+                            $_SESSION['is_active'] = 1;
+                        }
+
 
                         $message = "🎉 Your account has been successfully activated!";
                         $success = true;
@@ -50,17 +55,6 @@ if ($email && $token) {
                 $message = "❌ The verification link is invalid.";
             }
         }
-=======
-    $stmt = $pdo->prepare("SELECT * FROM user WHERE email = ? AND token = ?");
-    $stmt->execute([$email, $token]);
-    $user = $stmt->fetch();
-
-    if ($user) {
-        $stmt = $pdo->prepare("UPDATE user SET is_active = 1, token = NULL WHERE email = ?");
-        $stmt->execute([$email]);
-        $message = "🎉 Your account has been successfully activated!";
-        $success = true;
->>>>>>> 5a9701d (Reset OTP + link)
     } else {
         $message = "❌ User not found.";
     }
@@ -71,6 +65,7 @@ if ($email && $token) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <title>Account Verification | SkyNote</title>
@@ -86,44 +81,69 @@ if ($email && $token) {
             overflow: hidden;
             font-family: 'Segoe UI', sans-serif;
         }
+
         .cloud {
             background: #fff;
             border-radius: 50%;
             position: absolute;
             animation: float 30s linear infinite;
         }
+
         .cloud1 {
-            width: 200px; height: 60px; top: 80px; left: 10%;
+            width: 200px;
+            height: 60px;
+            top: 80px;
+            left: 10%;
         }
+
         .cloud2 {
-            width: 150px; height: 50px; top: 150px; left: 60%;
+            width: 150px;
+            height: 50px;
+            top: 150px;
+            left: 60%;
         }
+
         .cloud3 {
-            width: 180px; height: 55px; top: 250px; left: 30%;
+            width: 180px;
+            height: 55px;
+            top: 250px;
+            left: 30%;
         }
+
         @keyframes float {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(100vw); }
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(100vw);
+            }
         }
+
         .verify-box {
             background: rgba(255, 255, 255, 0.9);
             border-radius: 16px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
             padding: 40px;
             max-width: 420px;
             text-align: center;
             position: relative;
             z-index: 10;
         }
+
         .verify-box h2 {
             font-size: 28px;
             margin-bottom: 20px;
-            color: <?= $success ? '#28a745' : '#dc3545' ?>;
+            color:
+                <?= $success ? '#28a745' : '#dc3545' ?>
+            ;
         }
+
         .verify-box p {
             font-size: 17px;
             color: #333;
         }
+
         .verify-box a {
             display: inline-block;
             margin-top: 24px;
@@ -134,15 +154,18 @@ if ($email && $token) {
             border-radius: 8px;
             font-weight: bold;
         }
+
         .verify-box a:hover {
             background-color: #0056b3;
         }
+
         .icon {
             font-size: 48px;
             margin-bottom: 12px;
         }
     </style>
 </head>
+
 <body>
 
     <!-- Floating Clouds -->
@@ -157,10 +180,11 @@ if ($email && $token) {
         </div>
         <h2><?= $success ? '✅ Verification Successful' : '❌ Verification Failed' ?></h2>
         <p><?= htmlspecialchars($message) ?></p>
-        <a href="<?= $success ? 'home.php' : 'login.html' ?>">
+        <a href="<?= $success ? 'home.php' : 'login.php' ?>">
             <?= $success ? 'Go to SkyNote' : 'Back to Login' ?>
         </a>
     </div>
 
 </body>
+
 </html>

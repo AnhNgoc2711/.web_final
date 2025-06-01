@@ -45,7 +45,7 @@ if (resetForm) {
                 } else {
                     errorDiv.style.color = "#3ad900";
                     errorDiv.textContent = "Password reset successful! Please login.";
-                    setTimeout(() => window.location.href = 'login.html', 1500);
+                    setTimeout(() => window.location.href = 'login.php', 1500);
                 }
             });
     }

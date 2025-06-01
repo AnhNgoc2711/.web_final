@@ -12,7 +12,7 @@ if (isset($_SESSION['just_registered'])) {
 }
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.html");
+    header("Location: login.php");
     exit;
 }
 
@@ -116,11 +116,11 @@ $is_active = $_SESSION['is_active'] ?? 0;
         });
     </script>
 
-    <script>
+    <!-- <script>
         // Nếu người dùng mở tab mới hoặc reload -> sessionStorage không còn
         if (!sessionStorage.getItem('home_accessed')) {
             // Tab này chưa được cấp quyền truy cập → về login
-            window.location.href = 'login.html';
+            window.location.href = 'login.php';
         } else {
             // Tab đang hoạt động bình thường
             console.log('Tab hợp lệ. Tiếp tục truy cập...');
@@ -128,7 +128,7 @@ $is_active = $_SESSION['is_active'] ?? 0;
 
         // Đánh dấu tab đã truy cập lần đầu (sau khi đăng ký hoặc login)
         sessionStorage.setItem('home_accessed', 'true');
-    </script>
+    </script> -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

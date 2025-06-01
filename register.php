@@ -28,7 +28,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
     }
 
-<<<<<<< HEAD
     if ($password !== $confirmPassword) {
         $_SESSION['register_error'] = "Passwords do not match.";
         header("Location: login.php");
@@ -36,9 +35,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     $stmt = $pdo->prepare("SELECT * FROM USER WHERE email = ?");
-=======
-    $stmt = $pdo->prepare("SELECT * FROM user WHERE email = ?");
->>>>>>> 5a9701d (Reset OTP + link)
     $stmt->execute([$email]);
     if ($stmt->fetch()) {
         $_SESSION['register_error'] = "This email has already been registered.";
@@ -49,16 +45,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // Tạo user mới
     $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-<<<<<<< HEAD
     $stmt = $pdo->prepare("INSERT INTO USER (email, name, password, is_active) VALUES (?, ?, ?, 0)");
     $stmt->execute([$email, $name, $hashedPassword]);
-=======
-
-    $token = bin2hex(random_bytes(16));
-
-    $stmt = $pdo->prepare("INSERT INTO user (email, name, password, is_active, token) VALUES (?, ?, ?, 0, ?)");
-    $stmt->execute([$email, $fullname, $hashedPassword, $token]);
->>>>>>> 5a9701d (Reset OTP + link)
 
     $userId = $pdo->lastInsertId();
 

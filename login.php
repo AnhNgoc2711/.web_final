@@ -15,19 +15,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $email = $_POST['email'] ?? '';
   $password = $_POST['password'] ?? '';
 
-<<<<<<< HEAD
   if (empty($email) || empty($password)) {
     $errorMsg = 'Please enter both email and password.';
   } else {
     $stmt = $pdo->prepare("SELECT user_id, email, name, password, is_active FROM `USER` WHERE email = ?");
-=======
-    if (empty($email) || empty($password)) {
-        echo "<script>alert('Please enter both email and password.'); window.history.back();</script>";
-        exit;
-    }
-
-    $stmt = $pdo->prepare("SELECT * FROM user WHERE email = ?");
->>>>>>> 5a9701d (Reset OTP + link)
     $stmt->execute([$email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 

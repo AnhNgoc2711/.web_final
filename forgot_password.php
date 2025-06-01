@@ -149,7 +149,7 @@ if ($method === 'link') {
     $body = "<p>Dear user,</p>
         <p>You have requested to reset your password for your SkyNote account.</p>
         <p>To reset your password, please click the link below :</p>
-        <a href='{$resetLink}'>{$resetLink}</a></p>
+        <a href='{$resetLink}'>Click here to reset your password</a>
         <p>This link is valid for <b>30 minutes</b>. If you did not request a password reset, please ignore this email.</p>
         <br><p>Best regards,<br>SkyNote Team</p>";
     $send_result = send_mail($email, $subject, $body);
