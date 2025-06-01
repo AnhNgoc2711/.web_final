@@ -1,5 +1,5 @@
 <?php
-require 'db.php';
+require 'config.php';
 
 $email = $_GET['email'] ?? '';
 $token = $_GET['token'] ?? '';
@@ -7,12 +7,12 @@ $message = '';
 $success = false;
 
 if ($email && $token) {
-    $stmt = $pdo->prepare("SELECT * FROM user WHERE email = ? AND token = ?");
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ? AND token = ?");
     $stmt->execute([$email, $token]);
     $user = $stmt->fetch();
 
     if ($user) {
-        $stmt = $pdo->prepare("UPDATE user SET is_active = 1, token = NULL WHERE email = ?");
+        $stmt = $pdo->prepare("UPDATE users SET is_active = 1, token = NULL WHERE email = ?");
         $stmt->execute([$email]);
         $message = "🎉 Your account has been successfully activated!";
         $success = true;
