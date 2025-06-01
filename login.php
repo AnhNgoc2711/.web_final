@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'db.php';
+require 'config.php';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $email = $_POST['email'] ?? '';
@@ -11,7 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
     }
 
-    $stmt = $pdo->prepare("SELECT * FROM user WHERE email = ?");
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
     $stmt->execute([$email]);
     $user = $stmt->fetch();
 
