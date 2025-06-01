@@ -7,8 +7,10 @@ function send_mail($to, $subject, $body)
 {
     $mail = new PHPMailer(true);
 
-    $email = 'ngoccphamm2711@gmail.com';
-    $password = 'alhwfvzpmldomdtg';
+    // $email = 'ngoccphamm2711@gmail.com';
+    // $password = 'alhwfvzpmldomdtg';
+    $email = 'anhthunguyne@gmail.com';
+    $password = 'dbkliaovfbnjzuiu';
 
     try {
         $mail->isSMTP();
@@ -31,6 +33,22 @@ function send_mail($to, $subject, $body)
         return $mail->ErrorInfo;
     }
 }
+
+function send_activation_email($to, $name, $token)
+{
+    $verifyLink = "http://localhost/.web_final/verify.php?email=" . urlencode($to) . "&token=" . $token;
+    $subject = "SkyNote Registration Confirmation";
+    $body = "
+        Hello <strong>$name</strong>,<br><br>
+        We're excited to have you join SkyNote!<br><br>
+        Please click the link below to verify your account:<br>
+        <a href='$verifyLink'>Verify Your Account</a><br><br>
+        If you did not request this, please ignore this email.<br><br>
+        Best regards!
+    ";
+    return send_mail($to, $subject, $body);
+}
+
 
 function generateToken($length = 20)
 {

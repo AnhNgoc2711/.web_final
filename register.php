@@ -1,7 +1,8 @@
 <?php
 session_start();
 require 'db.php';
-require 'vendor/autoload.php'; 
+require 'mailer.php';
+require 'vendor/autoload.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -63,41 +64,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $_SESSION['is_active'] = 0;
     $_SESSION['just_registered'] = true;
 
-    // Gửi email xác minh
-    $mail = new PHPMailer(true);
-    try {
-        $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com';
-        $mail->SMTPAuth = true;
-        $mail->Username = 'anhthunguyne@gmail.com'; 
-        $mail->Password = 'dbkl iaov fbnj zuiu'; 
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 587;
-        $mail->CharSet = 'UTF-8'; 
 
-        $mail->setFrom('anhthunguyne@gmail.com', 'SkyNote');
-        $mail->addAddress($email, $name);
+    // Gửi mail xác minh qua hàm đã tối ưu hóa
+    $result = send_activation_email($email, $name, $token);
 
-        $verifyLink = "http://localhost/.web_final/verify.php?email=" . urlencode($email) . "&token=" . $token;
-        $mail->isHTML(true);
-        $mail->Subject = "SkyNote Registration Confirmation";
-        $mail->Body = "
-            Hello <strong>$name</strong>,<br><br>
-            We're excited to have you join SkyNote!<br><br>
-            Please click the link below to verify your account:<br>
-            <a href='$verifyLink'>Verify Your Account</a><br><br>
-            If you did not request this, please ignore this email.<br><br>
-            Best regards!
-        ";
-
-        $mail->send();
-
+    if ($result === true) {
         header("Location: home.php");
         exit;
-
-    } catch (Exception $e) {
-        echo "Unable to send verification email. Error: {$mail->ErrorInfo}";
+    } else {
+        echo "Unable to send verification email. Error: $result";
         exit;
     }
+
 }
 ?>
