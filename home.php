@@ -2,6 +2,15 @@
 session_set_cookie_params(0);
 session_start();
 
+if (isset($_SESSION['just_registered'])) {
+    echo '
+    <div class="alert alert-success alert-dismissible fade show" role="alert" style="position: fixed; top: 10px; right: 10px; z-index: 9999; min-width: 300px;">
+      <strong>🎉 Congratulations!</strong> You have successfully registered. Please check your email to verify your account.
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>';
+    unset($_SESSION['just_registered']);
+}
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.html");
     exit;
@@ -19,6 +28,7 @@ $is_active = $_SESSION['is_active'] ?? 0;
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
 </head>
 <body>
 
@@ -119,6 +129,7 @@ $is_active = $_SESSION['is_active'] ?? 0;
         // Đánh dấu tab đã truy cập lần đầu (sau khi đăng ký hoặc login)
         sessionStorage.setItem('home_accessed', 'true');
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

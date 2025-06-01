@@ -1,5 +1,5 @@
 <?php
-require 'config.php';
+require 'db.php';
 
 $email = $_GET['email'] ?? '';
 $token = $_GET['token'] ?? '';
@@ -7,17 +7,50 @@ $message = '';
 $success = false;
 
 if ($email && $token) {
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ? AND token = ?");
-    $stmt->execute([$email, $token]);
-    $user = $stmt->fetch();
+    // 1. Tìm user theo email
+    $stmtUser = $pdo->prepare("SELECT user_id, is_active FROM `USER` WHERE email = ?");
+    $stmtUser->execute([$email]);
+    $user = $stmtUser->fetch();
 
     if ($user) {
-        $stmt = $pdo->prepare("UPDATE users SET is_active = 1, token = NULL WHERE email = ?");
-        $stmt->execute([$email]);
-        $message = "🎉 Your account has been successfully activated!";
-        $success = true;
+        if ($user['is_active']) {
+            $message = "🎉 Your account is already activated!";
+            $success = true;
+        } else {
+            // 2. Kiểm tra token có hợp lệ trong bảng TOKEN
+            $stmtToken = $pdo->prepare("SELECT token_id, used, expires_at FROM TOKEN WHERE user_id = ? AND token = ? AND type = 'activation'");
+            $stmtToken->execute([$user['user_id'], $token]);
+            $tokenRow = $stmtToken->fetch();
+
+            if ($tokenRow) {
+                if ($tokenRow['used']) {
+                    $message = "❌ This activation link has already been used.";
+                } else {
+                    $now = date('Y-m-d H:i:s');
+                    if ($tokenRow['expires_at'] && $tokenRow['expires_at'] < $now) {
+                        $message = "❌ This activation link has expired.";
+                    } else {
+                        // 3. Cập nhật active user và đánh dấu token đã dùng
+                        $pdo->beginTransaction();
+
+                        $stmtUpdateUser = $pdo->prepare("UPDATE `USER` SET is_active = 1 WHERE user_id = ?");
+                        $stmtUpdateUser->execute([$user['user_id']]);
+
+                        $stmtUpdateToken = $pdo->prepare("UPDATE TOKEN SET used = 1 WHERE token_id = ?");
+                        $stmtUpdateToken->execute([$tokenRow['token_id']]);
+
+                        $pdo->commit();
+
+                        $message = "🎉 Your account has been successfully activated!";
+                        $success = true;
+                    }
+                }
+            } else {
+                $message = "❌ The verification link is invalid.";
+            }
+        }
     } else {
-        $message = "❌ The verification link is invalid or has expired.";
+        $message = "❌ User not found.";
     }
 } else {
     $message = "⚠️ Missing verification details.";
@@ -27,7 +60,7 @@ if ($email && $token) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Account Verification | SkyNote</title>
     <style>
         body {
@@ -41,14 +74,12 @@ if ($email && $token) {
             overflow: hidden;
             font-family: 'Segoe UI', sans-serif;
         }
-
         .cloud {
             background: #fff;
             border-radius: 50%;
             position: absolute;
             animation: float 30s linear infinite;
         }
-
         .cloud1 {
             width: 200px; height: 60px; top: 80px; left: 10%;
         }
@@ -58,12 +89,10 @@ if ($email && $token) {
         .cloud3 {
             width: 180px; height: 55px; top: 250px; left: 30%;
         }
-
         @keyframes float {
             0% { transform: translateX(0); }
             100% { transform: translateX(100vw); }
         }
-
         .verify-box {
             background: rgba(255, 255, 255, 0.9);
             border-radius: 16px;
@@ -74,18 +103,15 @@ if ($email && $token) {
             position: relative;
             z-index: 10;
         }
-
         .verify-box h2 {
             font-size: 28px;
             margin-bottom: 20px;
             color: <?= $success ? '#28a745' : '#dc3545' ?>;
         }
-
         .verify-box p {
             font-size: 17px;
             color: #333;
         }
-
         .verify-box a {
             display: inline-block;
             margin-top: 24px;
@@ -96,16 +122,13 @@ if ($email && $token) {
             border-radius: 8px;
             font-weight: bold;
         }
-
         .verify-box a:hover {
             background-color: #0056b3;
         }
-
         .icon {
             font-size: 48px;
             margin-bottom: 12px;
         }
-
     </style>
 </head>
 <body>
