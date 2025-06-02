@@ -59,9 +59,26 @@
           <div class="errorMessageForgetPassword"></div>
           <p>You need to enter email to retrieve password: </p>
           <input name="email" type="email" placeholder="Email" required />
+          <input name="otp" type="otp" placeholder="OTP" />
           <button type="submit" class="tab-btn ">Retrieve Password</button>
           <div class="create-account">
             <a onclick="showTab('loginForm', event)"> < Back to Login</a>
+          </div>
+        </form>
+        <form id="NewPassword" action="#" method="POST" novalidate>
+          <div class="errorMessageNewPassword"></div>
+          <p>You can now create a new password: </p>
+          <div class="password-container">
+            <input name="password" type="password" placeholder="Password" required />
+            <i class="bi bi-eye-slash toggle-password"></i>
+          </div>
+          <div class="password-container">
+            <input name="confirm" type="password" placeholder="Re-enter the password" required />
+            <i class="bi bi-eye-slash toggle-password"></i>
+          </div>
+          <button type="submit" class="tab-btn ">Create new password</button>
+          <div class="create-account">
+            <a onclick="showTab('loginForm', event)"> < Cancel and Back to Login</a>
           </div>
         </form>
       </div>

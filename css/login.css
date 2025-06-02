@@ -122,7 +122,8 @@ form.active {
 
 input[type="text"],
 input[type="email"],
-input[type="password"] {
+input[type="password"],
+input[type="otp"] {
     padding: 0.7rem 1rem;
     border: none;
     border-radius: 10px;
