@@ -257,6 +257,7 @@ input:focus {
     font-weight: 500;
 }
 
+
 input.input-error {
     border: 2px solid #ff4d4f;
     box-shadow: 0 0 5px #ffbaba;

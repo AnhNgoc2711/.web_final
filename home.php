@@ -27,274 +27,383 @@ $is_active = $_SESSION['is_active'] ?? 0;
 
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-</head>
-<body>
-
-<?php if ($is_active == 0): ?>
-<div style="background: #ffcccc; color: #900; padding: 10px; text-align: center; font-weight: bold; border-bottom: 2px solid red;">
-    Your account has not been activated yet. Please check your email to activate.
-</div>
-<?php endif; ?>
-
-<!DOCTYPE html>
-<html lang="vi">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>SkyNote Website</title>
-    <link rel="icon" href="image/icon.png" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" />
-    <link rel="stylesheet" href="css/home.css" />
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
 </head>
 
 <body>
 
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <i class="bi bi-x close-sidebar" title="Close" aria-label="Close sidebar" role="button"
-            tabindex="0"></i><br><br>
-        <ul>
-            <li><i class="bi bi-sticky"></i> Note</li>
-            <li><i class="bi bi-bell"></i> Reminder</li>
-            <li><i class="bi bi-archive"></i> Storage</li>
-            <li><i class="bi bi-trash"></i> Trash</li>
-        </ul>
-        <div class="labels">
-            <h4><i class="bi bi-tag"></i> Labels</h4>
+    <?php if ($is_active == 0): ?>
+        <div
+            style="background: #ffcccc; color: #900; padding: 10px; text-align: center; font-weight: bold; border-bottom: 2px solid red;">
+            Your account has not been activated yet. Please check your email to activate.
+        </div>
+    <?php endif; ?>
+
+    <!DOCTYPE html>
+    <html lang="vi">
+
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>SkyNote Website</title>
+        <link rel="icon" href="image/icon.png" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" />
+        <link rel="stylesheet" href="css/home.css" />
+
+    </head>
+
+    <body>
+
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <i class="bi bi-x close-sidebar" title="Close" aria-label="Close sidebar" role="button"
+                tabindex="0"></i><br><br>
             <ul>
-                <li><i class="bi bi-tag"></i> Study</li>
-                <li><i class="bi bi-tag"></i> Work</li>
-                <li><i class="bi bi-plus-circle"></i>Add Label</li>
+                <li><i class="bi bi-sticky"></i> Note</li>
+                <li><i class="bi bi-bell"></i> Reminder</li>
+                <li><i class="bi bi-archive"></i> Storage</li>
+                <li><i class="bi bi-trash"></i> Trash</li>
             </ul>
-        </div>
-    </div>
-
-    <!-- Main -->
-    <div class="main" style="margin-left: 0; transition: margin-left 0.3s ease;">
-        <div class="top-bar">
-            <i class="bi bi-list" id="menuToggle" aria-label="Toggle menu" role="button" tabindex="0"></i>
-            <h2><i class="bi bi-cloudy"></i> SkyNote</h2>
-            <input type="text" placeholder="Search..." aria-label="Search notes" />
-            <i class="bi bi-list" id="toggleViewBtn" title="List view"></i>
-            <i class="bi bi-person-circle" title="User account"></i>
+            <div class="labels">
+                <h4><i class="bi bi-tag"></i> Labels</h4>
+                <ul>
+                    <li><i class="bi bi-tag"></i> Study</li>
+                    <li><i class="bi bi-tag"></i> Work</li>
+                    <li><i class="bi bi-plus-circle"></i>Add Label</li>
+                </ul>
+            </div>
         </div>
 
-        <div class="add-note-btn" title="Add new note" role="button" tabindex="0">
-            <i class="bi bi-plus-circle"></i>
+        <!-- Main -->
+        <div class="main" style="margin-left: 0; transition: margin-left 0.3s ease;">
+            <div class="top-bar">
+                <i class="bi-list" id="menuToggle" aria-label="Toggle menu" role="button" tabindex="0"></i>
+                <h2><i class="bi bi-cloudy"></i> SkyNote</h2>
+                <input type="text" placeholder="Search..." aria-label="Search notes" />
+                <i class="bi bi-list-task" id="toggleViewBtn" title="List view"></i>
+                <i class="bi bi-person-circle" title="User account"></i>
+            </div>
+
+            <div class="add-note-bar">
+                <input type="text" class="add-note-input" placeholder="New note..." readonly
+                    onclick="expandAddNote()" />
+                <div class="add-note-icons">
+                    <i class="bi bi-image" title="Add picture"></i>
+                    <i class="bi bi-palette" title="Note color"></i>
+                </div>
+            </div>
+
+            <div class="add-note-expanded hidden">
+                <input type="text" class="note-title-input" placeholder="Title">
+                <textarea class="note-content-input" placeholder="Content..."></textarea>
+                <div class="expanded-note-icons">
+                    <i class="bi bi-type" title="Font size"></i>
+                    <i class="bi bi-image" title="Add picture"></i>
+                    <i class="bi bi-palette" title="Note color"></i>
+                    <i class="bi bi-pin-angle" title="Pin"></i>
+                    <i class="bi bi-share" title="Share"></i>
+                    <i class="bi bi-lock" title="Lock"></i>
+                    <i class="bi bi-tag" title="Label"></i>
+                    <button class="close-add-note" type="button" title="Close">Close</button>
+                </div>
+            </div>
+
+
+            <div class="notes" aria-live="polite">
+                <!-- Vị trí hiển thị danh sách note -->
+            </div>
         </div>
 
-        <div class="notes" aria-live="polite">
-            <div class="note" tabindex="0" aria-label="Title note">
-                <div class="icons">
+        <!-- Sidebar người dùng -->
+        <div class="user-dropdown-container">
+            <div class="user-dropdown" id="userDropdown">
+                <div class="user-header">
+                    <img src="image/background.jpg" alt="Avatar" class="user-avatar" />
+                    <div class="user-name">Username</div>
+                </div>
+
+                <ul class="user-menu">
+                    <li id="openPersonalInfo"><i class="bi bi-person-circle"></i> Personal Information
+                    </li>
+                    <li><i class="bi bi-gear"></i> Setting</li>
+                    <li></li>
+                    <li><i class="bi bi-box-arrow-right"></i> Logout</li>
+                </ul>
+            </div>
+
+            <!-- Tab chứa thông tin cá nhân (ẩn ban đầu) -->
+            <div class="personal-info-tab" id="personalInfoTab">
+                <div class="personal-info-content">
+                    <i class="bi bi-x close-personal-info" title="Close" role="button" tabindex="0"></i>
+
+                    <img src="image/icontitle.jpg" alt="Avatar" class="avatar-info" />
+                    <h3>Tên người dùng</h3>
+                    <p>Email: user@example.com</p>
+
+                    <div class="personal-info-buttons">
+                        <button>Reset Password</button>
+                        <button>Edit information</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Giao diện chỉnh sửa note -->
+        <div id="popup-modal" class="popup-modal hidden">
+            <div class="add-note-expanded popup-content">
+                <input type="text" id="modal-title" class="note-title-input" placeholder="Title">
+                <textarea id="modal-content" class="note-content-input" placeholder="Content..."></textarea>
+                <div class="expanded-note-icons">
+                    <i class="bi bi-type" title="Font size"></i>
+                    <i class="bi bi-image" title="Add picture"></i>
+                    <i class="bi bi-palette" title="Note color"></i>
                     <i class="bi bi-pin-angle" title="Pin"></i>
                     <i class="bi bi-share" title="Share"></i>
                     <i class="bi bi-lock" title="Lock"></i>
                     <i class="bi bi-tag" title="Label"></i>
                     <i class="bi bi-trash" title="Delete"></i>
-                </div><br>
-                <img src="image/anh1.png" alt="Illustration note" />
-                <div class="content">
-                    <p class="title"><strong>Title note</strong></p>
-                    <p class="body">Content...</p>
-                </div>
-            </div>
-
-            <div class="note" tabindex="0" aria-label="Title note">
-                <div class="icons">
-                    <i class="bi bi-pin-angle" title="Pin"></i>
-                    <i class="bi bi-share" title="Share"></i>
-                    <i class="bi bi-lock" title="Lock"></i>
-                    <i class="bi bi-tag" title="Label"></i>
-                    <i class="bi bi-trash" title="Delete"></i>
-                </div><br>
-                <img src="image/anh1.png" alt="Illustration note" />
-                <div class="content">
-                    <p class="title"><strong>Title note</strong></p>
-                    <p class="body">Content...</p>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- Sidebar người dùng -->
-    <div class="user-dropdown-container">
-        <div class="user-dropdown" id="userDropdown">
-            <div class="user-header">
-                <img src="image/background.jpg" alt="Avatar" class="user-avatar" />
-                <div class="user-name">Username</div>
-            </div>
-
-            <ul class="user-menu">
-                <li id="openPersonalInfo"><i class="bi bi-person-circle"></i> Personal Information
-                </li>
-                <li><i class="bi bi-gear"></i> Setting</li>
-                <li></li>
-                <li><i class="bi bi-box-arrow-right"></i> Logout</li>
-            </ul>
-        </div>
-
-        <!-- Tab chứa thông tin cá nhân (ẩn ban đầu) -->
-        <div class="personal-info-tab" id="personalInfoTab">
-            <div class="personal-info-content">
-                <i class="bi bi-x close-personal-info" title="Close" role="button" tabindex="0"></i>
-
-                <img src="image/icontitle.jpg" alt="Avatar" class="avatar-info" />
-                <h3>Tên người dùng</h3>
-                <p>Email: user@example.com</p>
-
-                <div class="personal-info-buttons">
-                    <button>Reset Password</button>
-                    <button>Edit information</button>
+                    <button class="close-add-note" id="popup-close">Close</button>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Label add note -->
-    <div class="add-note-form" id="addNoteForm" style="display: none;">
-        <h3>Create new note</h3>
-        <label for="noteTitle">Title:</label>
-        <input type="text" id="noteTitle" placeholder="Enter title note..." />
-
-        <label for="noteImage">Image/File: </label>
-        <input type="file" id="noteImage" />
-
-        <label for="noteContent">Content:</label>
-        <textarea id="noteContent" placeholder="Enter content..."></textarea>
-
-        <button id="saveNoteBtn">Save</button>
-        <button id="cancelNoteBtn">Cancel</button>
-    </div>
 
 
 
-    <script>
-        const sidebar = document.getElementById('sidebar');
-        const menuToggle = document.getElementById('menuToggle');
-        const mainContent = document.querySelector('.main');
-        const closeSidebar = document.querySelector('.close-sidebar');
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const sidebar = document.getElementById('sidebar');
+                const menuToggle = document.getElementById('menuToggle');
+                const mainContent = document.querySelector('.main');
+                const closeSidebar = document.querySelector('.close-sidebar');
 
-        // Sidebar chính
-        menuToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('active');
-        });
+                menuToggle.addEventListener('click', () => {
+                    sidebar.classList.toggle('active');
+                });
+                closeSidebar.addEventListener('click', () => {
+                    sidebar.classList.remove('active');
+                });
 
-        closeSidebar.addEventListener('click', () => {
-            sidebar.classList.remove('active');
-        });
+                // Sidebar người dùng 
+                const userIcon = document.querySelector(".bi-person-circle");
+                const userDropdown = document.getElementById("userDropdown");
+                const openPersonalInfoBtn = document.getElementById("openPersonalInfo");
+                const personalInfoTab = document.getElementById("personalInfoTab");
+                const closePersonalInfoBtn = document.querySelector(".close-personal-info");
 
-        // Sidebar người dùng
-        const userIcon = document.querySelector(".bi-person-circle");
-        const userDropdown = document.getElementById("userDropdown");
-        const openPersonalInfoBtn = document.getElementById("openPersonalInfo");
-        const personalInfoTab = document.getElementById("personalInfoTab");
-        const closePersonalInfoBtn = document.querySelector(".close-personal-info");
+                userIcon.addEventListener("click", () => {
+                    userDropdown.classList.toggle("active");
+                });
 
-        userIcon.addEventListener("click", () => {
-            userDropdown.classList.toggle("active");
-            document.querySelector(".add-note-btn").classList.toggle("hidden", userDropdown.classList.contains("active"));
-        });
+                openPersonalInfoBtn.addEventListener("click", () => {
+                    personalInfoTab.classList.add("show");
+                    userDropdown.classList.add("hide");
+                });
+                closePersonalInfoBtn.addEventListener("click", () => {
+                    personalInfoTab.classList.remove("show");
+                });
 
-        openPersonalInfoBtn.addEventListener("click", () => {
-            personalInfoTab.classList.add("show");
-            userDropdown.classList.add("hide");
-        });
-
-        closePersonalInfoBtn.addEventListener("click", () => {
-            personalInfoTab.classList.remove("show");
-        });
-
-
-        const toggleViewBtn = document.getElementById('toggleViewBtn');
-        const notesContainer = document.querySelector('.notes');
-
-        toggleViewBtn.addEventListener('click', () => {
-            if (notesContainer.classList.contains('grid-view')) {
-                // list view
-                notesContainer.classList.remove('grid-view');
-                notesContainer.classList.add('list-view');
-
-                toggleViewBtn.classList.replace('bi-list', 'bi-grid-3x3-gap');
-                toggleViewBtn.setAttribute('title', 'Chế độ xem danh sách');
-            } else {
-                // grid view
-                notesContainer.classList.remove('list-view');
-                notesContainer.classList.add('grid-view');
-
-                toggleViewBtn.classList.replace('bi-grid-3x3-gap', 'bi-list');
-                toggleViewBtn.setAttribute('title', 'Chế độ xem lưới');
-            }
-        });
-
-        // Add new note
-        const addNoteBtn = document.querySelector('.add-note-btn');
-        const addNoteForm = document.getElementById('addNoteForm');
-        const saveNoteBtn = document.getElementById('saveNoteBtn');
-        const cancelNoteBtn = document.getElementById('cancelNoteBtn');
-
-        addNoteBtn.addEventListener('click', () => {
-            addNoteForm.style.display = 'block';
-        });
-
-        cancelNoteBtn.addEventListener('click', () => {
-            addNoteForm.style.display = 'none';
-        });
-
-        saveNoteBtn.addEventListener('click', () => {
-            const title = document.getElementById('noteTitle').value;
-            const fileInput = document.getElementById('noteImage');
-            const content = document.getElementById('noteContent').value;
-
-            const note = document.createElement('div');
-            note.classList.add('note');
-            note.setAttribute('tabindex', '0');
-            note.setAttribute('aria-label', title);
-
-            const icons = document.createElement('div');
-            icons.classList.add('icons');
-            icons.innerHTML =
-                `<i class="bi bi-pin-angle" title="Pin"></i>
-            <i class="bi bi-share" title="Share"></i>
-            <i class="bi bi-lock" title="Lock"></i>
-            <i class="bi bi-tag" title="Label"></i>
-            <i class="bi bi-trash" title="Delete"></i>`;
-
-            let imgTag = '';
-            if (fileInput.files.length > 0) {
-                const file = fileInput.files[0];
-                const imgURL = URL.createObjectURL(file);
-                imgTag = `<img src="${imgURL}" alt="Note image" />`;
-            }
-
-            note.innerHTML =
-                `<div class="icons">${icons.innerHTML}</div><br>
-            ${imgTag}
-            <div class="content">
-                <p class="title"><strong>${title}</strong></p>
-                <p class="body">${content}</p>
-            </div>`;
-
-            notesContainer.appendChild(note);
-
-            // Reset form và ẩn đi
-            addNoteForm.style.display = 'none';
-            document.getElementById('noteTitle').value = '';
-            document.getElementById('noteImage').value = '';
-            document.getElementById('noteContent').value = '';
-        });
+                // Toggle grid/list view
+                const toggleViewBtn = document.getElementById('toggleViewBtn');
+                const notesContainer = document.querySelector('.notes');
+                if (toggleViewBtn && notesContainer) {
+                    toggleViewBtn.addEventListener('click', () => {
+                        notesContainer.classList.toggle('list-view');
+                        notesContainer.classList.toggle('grid-view');
+                        if (notesContainer.classList.contains('list-view')) {
+                            toggleViewBtn.classList.replace('bi-list-task', 'bi-grid-3x3-gap');
+                            toggleViewBtn.setAttribute('title', 'Grid view');
+                        } else {
+                            toggleViewBtn.classList.replace('bi-grid-3x3-gap', 'bi-list-task');
+                            toggleViewBtn.setAttribute('title', 'List view');
+                        }
+                    });
+                }
 
 
+                // Khai báo biến chung
+                const addNoteBar = document.querySelector('.add-note-bar');
+                const addNoteExpanded = document.querySelector('.add-note-expanded');
+                const addNoteInput = document.querySelector('.add-note-input');
+                const closeBtn = document.querySelector('.close-add-note');
+                const titleInput = document.querySelector('.note-title-input');
+                const contentInput = document.querySelector('.note-content-input');
+                let autosaveNoteId = null;
+                let autosaveTimeout = null;
+
+                // Hàm reset form note về trắng
+                function resetAddNoteForm() {
+                    titleInput.value = '';
+                    contentInput.value = '';
+                    autosaveNoteId = null;
+                }
+
+                // Mở form tạo note
+                window.expandAddNote = function () {
+                    addNoteBar.classList.add('hidden');
+                    addNoteExpanded.classList.remove('hidden');
+                    resetAddNoteForm();
+                    contentInput.focus();
+                };
+
+                // Đóng form khi click close
+                closeBtn.addEventListener('click', function (e) {
+                    resetAddNoteForm();
+                    addNoteExpanded.classList.add('hidden');
+                    addNoteBar.classList.remove('hidden');
+                    e.stopPropagation();
+                });
+
+                // Đóng form khi click ngoài vùng note
+                document.addEventListener('click', function (e) {
+                    if (
+                        !addNoteExpanded.classList.contains('hidden') &&
+                        !addNoteExpanded.contains(e.target) &&
+                        e.target !== addNoteInput
+                    ) {
+                        resetAddNoteForm();
+                        addNoteExpanded.classList.add('hidden');
+                        addNoteBar.classList.remove('hidden');
+                    }
+                });
+
+                // Autosave note khi nhập
+                function triggerAutosave() {
+                    clearTimeout(autosaveTimeout);
+                    autosaveTimeout = setTimeout(() => {
+                        const title = titleInput.value.trim();
+                        const content = contentInput.value.trim();
+                        if (!title && !content) return;
+                        const formData = new FormData();
+                        formData.append('title', title);
+                        formData.append('content', content);
+                        if (autosaveNoteId) formData.append('note_id', autosaveNoteId);
+
+                        fetch('note.php', {
+                            method: 'POST',
+                            body: formData
+                        })
+                            .then(r => r.json())
+                            .then(data => {
+                                if (data.note_id) autosaveNoteId = data.note_id;
+                                fetchNotes();
+                            });
+                    }, 400);
+                }
+                titleInput.addEventListener('input', triggerAutosave);
+                contentInput.addEventListener('input', triggerAutosave);
+
+                // Global biến tạm để giữ note đang mở popup
+                let openedNote = null;
+
+                // Hiển thị danh sách note
+                function renderNotes(notes) {
+                    const container = document.querySelector('.notes');
+                    if (!container) return;
+                    container.innerHTML = '';
+                    notes.forEach(note => {
+                        let noteHtml = `
+                            <div class="note" tabindex="0" aria-label="${note.title || note.content || 'note'}" data-note-id="${note.note_id}">
+                                <div class="icons">
+                                    <i class="bi bi-pin-angle" title="Pin"></i>
+                                    <i class="bi bi-share" title="Share"></i>
+                                    <i class="bi bi-lock" title="Lock"></i>
+                                    <i class="bi bi-tag" title="Label"></i>
+                                    <i class="bi bi-trash" title="Delete"></i>
+                                </div>
+                                <div class="content">
+                        `;
+                        if (note.title && note.title.trim() !== "") {
+                            noteHtml += `<p class="title">${note.title}</p>`;
+                            noteHtml += `<p class="body">${note.content || ''}</p>`;
+                        } else {
+                            // Nếu không có title: content sẽ nằm ở vị trí title, body rỗng để giữ chiều cao
+                            noteHtml += `<p class="title">${note.content || ''}</p>`;
+                            noteHtml += `<p class="body"></p>`;
+                        }
+                        noteHtml += `
+                                </div>
+                            </div>
+                        `;
+                        container.innerHTML += noteHtml;
+                    });
 
 
-    </script>
+                    // Gắn event cho tất cả note
+                    document.querySelectorAll('.note').forEach(el => {
+                        el.addEventListener('click', function () {
+                            const noteId = el.getAttribute('data-note-id');
+                            const note = notes.find(n => n.note_id == noteId);
+                            if (!note) return;
+                            openedNote = note;
+                            showNoteModal(note);
+                        });
+                    });
+                }
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                function showNoteModal(note) {
+                    const popup = document.getElementById('popup-modal');
+                    const titleInput = document.getElementById('modal-title');
+                    const contentInput = document.getElementById('modal-content');
+                    if (!popup || !titleInput || !contentInput) {
+                        alert('Modal popup missing input or textarea with correct id!');
+                        return;
+                    }
+                    popup.classList.remove('hidden');
+                    titleInput.value = note.title || '';
+                    contentInput.value = note.content || '';
+                    titleInput.focus();
 
-</body>
+                    let saveTimer = null;
+                    function autosaveModal() {
+                        clearTimeout(saveTimer);
+                        saveTimer = setTimeout(() => {
+                            fetch('note.php', {
+                                method: 'POST',
+                                body: new URLSearchParams({
+                                    note_id: note.note_id,
+                                    title: titleInput.value,
+                                    content: contentInput.value
+                                })
+                            }).then(r => r.json())
+                                .then(data => fetchNotes());
+                        }, 400);
+                    }
+                    titleInput.oninput = autosaveModal;
+                    contentInput.oninput = autosaveModal;
 
-</html>
+                    // Đóng popup khi bấm nút close
+                    document.getElementById('popup-close').onclick = hideModal;
+                    // Đóng popup khi click ra ngoài vùng trắng
+                    popup.onclick = function (e) {
+                        if (e.target === popup) {
+                            hideModal();
+                        }
+                    };
+                    function hideModal() {
+                        popup.classList.add('hidden');
+                        fetchNotes();
+                    }
+                }
+
+                // Lấy danh sách note từ API
+                function fetchNotes() {
+                    fetch('note.php')
+                        .then(r => r.json())
+                        .then(renderNotes);
+                }
+
+                // Gọi khi load trang
+                fetchNotes();
+            });
+
+
+
+        </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    </body>
+
+    </html>
