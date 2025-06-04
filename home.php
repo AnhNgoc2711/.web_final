@@ -120,9 +120,10 @@ $is_active = $_SESSION['is_active'] ?? 0;
             </div>
 
 
-            <div class="notes" aria-live="polite">
-                <!-- Vị trí hiển thị danh sách note -->
-            </div>
+            <!-- Vị trí hiển thị danh sách note -->
+            <div class="notes"></div>
+
+
         </div>
 
         <!-- Sidebar người dùng -->
@@ -158,35 +159,17 @@ $is_active = $_SESSION['is_active'] ?? 0;
             </div>
         </div>
 
-        <!-- Giao diện chỉnh sửa note -->
-        <!-- <div id="popup-modal" class="popup-modal hidden">
-            <div class="add-note-expanded popup-content">
-                <input type="text" id="modal-title" class="note-title-input" placeholder="Title">
-                <textarea id="modal-content" class="note-content-input" placeholder="Content..."></textarea>
-                <div class="expanded-note-icons">
-                    <i class="bi bi-type" title="Font size"></i>
-                    <i class="bi bi-image" title="Add picture"></i>
-                    <i class="bi bi-palette" title="Note color"></i>
-                    <i class="bi bi-pin-angle" title="Pin"></i>
-                    <i class="bi bi-share" title="Share"></i>
-                    <i class="bi bi-lock" title="Lock"></i>
-                    <i class="bi bi-tag" title="Label"></i>
-                    <i class="bi bi-trash" title="Delete"></i>
-                    <button class="close-add-note" id="popup-close">Close</button>
-                </div>
-            </div>
-        </div> -->
+
         <!-- Giao diện chỉnh sửa note -->
         <div id="popup-modal" class="popup-modal hidden">
             <div class="add-note-expanded popup-content">
                 <input type="text" id="modal-title" class="note-title-input" placeholder="Title">
                 <textarea id="modal-content" class="note-content-input" placeholder="Content..."></textarea>
-                <div class="icons"> 
+                <div class="icons">
                 </div>
                 <button class="close-add-note" id="popup-close">Close</button>
             </div>
         </div>
-
 
 
         <script src="js/home.js"></script>
