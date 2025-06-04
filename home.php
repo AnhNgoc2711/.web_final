@@ -159,7 +159,7 @@ $is_active = $_SESSION['is_active'] ?? 0;
         </div>
 
         <!-- Giao diện chỉnh sửa note -->
-        <div id="popup-modal" class="popup-modal hidden">
+        <!-- <div id="popup-modal" class="popup-modal hidden">
             <div class="add-note-expanded popup-content">
                 <input type="text" id="modal-title" class="note-title-input" placeholder="Title">
                 <textarea id="modal-content" class="note-content-input" placeholder="Content..."></textarea>
@@ -174,6 +174,16 @@ $is_active = $_SESSION['is_active'] ?? 0;
                     <i class="bi bi-trash" title="Delete"></i>
                     <button class="close-add-note" id="popup-close">Close</button>
                 </div>
+            </div>
+        </div> -->
+        <!-- Giao diện chỉnh sửa note -->
+        <div id="popup-modal" class="popup-modal hidden">
+            <div class="add-note-expanded popup-content">
+                <input type="text" id="modal-title" class="note-title-input" placeholder="Title">
+                <textarea id="modal-content" class="note-content-input" placeholder="Content..."></textarea>
+                <div class="icons"> 
+                </div>
+                <button class="close-add-note" id="popup-close">Close</button>
             </div>
         </div>
 

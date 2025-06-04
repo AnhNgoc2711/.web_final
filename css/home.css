@@ -659,22 +659,9 @@ body {
     position: relative;
 }
 
-.add-note-icons i,
-.expanded-note-icons i {
-    font-size: 1.4rem;
-    color: #5280ff;
-    border-radius: 50%;
-    padding: 7px;
-    margin: 0;
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s;
-}
 
-.add-note-icons i:hover,
-.expanded-note-icons i:hover,
-.close-add-note:hover {
-    background: #d8d7d73c;
-}
+
+
 
 .hidden {
     display: none !important;
@@ -695,7 +682,7 @@ body {
     transition: opacity 0.2s, color 0.2s, background 0.15s;
 }
 
-/* Hover icon */
+/* Hover icon note*/
 .note .icons i,
 .note .icons button {
     opacity: 0;
@@ -714,6 +701,47 @@ body {
     opacity: 1 !important;
     pointer-events: auto !important;
     color: #fa5cbb;
+}
+
+
+/* Hover icon create note*/
+#popup-modal .icons,
+#popup-modal .icons button.active {
+    color: #fa5cbb;
+    opacity: 1 !important;
+}
+
+#popup-modal .icons i,
+#popup-modal .icons button {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+
+/* Icon trong popup */
+.popup-modal .icons i,
+.add-note-expanded .expanded-note-icons i {
+    font-size: 1.4rem;
+    color: #5280ff;
+    border-radius: 50%;
+    padding: 7px;
+    margin-right: 10px;
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s;
+}
+
+/* Hover xanh */
+.popup-modal .icons i:hover,
+.add-note-expanded .expanded-note-icons i:hover {
+    background: #d8d7d73c;
+}
+
+/* Đang active */
+.popup-modal .icons i.active,
+.add-note-expanded .expanded-note-icons i.active {
+    color: #5280ff;
+    background: #d8d7d79c;
+    border-radius: 50%;
 }
 
 
@@ -754,6 +782,9 @@ body {
     font-size: 1.12rem;
 }
 
+
+
+
 @keyframes popup-fadein {
     from {
         opacity: 0;
@@ -766,263 +797,283 @@ body {
     }
 }
 
+
+
 .modal {
-  display: none;
-  position: fixed;
-  z-index: 999;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.3); /* nền tối mờ */
-  justify-content: center;
-  align-items: center;
-  font-family: Arial, sans-serif;
-  backdrop-filter: blur(3px); /* làm mờ nền sau modal */
+    display: none;
+    position: fixed;
+    z-index: 999;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    /* nền tối mờ */
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    backdrop-filter: blur(3px);
+    /* làm mờ nền sau modal */
 }
 
 .modal-content {
-  background: rgba(255, 255, 255, 0.2); /* trong suốt */
-  border-radius: 16px;
-  padding: 20px;
-  width: 360px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(20px); /* mờ nội dung trong modal */
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #fff;
-  transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.2);
+    /* trong suốt */
+    border-radius: 16px;
+    padding: 20px;
+    width: 360px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(20px);
+    /* mờ nội dung trong modal */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    transition: all 0.3s ease;
 }
 
 .modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 18px;
-  font-weight: 600;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 18px;
+    font-weight: 600;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .close-modal {
-  cursor: pointer;
-  font-size: 20px;
-  color: #fff;
+    cursor: pointer;
+    font-size: 20px;
+    color: #fff;
 }
 
 .label-list {
-  list-style: none;
-  padding: 0;
-  margin: 15px 0;
-  max-height: 200px;
-  overflow-y: auto;
+    list-style: none;
+    padding: 0;
+    margin: 15px 0;
+    max-height: 200px;
+    overflow-y: auto;
 }
 
 .label-list li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .label-name {
-  flex: 1;
-  padding-right: 10px;
-  color: #fff;
+    flex: 1;
+    padding-right: 10px;
+    color: #fff;
 }
 
 .label-icons i {
-  margin-left: 10px;
-  cursor: pointer;
-  color: #fff;
+    margin-left: 10px;
+    cursor: pointer;
+    color: #fff;
 }
 
 .label-input {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  padding-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding-top: 10px;
 }
 
 .label-input input {
-  flex: 1;
-  padding: 6px 8px;
-  border: none;
-  border-radius: 6px;
-  outline: none;
-  background: rgba(255, 255, 255, 0.3);
-  color: #fff;
+    flex: 1;
+    padding: 6px 8px;
+    border: none;
+    border-radius: 6px;
+    outline: none;
+    background: rgba(255, 255, 255, 0.3);
+    color: #fff;
 }
 
 .label-input input::placeholder {
-  color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.7);
 }
 
 #labelList .label-name {
-  color: rgb(107, 105, 105);
+    color: rgb(107, 105, 105);
 }
 
 
 .labelModal {
-  display: none;
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background-color: rgba(0,0,0,0.5);
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
 }
 
 #labelModal.show {
-  display: flex;
+    display: flex;
 }
 
 /* Danh sách nhãn */
 #labelModal ul#labellist {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  max-height: 280px;
-  overflow-y: auto;
-  border-top: 1px solid rgba(255,255,255,0.1);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 280px;
+    overflow-y: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Item nhãn */
 #labelModal ul#labellist li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  cursor: default;
-  transition: background-color 0.15s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: default;
+    transition: background-color 0.15s ease;
 }
+
 #labelModal ul#labellist li:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Tên nhãn */
 #labelModal .label-name {
-  flex: 1;
-  font-size: 15px;
-  color: #eee;
-  user-select: none;
-  padding-right: 10px;
+    flex: 1;
+    font-size: 15px;
+    color: #eee;
+    user-select: none;
+    padding-right: 10px;
 }
 
 /* Icon hành động */
 #labelModal .label-icons i {
-  font-size: 18px;
-  margin-left: 12px;
-  color: #bbb;
-  cursor: pointer;
-  transition: color 0.25s ease;
+    font-size: 18px;
+    margin-left: 12px;
+    color: #bbb;
+    cursor: pointer;
+    transition: color 0.25s ease;
 }
+
 #labelModal .label-icons i:hover.edit-label {
-  color: #4caf50; /* xanh lá */
+    color: #4caf50;
+    /* xanh lá */
 }
+
 #labelModal .label-icons i:hover.delete-label {
-  color: #f44336; /* đỏ */
+    color: #f44336;
+    /* đỏ */
 }
 
 
 #label-popup {
-  display: none;
-  position: absolute;
-  top: 80%; /* vẫn giữ vị trí theo yêu cầu */
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(245, 244, 243, 0.9); /* nền sáng hơi trong suốt */
-  border: 1px solid rgba(204, 204, 204, 0.8);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  padding: 16px 24px; /* rộng hơn */
-  border-radius: 10px;
-  width: 320px; /* rộng hơn */
-  z-index: 100;
-  backdrop-filter: blur(8px); /* hiệu ứng mờ nền phía sau */
+    display: none;
+    position: absolute;
+    top: 80%;
+    /* vẫn giữ vị trí theo yêu cầu */
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(245, 244, 243, 0.9);
+    /* nền sáng hơi trong suốt */
+    border: 1px solid rgba(204, 204, 204, 0.8);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    padding: 16px 24px;
+    /* rộng hơn */
+    border-radius: 10px;
+    width: 320px;
+    /* rộng hơn */
+    z-index: 100;
+    backdrop-filter: blur(8px);
+    /* hiệu ứng mờ nền phía sau */
 }
+
 #label-popup strong {
-  display: block;
-  font-size: 1.2em;
-  margin-bottom: 12px;
-  color: #333;
-  font-weight: 600;
-  text-align: center;
+    display: block;
+    font-size: 1.2em;
+    margin-bottom: 12px;
+    color: #333;
+    font-weight: 600;
+    text-align: center;
 }
 
 #label-list {
-  max-height: 180px;
-  overflow-y: auto;
-  padding-left: 0;
-  margin-bottom: 16px;
-  border-top: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
+    max-height: 180px;
+    overflow-y: auto;
+    padding-left: 0;
+    margin-bottom: 16px;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
 }
 
 #label-list li {
-  display: flex;
-  align-items: center;
-  padding: 8px 10px;
-  border-radius: 8px;
-  margin-bottom: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
 }
 
 #label-list li:hover {
-  background-color: #e4e9f2;
+    background-color: #e4e9f2;
 }
 
 #label-list li input[type="checkbox"] {
-  margin-right: 12px;
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-  accent-color: #3f51b5; /* màu xanh nhẹ cho checkbox */
+    margin-right: 12px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #3f51b5;
+    /* màu xanh nhẹ cho checkbox */
 }
 
 #label-list li span {
-  flex-grow: 1;
-  font-size: 1em;
-  color: #222;
-  line-height: 1.3;
+    flex-grow: 1;
+    font-size: 1em;
+    color: #222;
+    line-height: 1.3;
 }
 
 /* Style phần tạo label */
 #label-popup div[style*="display:flex"] {
-  margin-top: 0;
+    margin-top: 0;
 }
 
 #new-label-input {
-  flex-grow: 1;
-  padding: 8px 12px;
-  font-size: 1em;
-  border: 1.5px solid #ccc;
-  border-radius: 8px;
-  outline-offset: 2px;
-  transition: border-color 0.3s ease;
+    flex-grow: 1;
+    padding: 8px 12px;
+    font-size: 1em;
+    border: 1.5px solid #ccc;
+    border-radius: 8px;
+    outline-offset: 2px;
+    transition: border-color 0.3s ease;
 }
 
 #new-label-input:focus {
-  border-color: #3f51b5;
-  box-shadow: 0 0 5px rgba(63, 81, 181, 0.5);
+    border-color: #3f51b5;
+    box-shadow: 0 0 5px rgba(63, 81, 181, 0.5);
 }
 
 #add-label-btn {
-  padding: 8px 16px;
-  background-color: #3f51b5;
-  border: none;
-  border-radius: 8px;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+    padding: 8px 16px;
+    background-color: #3f51b5;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 #add-label-btn:disabled {
-  background-color: #999;
-  cursor: not-allowed;
+    background-color: #999;
+    cursor: not-allowed;
 }
 
 #add-label-btn:not(:disabled):hover {
-  background-color: #303f9f;
+    background-color: #303f9f;
 }
-
