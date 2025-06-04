@@ -245,6 +245,7 @@ body {
     right: 8px;
     display: flex;
     gap: 0.5rem;
+    pointer-events: none;
 }
 
 .note .icons i {
@@ -708,12 +709,13 @@ body {
     pointer-events: auto;
 }
 
-.note .icons .icon-active {
+.note .icons i.active,
+.note .icons button.active {
     opacity: 1 !important;
     pointer-events: auto !important;
     color: #fa5cbb;
-
 }
+
 
 
 /* Popup chỉnh sửa note */
@@ -920,8 +922,6 @@ body {
 #labelModal .label-icons i:hover.delete-label {
   color: #f44336; /* đỏ */
 }
-
-
 
 
 #label-popup {

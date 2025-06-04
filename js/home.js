@@ -120,89 +120,91 @@ document.addEventListener('DOMContentLoaded', function () {
     titleInput.addEventListener('input', triggerAutosave);
     contentInput.addEventListener('input', triggerAutosave);
 
-    // Global biến tạm để giữ note đang mở popup
-    let openedNote = null;
 
-    // Hiển thị danh sách note
     function renderNotes(notes) {
         const container = document.querySelector('.notes');
-        if (!container) return;
         container.innerHTML = '';
         notes.forEach(note => {
+            // Xác định class fill/active đúng cho từng icon
+            let pinClass = note.pinned == 1 ? "bi-pin-angle-fill active" : "bi-pin-angle";
+            let lockClass = note.locked == 1 ? "bi-lock-fill active" : "bi-lock";
+            let shareClass = note.is_shared == 1 ? "bi-share-fill active" : "bi-share";
+            let tagClass = note.has_label == 1 ? "bi-tag-fill active" : "bi-tag";
+            // Nếu có icon nào active thì gắn show-icons
+            let showIcons = (note.pinned == 1 || note.locked == 1 || note.is_shared == 1 || note.has_label == 1);
+            let showIconsClass = showIcons ? " show-icons" : "";
+
             let noteHtml = `
-                            <div class="note" tabindex="0" aria-label="${note.title || note.content || 'note'}" data-note-id="${note.note_id}">
-                                <div class="icons">
-                                    <i class="bi bi-trash-fill" title="Delete"></i>
-                                    <i class="bi bi-tag-fill" title="Label"></i>
-                                    <i class="bi bi-share-fill" title="Share"></i>
-                                    <i class="bi bi-lock-fill" title="Lock"></i>
-                                    <i class="bi bi-pin-angle-fill" title="Pin"></i>
-                                </div>
-                                <div class="content">
-                        `;
-            if (note.title && note.title.trim() !== "") {
-                noteHtml += `<p class="title">${note.title}</p>`;
-                noteHtml += `<p class="body">${note.content || ''}</p>`;
-            } else {
-                noteHtml += `<p class="title">${note.content || ''}</p>`;
-                noteHtml += `<p class="body"></p>`;
-            }
-            noteHtml += `
-                                </div>
-                            </div>
-                        `;
+            <div class="note${showIconsClass}" data-note-id="${note.note_id}">
+                <div class="icons">  
+                    <i class="bi bi-trash" data-action="delete"></i>
+                    <i class="bi ${tagClass}" data-action="tag"></i>
+                    <i class="bi ${lockClass}" data-action="lock"></i>
+                    <i class="bi ${shareClass}" data-action="share"></i>
+                    <i class="bi ${pinClass}" data-action="pin"></i>
+                </div>
+                <div class="content">
+                ${
+                    note.title && note.title.trim() !== ""
+                    ? `<div class="title">${note.title}</div>
+                   <div class="body">${note.content || ''}</div>`
+                    : `<div class="title">${note.content || ''}</div>
+                   <div class="body"></div>`
+                }
+        </div>
+            </div>
+        `;
             container.innerHTML += noteHtml;
         });
 
-        // ====== BỔ SUNG ĐOẠN NÀY Ở ĐÂY ======
+        attachIconEvents(); // gắn lại event cho icon
+        attachNoteClickEvents(); // gắn lại event cho note để mở popup (nếu cần)
+    }
+
+    function attachIconEvents() {
         document.querySelectorAll('.icons i').forEach(icon => {
-            icon.addEventListener('click', function (e) {
+            icon.onclick = function (e) {
                 e.stopPropagation();
-                // Toggle trạng thái "active" cho icon vừa bấm
-                this.classList.toggle('active');
-                // Lấy thẻ note bao quanh icon
                 const noteDiv = this.closest('.note');
-                // Nếu có bất kỳ icon nào đang active thì show-icons, ngược lại thì remove
-                if (noteDiv.querySelector('i.active')) {
-                    noteDiv.classList.add('show-icons');
-                } else {
-                    noteDiv.classList.remove('show-icons');
+                const noteId = noteDiv.getAttribute('data-note-id');
+                const action = this.dataset.action;
+                if (action === 'delete') {
+                    if (confirm("Xóa note này?")) {
+                        // TODO: Thêm API xóa nếu cần
+                    }
+                    return;
                 }
-            });
-        });
-
-        // Gắn event cho icon
-        document.querySelectorAll('.icons i').forEach(icon => {
-            icon.addEventListener('click', function (e) {
-                e.stopPropagation();
-                const noteId = this.dataset.noteId;
-                if (this.classList.contains('pin-icon')) {
-                    // AJAX pin/unpin
-                    fetch('note.php', {
-                        method: 'POST',
-                        body: new URLSearchParams({ action: 'toggle_pin', note_id: noteId })
+                fetch('note.php', {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        action: 'toggle_icon',
+                        note_id: noteId,
+                        icon: action
                     })
-                        .then(r => r.json())
-                        .then(() => fetchNotes());
-                } else {
-                    this.classList.toggle('icon-active');
-                    // Xử lý các chức năng khác tương tự...
-                }
-            });
+                })
+                    .then(r => r.json())
+                    .then(() => fetchNotes()); // fetch lại để render đúng trạng thái, class
+            }
         });
+    }
 
-
-        // Gắn event cho tất cả note
+    function attachNoteClickEvents() {
         document.querySelectorAll('.note').forEach(el => {
-            el.addEventListener('click', function () {
+            el.addEventListener('click', function (e) {
+                if (e.target.closest('.icons')) return;
                 const noteId = el.getAttribute('data-note-id');
-                const note = notes.find(n => n.note_id == noteId);
-                if (!note) return;
-                openedNote = note;
-                showNoteModal(note);
+                fetch('note.php')
+                    .then(r => r.json())
+                    .then(notes => {
+                        const note = notes.find(n => n.note_id == noteId);
+                        if (note) showNoteModal(note);
+                    });
             });
         });
     }
+
+
+
 
     function showNoteModal(note) {
         const popup = document.getElementById('popup-modal');
