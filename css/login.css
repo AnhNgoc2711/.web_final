@@ -58,7 +58,7 @@ body {
     padding: 2rem 1rem;
     display: flex;
     flex-direction: column;
-    justify-content: center; 
+    justify-content: center;
     border-top-right-radius: 20px;
     border-bottom-right-radius: 20px;
 }
@@ -80,6 +80,7 @@ body {
     margin-bottom: 1px;
     color: #ddd;
 }
+
 .home-right-center {
     position: absolute;
     top: 50%;
@@ -92,8 +93,8 @@ body {
 }
 
 .tab-btn {
-    background: #eac54d;           
-    border: 2px ;
+    background: #eac54d;
+    border: 2px;
     border-radius: 30px;
     padding: 0.5rem 1.2rem;
     cursor: pointer;
@@ -164,7 +165,7 @@ input:focus {
     min-height: 1em;
 }
 
-.forgot-password{
+.forgot-password {
     text-align: left;
     /* margin-top: -0.5rem; */
     margin-bottom: 0.8rem;
@@ -187,11 +188,13 @@ input:focus {
     margin: 0.2rem 0;
     font-size: 0.9rem;
 }
+
 .create-account a {
     color: #fbbc04;
     text-decoration: none;
     transition: color 0.3s;
 }
+
 .create-account a:hover {
     color: #e6f112;
     text-decoration: underline;
@@ -216,6 +219,7 @@ input:focus {
     font-size: 1.1rem;
     opacity: 0.7;
 }
+
 #registerForm .tab-btn {
     margin-top: 0.7rem;
 }
@@ -226,7 +230,7 @@ input:focus {
 
 .method-group label {
     display: flex;
-    align-items: center;    
+    align-items: center;
     gap: 8px;
     font-size: 1.04rem;
     line-height: 1.5;
@@ -236,21 +240,24 @@ input:focus {
 }
 
 .method-group input[type="radio"] {
-    accent-color: #fbbc04;       
+    accent-color: #fbbc04;
     width: 20px;
     height: 18px;
     margin: 0;
-    vertical-align: middle;             
-    box-shadow: none;               
+    vertical-align: middle;
+    box-shadow: none;
 }
+
 .errorMessageForgetPassword {
-    color: #ff4d4f; 
+    color: #ff4d4f;
     font-size: 1rem;
     margin-top: 1rem;
     text-align: left;
     min-height: 1em;
     font-weight: 500;
 }
+
+
 input.input-error {
     border: 2px solid #ff4d4f;
     box-shadow: 0 0 5px #ffbaba;
@@ -260,27 +267,69 @@ input.input-error {
 
 .otp-input-group {
     display: flex;
-    gap: 14px;
+    gap: 16px;
     justify-content: center;
     margin-bottom: 1.4em;
+    padding: 0 1vw;
+    width: 100%;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 14px;
+    box-sizing: border-box;
 }
+
 .otp-input-group input[type="text"] {
-    width: 2.6em;
-    height: 2.6em;
-    font-size: 1.6em;
+    width: 48px;
+    height: 48px;
+    font-size: 2.2rem;
     text-align: center;
     border: 2px solid #ccc;
     border-radius: 12px;
     background: #fff;
     color: #222;
-    transition: border 0.2s;
+    transition: border 0.2s, box-shadow 0.2s;
     margin: 0;
     outline: none;
-}
-.otp-input-group input[type="text"]:focus {
-    border: 2px solid #fbbc04;
+    box-shadow: 0 2px 10px #0001;
+    font-weight: bold;
+    letter-spacing: 0;
+    padding: 0;
+    display: inline-block;
 }
 
+.otp-input-group input[type="text"]:focus {
+    border: 2px solid #fbbc04;
+    box-shadow: 0 0 0 3px #fbbc0422;
+}
+
+@media (max-width: 900px) {
+    .otp-input-group {
+        max-width: 400px;
+        gap: 10px;
+    }
+
+    .otp-input-group input[type="text"] {
+        width: 40px;
+        height: 40px;
+        font-size: 1.3rem;
+        border-radius: 9px;
+    }
+}
+
+@media (max-width: 500px) {
+    .otp-input-group {
+        max-width: 95vw;
+        gap: 7px;
+    }
+
+    .otp-input-group input[type="text"] {
+        width: 40px;
+        height: 40px;
+        font-size: 1.3rem;
+        border-radius: 9px;
+    }
+}
 
 
 
