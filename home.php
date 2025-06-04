@@ -2,6 +2,14 @@
 session_set_cookie_params(0);
 session_start();
 
+if (isset($_GET['logout'])) {
+    session_unset();
+    session_destroy();
+    header("Location: login.php");
+    exit;
+}
+
+
 if (isset($_SESSION['just_registered'])) {
     echo '
     <div class="alert alert-success alert-dismissible fade show" role="alert" style="position: fixed; top: 10px; right: 10px; z-index: 9999; min-width: 300px;">
@@ -30,6 +38,7 @@ $is_active = $_SESSION['is_active'] ?? 0;
 
 <head>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 
 <body>
@@ -126,10 +135,9 @@ $is_active = $_SESSION['is_active'] ?? 0;
 
                 <ul class="user-menu">
                     <li id="openPersonalInfo"><i class="bi bi-person-circle"></i> Personal Information
-                    </li>
                     <li><i class="bi bi-gear"></i> Setting</li>
-                    <li></li>
-                    <li><i class="bi bi-box-arrow-right"></i> Logout</li>
+
+                    <li id="logoutBtn"><i class="bi bi-box-arrow-right"></i> Logout</li>
                 </ul>
             </div>
 
@@ -171,238 +179,8 @@ $is_active = $_SESSION['is_active'] ?? 0;
 
 
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const sidebar = document.getElementById('sidebar');
-                const menuToggle = document.getElementById('menuToggle');
-                const mainContent = document.querySelector('.main');
-                const closeSidebar = document.querySelector('.close-sidebar');
+        <script src="js/home.js"></script>
 
-                menuToggle.addEventListener('click', () => {
-                    sidebar.classList.toggle('active');
-                });
-                closeSidebar.addEventListener('click', () => {
-                    sidebar.classList.remove('active');
-                });
-
-                // Sidebar người dùng 
-                const userIcon = document.querySelector(".bi-person-circle");
-                const userDropdown = document.getElementById("userDropdown");
-                const openPersonalInfoBtn = document.getElementById("openPersonalInfo");
-                const personalInfoTab = document.getElementById("personalInfoTab");
-                const closePersonalInfoBtn = document.querySelector(".close-personal-info");
-
-                userIcon.addEventListener("click", () => {
-                    userDropdown.classList.toggle("active");
-                });
-
-                openPersonalInfoBtn.addEventListener("click", () => {
-                    personalInfoTab.classList.add("show");
-                    userDropdown.classList.add("hide");
-                });
-                closePersonalInfoBtn.addEventListener("click", () => {
-                    personalInfoTab.classList.remove("show");
-                });
-
-                // Toggle grid/list view
-                const toggleViewBtn = document.getElementById('toggleViewBtn');
-                const notesContainer = document.querySelector('.notes');
-                if (toggleViewBtn && notesContainer) {
-                    toggleViewBtn.addEventListener('click', () => {
-                        notesContainer.classList.toggle('list-view');
-                        notesContainer.classList.toggle('grid-view');
-                        if (notesContainer.classList.contains('list-view')) {
-                            toggleViewBtn.classList.replace('bi-list-task', 'bi-grid-3x3-gap');
-                            toggleViewBtn.setAttribute('title', 'Grid view');
-                        } else {
-                            toggleViewBtn.classList.replace('bi-grid-3x3-gap', 'bi-list-task');
-                            toggleViewBtn.setAttribute('title', 'List view');
-                        }
-                    });
-                }
-
-
-                // Khai báo biến chung
-                const addNoteBar = document.querySelector('.add-note-bar');
-                const addNoteExpanded = document.querySelector('.add-note-expanded');
-                const addNoteInput = document.querySelector('.add-note-input');
-                const closeBtn = document.querySelector('.close-add-note');
-                const titleInput = document.querySelector('.note-title-input');
-                const contentInput = document.querySelector('.note-content-input');
-                let autosaveNoteId = null;
-                let autosaveTimeout = null;
-
-                // Hàm reset form note về trắng
-                function resetAddNoteForm() {
-                    titleInput.value = '';
-                    contentInput.value = '';
-                    autosaveNoteId = null;
-                }
-
-                // Mở form tạo note
-                window.expandAddNote = function () {
-                    addNoteBar.classList.add('hidden');
-                    addNoteExpanded.classList.remove('hidden');
-                    resetAddNoteForm();
-                    contentInput.focus();
-                };
-
-                // Đóng form khi click close
-                closeBtn.addEventListener('click', function (e) {
-                    resetAddNoteForm();
-                    addNoteExpanded.classList.add('hidden');
-                    addNoteBar.classList.remove('hidden');
-                    e.stopPropagation();
-                });
-
-                // Đóng form khi click ngoài vùng note
-                document.addEventListener('click', function (e) {
-                    if (
-                        !addNoteExpanded.classList.contains('hidden') &&
-                        !addNoteExpanded.contains(e.target) &&
-                        e.target !== addNoteInput
-                    ) {
-                        resetAddNoteForm();
-                        addNoteExpanded.classList.add('hidden');
-                        addNoteBar.classList.remove('hidden');
-                    }
-                });
-
-                // Autosave note khi nhập
-                function triggerAutosave() {
-                    clearTimeout(autosaveTimeout);
-                    autosaveTimeout = setTimeout(() => {
-                        const title = titleInput.value.trim();
-                        const content = contentInput.value.trim();
-                        if (!title && !content) return;
-                        const formData = new FormData();
-                        formData.append('title', title);
-                        formData.append('content', content);
-                        if (autosaveNoteId) formData.append('note_id', autosaveNoteId);
-
-                        fetch('note.php', {
-                            method: 'POST',
-                            body: formData
-                        })
-                            .then(r => r.json())
-                            .then(data => {
-                                if (data.note_id) autosaveNoteId = data.note_id;
-                                fetchNotes();
-                            });
-                    }, 400);
-                }
-                titleInput.addEventListener('input', triggerAutosave);
-                contentInput.addEventListener('input', triggerAutosave);
-
-                // Global biến tạm để giữ note đang mở popup
-                let openedNote = null;
-
-                // Hiển thị danh sách note
-                function renderNotes(notes) {
-                    const container = document.querySelector('.notes');
-                    if (!container) return;
-                    container.innerHTML = '';
-                    notes.forEach(note => {
-                        let noteHtml = `
-                            <div class="note" tabindex="0" aria-label="${note.title || note.content || 'note'}" data-note-id="${note.note_id}">
-                                <div class="icons">
-                                    <i class="bi bi-pin-angle" title="Pin"></i>
-                                    <i class="bi bi-share" title="Share"></i>
-                                    <i class="bi bi-lock" title="Lock"></i>
-                                    <i class="bi bi-tag" title="Label"></i>
-                                    <i class="bi bi-trash" title="Delete"></i>
-                                </div>
-                                <div class="content">
-                        `;
-                        if (note.title && note.title.trim() !== "") {
-                            noteHtml += `<p class="title">${note.title}</p>`;
-                            noteHtml += `<p class="body">${note.content || ''}</p>`;
-                        } else {
-                            // Nếu không có title: content sẽ nằm ở vị trí title, body rỗng để giữ chiều cao
-                            noteHtml += `<p class="title">${note.content || ''}</p>`;
-                            noteHtml += `<p class="body"></p>`;
-                        }
-                        noteHtml += `
-                                </div>
-                            </div>
-                        `;
-                        container.innerHTML += noteHtml;
-                    });
-
-
-                    // Gắn event cho tất cả note
-                    document.querySelectorAll('.note').forEach(el => {
-                        el.addEventListener('click', function () {
-                            const noteId = el.getAttribute('data-note-id');
-                            const note = notes.find(n => n.note_id == noteId);
-                            if (!note) return;
-                            openedNote = note;
-                            showNoteModal(note);
-                        });
-                    });
-                }
-
-                function showNoteModal(note) {
-                    const popup = document.getElementById('popup-modal');
-                    const titleInput = document.getElementById('modal-title');
-                    const contentInput = document.getElementById('modal-content');
-                    if (!popup || !titleInput || !contentInput) {
-                        alert('Modal popup missing input or textarea with correct id!');
-                        return;
-                    }
-                    popup.classList.remove('hidden');
-                    titleInput.value = note.title || '';
-                    contentInput.value = note.content || '';
-                    titleInput.focus();
-
-                    let saveTimer = null;
-                    function autosaveModal() {
-                        clearTimeout(saveTimer);
-                        saveTimer = setTimeout(() => {
-                            fetch('note.php', {
-                                method: 'POST',
-                                body: new URLSearchParams({
-                                    note_id: note.note_id,
-                                    title: titleInput.value,
-                                    content: contentInput.value
-                                })
-                            }).then(r => r.json())
-                                .then(data => fetchNotes());
-                        }, 400);
-                    }
-                    titleInput.oninput = autosaveModal;
-                    contentInput.oninput = autosaveModal;
-
-                    // Đóng popup khi bấm nút close
-                    document.getElementById('popup-close').onclick = hideModal;
-                    // Đóng popup khi click ra ngoài vùng trắng
-                    popup.onclick = function (e) {
-                        if (e.target === popup) {
-                            hideModal();
-                        }
-                    };
-                    function hideModal() {
-                        popup.classList.add('hidden');
-                        fetchNotes();
-                    }
-                }
-
-                // Lấy danh sách note từ API
-                function fetchNotes() {
-                    fetch('note.php')
-                        .then(r => r.json())
-                        .then(renderNotes);
-                }
-
-                // Gọi khi load trang
-                fetchNotes();
-            });
-
-
-
-        </script>
-
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     </body>
 

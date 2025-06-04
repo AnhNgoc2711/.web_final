@@ -695,18 +695,25 @@ body {
 }
 
 /* Hover icon */
-.note .icons {
+.note .icons i,
+.note .icons button {
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.2s;
+    transition: opacity 0.18s, color 0.2s, background 0.2s;
 }
 
-/* Hiện icon khi hover vào note */
-.note:hover .icons {
+.note:hover .icons i,
+.note:hover .icons button {
     opacity: 1;
     pointer-events: auto;
 }
 
+.note .icons .icon-active {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    color: #fa5cbb;
+
+}
 
 
 /* Popup chỉnh sửa note */
