@@ -30,19 +30,18 @@ document.addEventListener('DOMContentLoaded', function () {
         personalInfoTab.classList.remove("show");
     });
 
-    // Toggle grid/list view
     const toggleViewBtn = document.getElementById('toggleViewBtn');
-    const notesContainer = document.querySelector('.notes');
-    if (toggleViewBtn && notesContainer) {
-        toggleViewBtn.addEventListener('click', () => {
-            notesContainer.classList.toggle('list-view');
-            notesContainer.classList.toggle('grid-view');
-            if (notesContainer.classList.contains('list-view')) {
+    if (toggleViewBtn) {
+        toggleViewBtn.addEventListener('click', function () {
+            document.querySelectorAll('.note-list').forEach(list => {
+                list.classList.toggle('list-view');
+                list.classList.toggle('grid-view');
+            });
+            // Đổi icon toggle
+            if (document.querySelector('.note-list.list-view')) {
                 toggleViewBtn.classList.replace('bi-list-task', 'bi-grid-3x3-gap');
-                toggleViewBtn.setAttribute('title', 'Grid view');
             } else {
                 toggleViewBtn.classList.replace('bi-grid-3x3-gap', 'bi-list-task');
-                toggleViewBtn.setAttribute('title', 'List view');
             }
         });
     }
@@ -231,6 +230,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const iconsDiv = popup.querySelector('.icons');
         popup.classList.remove('hidden');
 
+        titleInput.value = note.title || '';
+        contentInput.value = note.content || '';
+        titleInput.focus(); 
+        
         // Sao chép trạng thái ban đầu để render icon mượt mà (không phụ thuộc tham chiếu note)
         let iconState = {
             pinned: note.pinned || 0,
@@ -320,55 +323,75 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function renderNotes(notes) {
         const container = document.querySelector('.notes');
-        container.innerHTML = '';
+        if (!container) return;
 
-        const pinnedNotes = notes.filter(note => note.pinned == 1);
-        const otherNotes = notes.filter(note => note.pinned != 1);
+        // Tách note thành 2 nhóm, ép kiểu string
+        const pinnedNotes = notes.filter(n => String(n.pinned) === '1');
+        const normalNotes = notes.filter(n => String(n.pinned) === '0');
 
+        let html = "";
+
+        // Nhóm note được pin
         if (pinnedNotes.length > 0) {
-            container.innerHTML += `
-                <div class="note-group">
-                    <div class="note-group-title">PINNED</div>
-                    <div class="note-list">
-                        ${pinnedNotes.map(note => generateNoteHTML(note)).join('')}
-                    </div>
-                </div>`;
+            html += `
+        <div class="note-group">
+            <div class="note-group-title">PINNED</div>
+            <div class="note-list">
+                ${pinnedNotes.map(note => generateNoteHTML(note)).join('')}
+            </div>
+        </div>
+        `;
         }
-        if (otherNotes.length > 0) {
-            container.innerHTML += `
-                <div class="note-group">
-                    <div class="note-group-title">MY NOTES</div>
-                    <div class="note-list">
-                        ${otherNotes.map(note => generateNoteHTML(note)).join('')}
-                    </div>
-                </div>`;
+
+        // Nhóm note bình thường
+        if (normalNotes.length > 0) {
+            html += `
+        <div class="note-group">
+            <div class="note-group-title">MY NOTES</div>
+            <div class="note-list">
+                ${normalNotes.map(note => generateNoteHTML(note)).join('')}
+            </div>
+        </div>
+        `;
         }
+
+        container.innerHTML = html;
 
         attachIconEvents();
         attachNoteClickEvents();
     }
 
 
-    // Viết hàm tạo note HTML (để tái sử dụng)
+
     function generateNoteHTML(note) {
-        let showIcons = (note.pinned == 1 || note.locked == 1 || note.is_shared == 1 || note.has_label == 1);
-        let showIconsClass = showIcons ? " show-icons" : "";
-        return `
-        <div class="note${showIconsClass}" data-note-id="${note.note_id}">
-            <div class="icons">
-                ${generateCardIconsHTML(note)}
-            </div>
-        <div class="content">
-            ${note.title && note.title.trim() !== ""
-                ? `<div class="title">${note.title}</div>
-                   <div class="body">${note.content || ''}</div>`
-                : `<div class="title">${note.content || ''}</div>
-                   <div class="body"></div>`
-            }
-        </div>
-    </div>
-    `;
+        if (note.title && note.title.trim() !== "") {
+            return `
+                <div class="note" data-note-id="${note.note_id}">
+                    <div class="icons">
+                        ${generateCardIconsHTML(note)}
+                    </div>
+                    <div class="content">
+                        <div class="title">${note.title}</div>
+                        <div class="body">${note.content || ''}</div>
+                    </div>
+                </div>
+                `;
+        } else {
+            return `
+                <div class="note" data-note-id="${note.note_id}">
+                    <div class="icons">
+                        ${generateCardIconsHTML(note)}
+                    </div>
+                    <div class="content">
+                        <div class="title">${note.content || ''}</div>
+                        <div class="body"></div>
+                    </div>
+                </div>
+                `;
+        }
     }
+
+
 
 
     function attachIconEvents() {
@@ -403,7 +426,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function attachNoteClickEvents() {
         document.querySelectorAll('.note').forEach(el => {
             el.addEventListener('click', function (e) {
-                if (e.target.closest('.icons')) return;
+                if (e.target.closest('.icons')) return; // Không mở popup khi click icon
                 const noteId = el.getAttribute('data-note-id');
                 fetch('note.php')
                     .then(r => r.json())

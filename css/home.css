@@ -166,6 +166,30 @@ body {
 }
 
 /* Note */
+
+
+.note-list.grid-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.5rem;
+    align-items: flex-start;
+}
+
+.note-list.list-view {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.note-list.list-view .note {
+    width: 100%;
+    max-width: 100%;
+}
+
+
+
+
+
 .notes {
     padding: 2rem 1.5rem;
     display: block;

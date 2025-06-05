@@ -121,7 +121,9 @@ $is_active = $_SESSION['is_active'] ?? 0;
 
 
             <!-- Vị trí hiển thị danh sách note -->
-            <div class="notes"></div>
+            <div class="notes" aria-live="polite">
+                <!-- JS sẽ render nhóm note ở đây -->
+            </div>
 
 
         </div>
