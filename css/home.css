@@ -1019,3 +1019,15 @@ body {
   background-color: #303f9f;
 }
 
+.label-tag {
+  display: inline-block;
+  background-color: #d1e7dd;
+  color: #0f5132;
+  border-radius: 8px;
+  padding: 4px 8px;
+  margin: 3px;
+  font-size: 0.9em;
+}
+.add-note-expanded.popup-content {
+  position: relative;
+}

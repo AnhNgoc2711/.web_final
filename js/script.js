@@ -1,115 +1,94 @@
-function isOnline() {
-    return navigator.onLine;
-}
-
-// Yêu cầu quyền thông báo
-Notification.requestPermission().then(permission => {
-    if (permission === "granted") {
-        console.log("🔔 Notifications allowed for SkyNote.");
-    }
-});
-
-// Hiển thị thông báo nếu đã cấp quyền
-if ("serviceWorker" in navigator && "Notification" in window) {
-    navigator.serviceWorker.ready.then(registration => {
-        if (Notification.permission === "granted") {
-            registration.showNotification("Welcome to SkyNote!", {
-                body: "You can take notes even while offline!",
-                icon: "/.web_final/image/icon.png"
-            });
-        }
-    });
-}
-
-// Lưu ghi chú offline
+// Lưu ghi chú tạm khi offline
 function saveNoteOffline(note) {
     let offlineNotes = JSON.parse(localStorage.getItem('offlineNotes')) || [];
     offlineNotes.push(note);
     localStorage.setItem('offlineNotes', JSON.stringify(offlineNotes));
-    alert("📴 Bạn đang offline. Ghi chú đã được lưu tạm thời.");
+    showMessage("📴 Bạn đang offline. Ghi chú đã được lưu tạm thời.");
 }
 
-// Gửi lại các note bị lưu khi online
+// Tự động gửi lại khi có mạng
 window.addEventListener('online', () => {
     let offlineNotes = JSON.parse(localStorage.getItem('offlineNotes')) || [];
 
     if (offlineNotes.length === 0) return;
 
     const syncPromises = offlineNotes.map(note => {
-        return fetch('/.web_final/add_note.php', {
+        return fetch('note.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(note)
         })
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) throw new Error("Lỗi fetch");
+            return res.json();
+        })
         .then(data => {
             console.log('✅ Đồng bộ thành công:', data);
         })
-        .catch(err => console.error('❌ Lỗi đồng bộ:', err));
+        .catch(err => {
+            console.error('❌ Lỗi khi đồng bộ:', err);
+        });
     });
 
     Promise.all(syncPromises).then(() => {
         localStorage.removeItem('offlineNotes');
-        location.reload(); // Chỉ reload sau khi tất cả note đã đồng bộ
+        location.reload(); // Tải lại giao diện
     });
 });
 
-
-// Xử lý form thêm note
+// Bắt sự kiện submit từ form
 document.addEventListener('DOMContentLoaded', () => {
-    const noteList = document.querySelector('#noteList');
-    noteList.innerHTML = ''; // Xóa hết nội dung trước khi render lại
+    const form = document.querySelector('#noteForm');
+    form.addEventListener('submit', e => {
+        e.preventDefault();
 
-    // 1. Hiển thị note từ server (nếu có mạng)
-    if (navigator.onLine) {
-      fetch('/.web_final/get_notes.php')
-        .then(res => res.json())
-        .then(data => {
-          noteList.innerHTML = ''; // Xóa trước khi render
-          data.forEach(note => {
-            noteList.innerHTML += renderNoteHTML(note);
-          });
-        })
-        .catch(() => {
-          // Nếu fetch lỗi, vẫn hiển thị offline notes
-          renderOfflineNotes();
-        });
-    } else {
-      renderOfflineNotes();
-    }
+        const title = document.querySelector('#title').value;
+        const content = document.querySelector('#content').value;
+        const color = document.querySelector('#color').value;
+        const labels = []; // tự xử lý nếu có checkbox hay tag
 
-    function renderOfflineNotes() {
-      noteList.innerHTML = '';
-      const offlineNotes = JSON.parse(localStorage.getItem('offlineNotes') || '[]');
-      offlineNotes.forEach(note => {
-        noteList.innerHTML += renderNoteHTML(note, true);
-      });
-    }
-    // 2. Hiển thị note từ localStorage (offline)
-    const offlineNotes = JSON.parse(localStorage.getItem('offlineNotes') || '[]');
-    offlineNotes.forEach(note => {
-      noteList.innerHTML += renderNoteHTML(note, true); // truyền true để đánh dấu là note offline
+        const note = { title, content, color, labels };
+
+        if (!navigator.onLine) {
+            saveNoteOffline(note);
+            return;
+        } else {
+            fetch('note.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(note)
+            })
+            .then(res => {
+                if (!res.ok) throw new Error("Fetch fail");
+                return res.json();
+            })
+            .then(data => {
+                console.log('✅ Ghi chú đã lưu online:', data);
+                location.reload();
+            })
+            .catch(err => {
+                console.error('❌ Lỗi khi gửi ghi chú:', err);
+                saveNoteOffline(note);
+            });
+        }
     });
-  });
 
-  // Hàm render HTML cho 1 ghi chú
-  function renderNoteHTML(note, isOffline = false) {
-    return `
-      <div class="note ${isOffline ? 'note-offline' : ''}">
-        <h3>${note.title}</h3>
-        <p>${note.content}</p>
-        ${isOffline ? '<small>(offline)</small>' : ''}
-      </div>
-    `;
-  }
+    // Hiển thị note offline
+    renderOfflineNotes();
+});
 
+function renderOfflineNotes() {
+    const list = document.querySelector('#noteList');
+    const notes = JSON.parse(localStorage.getItem('offlineNotes') || '[]');
 
-
-
-
-
-    
-
-
-
-    
+    list.innerHTML = '';
+    notes.forEach(note => {
+        list.innerHTML += `
+            <div class="note note-offline">
+                <h3>${note.title}</h3>
+                <p>${note.content}</p>
+                <small>(Đang offline)</small>
+            </div>
+        `;
+    });
+}

@@ -85,7 +85,6 @@ function renderLabelsInNoteInput() {
         renderLabels();
         renderModalLabels();
       } else {
-        showMessage('Lỗi khi tải nhãn: ' + (data.error || 'Dữ liệu không hợp lệ'));
         labels = [];
         renderLabels();
         renderModalLabels();
@@ -164,21 +163,34 @@ function renderLabelsInNoteInput() {
   // ----------------------------
   // 6. Nhập nhãn mới bằng input
   // ----------------------------
-  input.addEventListener('keypress', async (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      const newLabel = input.value.trim();
-      if (newLabel && !labels.some(l => l.name_label === newLabel)) {
-        const success = await addLabelToDB(newLabel);
-        if (success) {
-          input.value = '';
-          await loadLabelsFromDB();
-        } else {
-          showMessage('Lỗi thêm nhãn!');
-        }
-      }
+input.addEventListener('keypress', async (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const newLabel = input.value.trim();
+
+    // Kiểm tra tên nhãn đã tồn tại chưa
+    if (!newLabel) {
+      showMessage('Label name cannot be empty.');
+      return;
     }
-  });
+    if (labels.some(l => l.name_label.toLowerCase() === newLabel.toLowerCase())) {
+      showMessage('Label name already exists.');
+      return;
+    }
+
+    try {
+      const success = await addLabelToDB(newLabel);
+      if (success) {
+        input.value = '';
+        await loadLabelsFromDB();
+      } else {
+        showMessage('Failed to add label.');
+      }
+    } catch (error) {
+      showMessage('Network or server error. Cannot add label while offline.');
+    }
+  }
+});
 
   // ----------------------------
   // 7. Edit / Delete label
@@ -196,28 +208,32 @@ function renderLabelsInNoteInput() {
   const labelObj = labels[index];
 
   // ✅ Xử lý XÓA
-  if (target.classList.contains('delete-label')) {
-    const result = await Swal.fire({
-      title: `Xóa nhãn "${labelObj.name_label}"?`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Xóa',
-      cancelButtonText: 'Hủy',
-    });
+if (target.classList.contains('delete-label')) {
+  const result = await Swal.fire({
+    title: `Delete label "${labelObj.name_label}"?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Delete',
+    cancelButtonText: 'Cancel',
+  });
 
-    if (result.isConfirmed) {
+  if (result.isConfirmed) {
+    try {
       const response = await deleteLabel(labelObj.label_id);
       if (response.success) {
         await loadLabelsFromDB();
       } else {
-        showMessage('Lỗi xóa nhãn: ' + (response.error || 'Không thể xóa'));
+        showMessage('Delete label failed: ' + (response.error || 'Cannot delete'));
       }
+    } catch (error) {
+      showMessage('Network or server error. Cannot delete label while offline.');
     }
-    return; // ❗Đảm bảo không chạy tiếp phần "sửa"
   }
+  return; // Để không chạy tiếp sửa
+}
 
   // ✅ Xử lý SỬA
-  if (target.classList.contains('edit-label')) {
+ if (target.classList.contains('edit-label')) {
   const labelSpan = labellist.querySelector(`.label-name[data-index="${index}"]`);
   labelSpan.contentEditable = true;
   labelSpan.focus();
@@ -227,19 +243,19 @@ function renderLabelsInNoteInput() {
     const newText = labelSpan.textContent.trim();
 
     if (!newText) {
-      showMessage('Tên nhãn không được để trống!');
+      showMessage('Label name cannot be empty!');
       labelSpan.textContent = labelObj.name_label;
       labelSpan.focus();
       return;
     }
 
-    // ✅ Kiểm tra trùng tên (khác chính nó)
+    // ✅ Check for duplicate name (except itself)
     const isDuplicate = labels.some((label, i) =>
       i !== parseInt(index) && label.name_label.toLowerCase() === newText.toLowerCase()
     );
 
     if (isDuplicate) {
-      showMessage('Tên nhãn đã tồn tại!');
+      showMessage('Label name already exists!');
       labelSpan.textContent = labelObj.name_label;
       labelSpan.focus();
       return;
@@ -255,11 +271,12 @@ function renderLabelsInNoteInput() {
       if (response.success) {
         await loadLabelsFromDB();
       } else {
+        showMessage('Failed to update label on server. Please try again.');
         labelSpan.textContent = labelObj.name_label;
         labelSpan.focus();
       }
     } catch (error) {
-      showMessage('Lỗi mạng hoặc server, vui lòng thử lại.');
+      showMessage('Network or server error. Please try again later.');
       labelSpan.textContent = labelObj.name_label;
       labelSpan.focus();
     }
@@ -273,5 +290,5 @@ function renderLabelsInNoteInput() {
     }
   }, { once: true });
 }
-});
+ });
 });
