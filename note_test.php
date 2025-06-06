@@ -41,13 +41,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $color = $_POST['color'] ?? null;
     $note_id = $_POST['note_id'] ?? null;
     $labels = $_POST['labels'] ?? [];
-if (!is_array($labels)) {
-    $labels = [];
-}
+    if (!is_array($labels)) {
+        $labels = [];
+    }
 
 
     if ($note_id) {
-    $_SESSION['current_note_id'] = $note_id;
+        $_SESSION['current_note_id'] = $note_id;
 
         $stmt = $pdo->prepare("UPDATE note SET title=?, content=?, color=?, updated_at=NOW() WHERE note_id=? AND user_id=?");
         $stmt->execute([$title, $content, $color, $note_id, $user_id]);
@@ -62,7 +62,7 @@ if (!is_array($labels)) {
         $stmt = $pdo->prepare("INSERT INTO note (user_id, title, content, color) VALUES (?, ?, ?, ?)");
         $stmt->execute([$user_id, $title, $content, $color]);
         $new_note_id = $pdo->lastInsertId();
-         // Thêm labels cho note mới
+        // Thêm labels cho note mới
         $stmtInsert = $pdo->prepare("INSERT INTO note_label (note_id, label_id) VALUES (?, ?)");
         foreach ($labels as $label_id) {
             $stmtInsert->execute([$new_note_id, $label_id]);

@@ -390,7 +390,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             // Nếu autosaveNoteId chưa set (chưa tạo note lần nào), ta không làm gì
                             if (!autosaveNoteId) return;
 
-                            fetch('note.php', {
+                            fetch('note_test.php', {
                                 method: 'POST',
                                 body: new URLSearchParams({
                                     action: 'set_size_type',

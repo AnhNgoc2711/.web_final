@@ -3,6 +3,9 @@ session_start();
 require 'db.php'; // $pdo
 
 header('Content-Type: application/json');
+require 'db.php'; // $pdo
+
+header('Content-Type: application/json');
 
 // Check login  
 if (!isset($_SESSION['user_id'])) {
@@ -137,9 +140,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($_POST['action'] === 'set_size_type') {
         $note_id = intval($_POST['note_id']);
         $size_type = $_POST['size_type']; // H1, H2, H3
-
+        
+        // Cập nhật vào cơ sở dữ liệu
         $stmt = $pdo->prepare("UPDATE note SET size_type = ? WHERE note_id = ?");
         $stmt->execute([$size_type, $note_id]);
+
         echo json_encode(['success' => true]);
         exit;
     }
