@@ -1,106 +1,182 @@
 (() => {
   let notes = [];
-  let labels = [];
-  let selectedFilterLabelId = null;
+  window.labels = []; // Global
+  window.selectedFilterLabelId = null; // Global
 
-const filterLabelListEl = document.getElementById('labellist');
+  const filterLabelListEl = document.getElementById('labelList');
+  const notesContainer = document.querySelector('.notes');
 
-function renderFilteredNotes() {
-  const selectedLabelsDiv = document.getElementById('selected-labels');
-  selectedLabelsDiv.innerHTML = '';
-
-  if (notes.length === 0) {
-    selectedLabelsDiv.innerHTML = '<p>Không có ghi chú nào.</p>';
-    return;
-  }
-
-  notes.forEach(note => {
-    const noteEl = document.createElement('div');
-    noteEl.className = 'note';
-    noteEl.innerHTML = `
-      <h3>${note.title}</h3>
-      <p>${note.content}</p>
-    `;
-    selectedLabelsDiv.appendChild(noteEl);
+  // Nhận sự kiện khi label được cập nhật từ file khác (label.js)
+  document.addEventListener("labelsUpdated", (e) => {
+    window.labels = e.detail;
+    window.renderFilterLabels();
   });
-}
 
-async function loadLabelsFromDB() {
-  try {
-    const res = await fetch('label.php'); // PHP trả về danh sách labels
-    const data = await res.json();
-
-    if (data.success) {
-      labels = data.labels;
-      console.log("Labels loaded:", labels);
-    } else {
-      console.error(data.message || 'Không thể tải danh sách nhãn');
-    }
-  } catch (error) {
-    console.error('Lỗi tải labels:', error);
+  function showMessage(msg, duration = 3000) {
+    const msgBox = document.getElementById('messageBox');
+    const msgText = document.getElementById('messageText');
+    if (!msgBox || !msgText) return alert(msg);
+    msgText.textContent = msg;
+    msgBox.style.display = 'block';
+    setTimeout(() => (msgBox.style.display = 'none'), duration);
   }
-}
 
-async function loadNotesByLabel(label_id = null) {
-  console.log("Gọi API với label_id:", label_id);
+  // Hiển thị danh sách ghi chú
+  function renderFilteredNotes() {
+    if (!notesContainer) return;
+    notesContainer.innerHTML = '';
 
-  try {
-    let url = 'get_note_labels.php';
-    if (label_id !== null) url += '?label_id=' + encodeURIComponent(label_id);
+    notes.forEach(note => {
+      let noteHtml = `
+        <div class="note" tabindex="0" aria-label="${note.title || note.content || 'note'}" data-note-id="${note.note_id}">
+          <div class="icons"></div>
+          <div class="content">
+            <p class="title">${note.title || note.content}</p>
+            <p class="body">${note.title ? note.content || '' : ''}</p>`;
 
-    const res = await fetch(url);
-    const data = await res.json();
+      if (Array.isArray(note.labels) && note.labels.length > 0) {
+        noteHtml += `<div class="note-labels" style="margin-top: 8px;">`;
+        note.labels.forEach(label => {
+          const labelName = typeof label === 'object' && label.name_label ? label.name_label : label;
+          noteHtml += `<span class="label" style="background:#eee;border-radius:12px;padding:4px 8px;font-size:0.8rem;margin-right:6px;display:inline-block;">${labelName}</span>`;
+        });
+        noteHtml += `</div>`;
+      }
 
-    if (data.success) {
-      console.log('Danh sách note_id trả về:', data.notes.map(n => n.note_id));
-      notes = data.notes.map(note => ({
-        ...note,
-        labels: note.labels || []
-      }));
-      renderFilteredNotes();
-    } else {
-      showMessage(data.message || 'Lỗi tải ghi chú');
-    }
-  } catch (e) {
-    console.error('Fetch error:', e);
-    showMessage('Lỗi mạng khi tải ghi chú');
+      noteHtml += `</div></div>`;
+      notesContainer.innerHTML += noteHtml;
+    });
+
+    document.querySelectorAll('.note').forEach(noteEl => {
+      noteEl.addEventListener('click', () => {
+        const noteId = noteEl.getAttribute('data-note-id');
+        const noteData = notes.find(n => n.note_id == noteId);
+        if (noteData) showNoteModal(noteData);
+      });
+    });
   }
-}
 
-function renderFilterLabels() {
-  filterLabelListEl.innerHTML = '';
-  console.log("labels hiện tại:", labels);
+  function showNoteModal(note) {
+    const popup = document.getElementById('popup-modal');
+    const titleInput = document.getElementById('modal-title');
+    const contentInput = document.getElementById('modal-content');
+    const closeBtn = document.getElementById('popup-close');
+    if (!popup || !titleInput || !contentInput) return showMessage("Modal input missing");
 
-  const allLi = document.createElement('li');
-  allLi.textContent = 'Tất cả ghi chú';
-  allLi.style.cursor = 'pointer';
-  allLi.style.fontWeight = selectedFilterLabelId === null ? 'bold' : 'normal';
-  allLi.onclick = () => {
-    selectedFilterLabelId = null;
-    renderFilterLabels();
-    loadNotesByLabel(null);
-  };
-  filterLabelListEl.appendChild(allLi);
+    window.currentNoteId = note.note_id;
+    popup.classList.remove('hidden');
+    titleInput.value = note.title || '';
+    contentInput.value = note.content || '';
+    titleInput.focus();
 
-  labels.forEach(label => {
-    const li = document.createElement('li');
-    li.textContent = label.name_label;
-    li.style.cursor = 'pointer';
-    li.style.fontWeight = selectedFilterLabelId === label.label_id ? 'bold' : 'normal';
-    li.onclick = () => {
-      selectedFilterLabelId = label.label_id;
-      console.log('Đã chọn label_id:', selectedFilterLabelId);
-      renderFilterLabels();
-      loadNotesByLabel(label.label_id);
+    let saveTimer = null;
+    const autosave = () => {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => {
+        if (!navigator.onLine) return showMessage("❌Connection lost, please check your network and try again.");
+        fetch('note_test.php', {
+          method: 'POST',
+          body: new URLSearchParams({
+            note_id: note.note_id,
+            title: titleInput.value,
+            content: contentInput.value
+          })
+        })
+          .then(r => r.json())
+          .then(() => saveLabelsForNote(note.note_id));
+      }, 400);
     };
-    filterLabelListEl.appendChild(li);
-  });
-}
 
-document.addEventListener('DOMContentLoaded', () => {
-  loadLabelsFromDB().then(() => {
-    renderFilterLabels();
-    loadNotesByLabel(null);
+    titleInput.oninput = autosave;
+    contentInput.oninput = autosave;
+    // Đóng popup khi bấm nút close
+    const popupCloseBtn = document.getElementById('popup-close');
+    if (popupCloseBtn) {
+      popupCloseBtn.onclick = hideModal;
+    }
+
+    // Đóng popup khi click ra ngoài vùng trắng
+    popup.onclick = function (e) {
+      if (e.target === popup) {
+        hideModal();
+      }
+    };
+
+    function hideModal() {
+      popup.classList.add('hidden');
+      fetchNotes();
+    }
+  }
+
+  async function loadLabelsFromDB() {
+    try {
+      const res = await fetch('label.php');
+      const data = await res.json();
+      if (data.success && Array.isArray(data.data)) {
+        window.labels = data.data;
+        window.renderFilterLabels();
+      } else {
+        showMessage("Lỗi tải nhãn từ server");
+      }
+    } catch (err) {
+      console.error(err);
+      showMessage("Lỗi mạng khi tải nhãn");
+    }
+  }
+
+  async function loadNotesByLabel(label_id = 0) {
+    try {
+      const res = await fetch(`get_note_labels.php?label_id=${label_id}`);
+      const data = await res.json();
+      if (data.success) {
+        notes = data.notes;
+        renderFilteredNotes();
+      } else {
+        showMessage("Không lấy được ghi chú");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  // ✅ HÀM NÀY ĐƯA RA GLOBAL
+  function renderFilterLabels() {
+    const filterLabelListEl = document.getElementById('labelList');
+    if (!filterLabelListEl) return;
+
+    filterLabelListEl.innerHTML = '';
+
+    const allLi = document.createElement('li');
+    allLi.textContent = 'All Notes';
+    allLi.style.cursor = 'pointer';
+    allLi.style.fontWeight = window.selectedFilterLabelId === null ? 'bold' : 'normal';
+    allLi.onclick = () => {
+      window.selectedFilterLabelId = null;
+      window.renderFilterLabels();
+      loadNotesByLabel(0);
+    };
+    filterLabelListEl.appendChild(allLi);
+
+    window.labels?.forEach(label => {
+      const li = document.createElement('li');
+      li.textContent = label.name_label;
+      li.style.cursor = 'pointer';
+      li.style.fontWeight = window.selectedFilterLabelId === label.label_id ? 'bold' : 'normal';
+      li.onclick = () => {
+        window.selectedFilterLabelId = label.label_id;
+        window.renderFilterLabels();
+        loadNotesByLabel(label.label_id);
+      };
+      filterLabelListEl.appendChild(li);
+    });
+  }
+
+  // Gán hàm ra global
+  window.renderFilterLabels = renderFilterLabels;
+
+  // Khởi động
+  document.addEventListener('DOMContentLoaded', () => {
+    loadLabelsFromDB();
+    loadNotesByLabel(0);
   });
-});
 })();
