@@ -51,7 +51,6 @@ $is_active = $_SESSION['is_active'] ?? 0;
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="css/home.css" />
     <link rel="manifest" href="manifest.json">
-    <script src="js/connect.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
@@ -69,20 +68,18 @@ $is_active = $_SESSION['is_active'] ?? 0;
 
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
-        <i class="bi bi-x close-sidebar" title="Close" aria-label="Close sidebar" role="button"
-            tabindex="0"></i><br><br>
+
         <i class="bi bi-x close-sidebar" title="Close" aria-label="Close sidebar" role="button"
             tabindex="0"></i><br><br>
         <ul>
             <li><i class="bi bi-sticky"></i> Note</li>
             <li><i class="bi bi-bell"></i> Reminder</li>
-            <li><i class="bi bi-archive"></i> Storage</li>
-            <li><i class="bi bi-trash"></i> <a href="trash.php" style="color: inherit; text-decoration: none;">Trash</a>
-            </li>
+            <li><i class="bi bi-trash"></i> <a href="trash.php" style="color: inherit; text-decoration: none;">Trash</a></li>
+            <li><i class="bi bi-tag"></i> Labels</li>
 
         </ul>
         <div class="labels">
-            <h4><i class="bi bi-tag"></i> Labels</h4>
+            
             <ul id="labelList"></ul>
             <ul>
                 <li id="openLabelModalBtn" style="cursor:pointer;">
@@ -170,9 +167,9 @@ $is_active = $_SESSION['is_active'] ?? 0;
             <ul class="user-menu">
                 <li id="openPersonalInfo"><i class="bi bi-person-circle"></i> Personal Information
                 </li>
-                <li><i class="bi bi-gear"></i> Setting</li>
+                <li id="openSettingBtn"><i class="bi bi-gear"></i> Setting</li>
                 <li></li>
-                <li><i class="bi bi-box-arrow-right"></i> Logout</li>
+                <li id="logoutBtn"><i class="bi bi-box-arrow-right"></i> Logout</li>
             </ul>
         </div>
 
@@ -264,12 +261,13 @@ $is_active = $_SESSION['is_active'] ?? 0;
 
 
 
-        <script src="js/home.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="js/script.js"></script>
+        <script src="js/home.js"></script>
+        <!-- <script src="js/script.js"></script> -->
         <script src="js/labels.js"></script> <!-- //Xử lý label trên sliddebars -->
-        <script src="js/note_label.js"></script> <!-- //Xử lý label trên note -->
-        <script src="js/filterNotesByLabel.js"></script>
+        <!-- <script src="js/note_label.js"></script> 
+        <script src="js/filterNotesByLabel.js"></script> -->
+        <script src="js/connect.js"></script>
 
 </body>
 

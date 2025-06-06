@@ -73,17 +73,35 @@ $is_active = $_SESSION['is_active'] ?? 0;
                 <li><i class="bi bi-sticky"></i> <a href="home.php" style="color: inherit; text-decoration: none;"></i>
                         Note</li>
                 <li><i class="bi bi-bell"></i> Reminder</li>
-                <li><i class="bi bi-archive"></i> Storage</li>
                 <li><i class="bi bi-trash"></i> <a href="trash.php"
                         style="color: inherit; text-decoration: none;">Trash</a></li>
+                <li><i class="bi bi-tag"></i> Labels</li>
 
             </ul>
             <div class="labels">
-                <h4><i class="bi bi-tag"></i> Labels</h4>
+
+                <ul id="labelList"></ul>
                 <ul>
-                    <li><i class="bi bi-tag"></i> Study</li>
-                    <li><i class="bi bi-tag"></i> Work</li>
-                    <li><i class="bi bi-plus-circle"></i>Add Label</li>
+                    <li id="openLabelModalBtn" style="cursor:pointer;">
+                        <i class="bi bi-plus-circle "></i> Edit Labels
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Modal chỉnh sửa nhãn -->
+        <div id="labelModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span>Edit Labels</span>
+                    <i class="bi bi-x close-modal" title="Close"></i>
+                </div>
+                <div class="label-input">
+                    <i class="bi bi-plus-circle-fill"></i>
+                    <input type="text" id="newLabelInput" placeholder="Create new label..." />
+                </div>
+                <ul id="labellist">
+                    <!-- Danh sách nhãn hiển thị tại đây -->
                 </ul>
             </div>
         </div>
@@ -171,7 +189,7 @@ $is_active = $_SESSION['is_active'] ?? 0;
 
 
         <script src="js/trash.js"></script>
-
+        <script src="js/labels.js"></script>
 
     </body>
 
