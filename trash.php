@@ -70,7 +70,8 @@ $is_active = $_SESSION['is_active'] ?? 0;
             <i class="bi bi-x close-sidebar" title="Close" aria-label="Close sidebar" role="button"
                 tabindex="0"></i><br><br>
             <ul>
-                <li><i class="bi bi-sticky"></i> Note</li>
+                <li><i class="bi bi-sticky"></i> <a href="home.php" style="color: inherit; text-decoration: none;"></i>
+                        Note</li>
                 <li><i class="bi bi-bell"></i> Reminder</li>
                 <li><i class="bi bi-archive"></i> Storage</li>
                 <li><i class="bi bi-trash"></i> <a href="trash.php"
@@ -95,39 +96,6 @@ $is_active = $_SESSION['is_active'] ?? 0;
                 <input type="text" placeholder="Search..." aria-label="Search notes" />
                 <i class="bi bi-list-task" id="toggleViewBtn" title="List view"></i>
                 <i class="bi bi-person-circle" title="User account"></i>
-            </div>
-
-            <div class="add-note-bar">
-                <input type="text" class="add-note-input" placeholder="New note..." readonly
-                    onclick="expandAddNote()" />
-                <div class="add-note-icons">
-                    <i class="bi bi-image" title="Add picture"></i>
-                    <i class="bi bi-palette" title="Note color"></i>
-                </div>
-            </div>
-
-            <div class="add-note-expanded hidden">
-                <input type="text" class="note-title-input" placeholder="Title">
-                <textarea class="note-content-input" placeholder="Content..."></textarea>
-                <div class="expanded-note-icons" style="display: flex; gap: 8px; align-items: center;">
-
-                    <span class="size-type-wrapper" style="position: relative; display: inline-block;">
-                        <i class="bi bi-type" id="font-size-icon" title="Font size"></i>
-                        <div class="size-type-popup hidden">
-                            <div class="size-option" data-size="H1">H1</div>
-                            <div class="size-option" data-size="H2">H2</div>
-                            <div class="size-option" data-size="H3">H3</div>
-                        </div>
-                    </span>
-
-                    <i class="bi bi-image" title="Add picture"></i>
-                    <i class="bi bi-palette" title="Note color"></i>
-                    <i class="bi bi-pin-angle" title="Pin"></i>
-                    <i class="bi bi-share" title="Share"></i>
-                    <i class="bi bi-lock" title="Lock"></i>
-                    <i class="bi bi-tag" title="Label"></i>
-                    <button class="close-add-note" type="button" title="Close">Close</button>
-                </div>
             </div>
 
 
@@ -184,12 +152,12 @@ $is_active = $_SESSION['is_active'] ?? 0;
             </div>
         </div>
 
-        <!-- Modal xác nhận xóa -->
+        <!-- Modal xác nhận xóa vĩnh viễn -->
         <div id="deleteConfirmModal" class="modal-confirm hidden">
             <div class="modal-content-confirm">
-                <div class="modal-title">Delete note?</div>
+                <div class="modal-title">Delete note permanently?</div>
                 <div class="modal-body">
-                    Are you sure you want to delete this note? <br>
+                    Are you sure you want to permanently delete this note? <br>
                 </div>
                 <div class="modal-actions">
                     <button id="confirmDeleteBtn" class="btn btn-danger">Delete</button>
@@ -199,7 +167,10 @@ $is_active = $_SESSION['is_active'] ?? 0;
         </div>
 
 
-        <script src="js/home.js"></script>
+
+
+
+        <script src="js/trash.js"></script>
 
 
     </body>

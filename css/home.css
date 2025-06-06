@@ -193,7 +193,7 @@ body {
 .notes {
     padding: 2rem 1.5rem;
     display: block;
-    max-width: 1100px;
+    max-width: 1000px;
     margin: 0 auto;
 }
 
@@ -851,8 +851,9 @@ body {
     align-items: center;
     font-family: Arial, sans-serif;
     backdrop-filter: blur(3px);
-    /* làm mờ nền sau modal */
+    z-index: 5000;
 }
+
 
 .modal-content {
     background: rgba(255, 255, 255, 0.2);
@@ -877,6 +878,81 @@ body {
     padding-bottom: 10px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
+
+
+/* Model xác nhận delete */
+.modal-confirm {
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.18);
+    z-index: 4000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-confirm.hidden {
+    display: none;
+}
+
+.modal-content-confirm {
+    background: #fff;
+    padding: 2.2rem 2.2rem 1.4rem 2.2rem;
+    border-radius: 18px;
+    box-shadow: 0 8px 36px #3336;
+    min-width: 330px;
+    max-width: 90vw;
+    text-align: center;
+    animation: popup-fadein 0.22s;
+}
+
+.modal-title {
+    font-size: 1.32rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.modal-body {
+    font-size: 1.09rem;
+    margin-bottom: 1.5rem;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1.2rem;
+}
+
+.btn.btn-danger {
+    background: #e9485c;
+    color: #fff;
+    border: none;
+    padding: 0.55rem 1.2rem;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn.btn-danger:hover {
+    background: #d41a38;
+}
+
+.btn.btn-secondary {
+    background: #eee;
+    color: #333;
+    border: none;
+    padding: 0.55rem 1.2rem;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.btn.btn-secondary:hover {
+    background: #ccc;
+}
+
 
 .close-modal {
     cursor: pointer;
@@ -1117,4 +1193,83 @@ body {
 
 #add-label-btn:not(:disabled):hover {
     background-color: #303f9f;
+}
+
+
+
+/* ===== FONT SIZE CHO NOTE CONTENT THEO size_type ===== */
+
+/* Ẩn popup mặc định */
+.size-type-popup {
+    display: none;
+    /* Ẩn khi có class .hidden */
+    position: absolute;
+    bottom: 100%;
+    /* Hiển ở trên icon */
+    left: 0;
+    margin-bottom: 8px;
+    /* Khoảng cách giữa icon và popup */
+    background-color: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+
+    /* ------------ THAY ĐỔI NÀY ------------ */
+    display: flex;
+    /* Cho phép xếp con ngang hàng */
+    flex-direction: row;
+    /* Tất cả phần tử con (H1/H2/H3) nằm 1 hàng */
+    padding: 0;
+    /* Ta sẽ set padding cho từng .size-option bên dưới */
+    border-radius: 4px;
+    /* Tùy chỉnh bo góc nếu cần */
+}
+
+/* Nếu vẫn còn class .hidden thì ẩn */
+.size-type-popup.hidden {
+    display: none !important;
+}
+
+/* Khi remove class .hidden (tức .size-type-popup) thì hiển thị flex */
+.size-type-popup:not(.hidden) {
+    display: flex !important;
+}
+
+/* ----- CSS CHO CÁC PHẦN TỬ H1/H2/H3 ----- */
+.size-option {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    color: #405dff;
+    white-space: nowrap;
+    user-select: none;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+
+.size-option:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+}
+
+
+.size-option+.size-option {
+    border-left: 1px solid #eee;
+}
+
+/* Class để áp cỡ chữ (nếu cần) */
+textarea.size-h1,
+.body.size-h1 {
+    font-size: 1.42rem;
+}
+
+textarea.size-h2,
+.body.size-h2 {
+    font-size: 1.12rem;
+}
+
+textarea.size-h3,
+.body.size-h3 {
+    font-size: 0.9rem;
 }
