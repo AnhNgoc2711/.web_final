@@ -195,7 +195,7 @@ input.addEventListener('keypress', async (e) => {
   // ----------------------------
   // 7. Edit / Delete label
   // ----------------------------
- labellist.addEventListener('click', async (e) => {
+ labellist.addEventListener('keypress', async (e) => {
   let target = e.target;
 
   if (!target.classList.contains('edit-label') && !target.classList.contains('delete-label')) {

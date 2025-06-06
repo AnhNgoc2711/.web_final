@@ -125,7 +125,6 @@ $is_active = $_SESSION['is_active'] ?? 0;
 
         <div class="notes" aria-live="polite">
                 <!-- Vị trí hiển thị danh sách note -->
-                 <div id="selected-labels"></div>
         </div>
     </div>
 

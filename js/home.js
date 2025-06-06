@@ -1,5 +1,3 @@
-
-
 document.addEventListener('DOMContentLoaded', function () {
     const sidebar = document.getElementById('sidebar');
     const menuToggle = document.getElementById('menuToggle');
@@ -135,13 +133,13 @@ document.addEventListener('DOMContentLoaded', function () {
             const checkboxes = document.querySelectorAll('#label-selection input[type="checkbox"]:checked');
             checkboxes.forEach(cb => selectedLabels.push(cb.value));
 
-            fetch('note.php', {
+            fetch('note_test.php', {
                 method: 'POST',
                 body: new URLSearchParams({
                     note_id: openedNote ? openedNote.note_id : '',
                     title: titleInput ? titleInput.value : '',
                     content: contentInput ? contentInput.value : '',
-                    labels: JSON.stringify(selectedLabels)
+                    // labels: JSON.stringify(selectedLabels)
                 })
             }).then(r => r.json())
                 .then(data => fetchNotes());
@@ -263,7 +261,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     showMessage("❌ Connection lost, please check your network and try again.");
                     return; // Stop the function, do not save anything
                 }
-                fetch('note.php', {
+                fetch('note_test.php', {
                     method: 'POST',
                     body: new URLSearchParams({
                         note_id: note.note_id,
@@ -278,7 +276,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
             }, 400);
         }
-
 
         titleInputModal.oninput = autosaveModal;
         contentInputModal.oninput = autosaveModal;
@@ -304,7 +301,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Lấy danh sách note từ API
     function fetchNotes() {
-        fetch('note.php')
+        fetch('note_test.php')
             .then(r => r.json())
             .then(renderNotes);
     }
