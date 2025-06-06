@@ -179,7 +179,7 @@ $is_active = $_SESSION['is_active'] ?? 0;
         <!-- Modal thông tin cá nhân -->
         <div class="personal-info-modal hidden" id="personalInfoModal">
             <div class="modal-overlay">
-                <div class="modal-content">
+                <div class="modal-personal">
                     <i class="bi bi-x close-personal-info" title="Close" role="button" tabindex="0"></i>
                     <!-- Avatar hiện thị (vẫn hiện trong reset password) -->
                     <img id="avatarPreview" src="image/icontitle.jpg" alt="Avatar" class="avatar-edit-preview" />
@@ -216,7 +216,7 @@ $is_active = $_SESSION['is_active'] ?? 0;
     <!-- Modal Setting -->
     <div class="setting-modal hidden" id="settingModal">
         <div class="modal-overlay"></div>
-        <div class="modal-content">
+        <div class="modal-personal">
             <i class="bi bi-x close-setting" title="Close" role="button" tabindex="0"></i>
             <h3>Settings</h3>
             <div class="setting-group">
