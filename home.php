@@ -237,9 +237,9 @@ $is_active = $_SESSION['is_active'] ?? 0;
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/script.js"></script>
     <script src="js/home.js"></script>
+    <script src="js/filterNotesByLabel.js"></script>
     <script src="js/labels.js"></script>   <!-- //Xử lý label trên sliddebars -->
     <script src="js/note_label.js"></script>   <!-- //Xử lý label trên note -->
-    <script src="js/filterNotesByLabel.js"></script>
     
 </body>
 

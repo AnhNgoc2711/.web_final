@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
             sidebar.classList.remove('active');
         });
     }
+    
 
     // Sidebar người dùng
     const userIcon = document.querySelector(".bi-person-circle");

@@ -77,20 +77,34 @@ function renderLabelsInNoteInput() {
   // 2. Load labels từ DB
   // ----------------------------
   async function loadLabelsFromDB() {
-    const res = await fetch('label.php');
-    if (res.ok) {
-      const data = await res.json();
-      if (data.success && Array.isArray(data.data)) {
-        labels = data.data;
-        renderLabels();
-        renderModalLabels();
-      } else {
-        labels = [];
-        renderLabels();
-        renderModalLabels();
-      }
+  const res = await fetch('label.php');
+  if (res.ok) {
+    const data = await res.json();
+    if (data.success && Array.isArray(data.data)) {
+      labels = data.data;
+
+      // ✅ Cập nhật global để các file khác dùng
+      window.labels = labels;
+
+      renderLabels();
+      renderModalLabels();
+      renderLabelsInNoteInput();
+
+      // ✅ Cập nhật sidebar filter
+      window.renderFilterLabels();
+
+      // ✅ Gửi sự kiện cho phần note nhận được nhãn mới
+      document.dispatchEvent(new CustomEvent("labelsUpdated", { detail: labels }));
+    } else {
+      labels = [];
+      renderLabels();
+      renderModalLabels();
+      renderLabelsInNoteInput();
+      window.renderFilterLabels();
+      document.dispatchEvent(new CustomEvent("labelsUpdated", { detail: labels }));
     }
   }
+}
 
   
   // ----------------------------
@@ -183,6 +197,7 @@ input.addEventListener('keypress', async (e) => {
       if (success) {
         input.value = '';
         await loadLabelsFromDB();
+        // location.reload();
       } else {
         showMessage('Failed to add label.');
       }
@@ -195,7 +210,7 @@ input.addEventListener('keypress', async (e) => {
   // ----------------------------
   // 7. Edit / Delete label
   // ----------------------------
- labellist.addEventListener('keypress', async (e) => {
+ labellist.addEventListener('click', async (e) => {
   let target = e.target;
 
   if (!target.classList.contains('edit-label') && !target.classList.contains('delete-label')) {
@@ -222,6 +237,7 @@ if (target.classList.contains('delete-label')) {
       const response = await deleteLabel(labelObj.label_id);
       if (response.success) {
         await loadLabelsFromDB();
+        location.reload();
       } else {
         showMessage('Delete label failed: ' + (response.error || 'Cannot delete'));
       }
@@ -270,8 +286,10 @@ if (target.classList.contains('delete-label')) {
       const response = await updateLabel(labelObj.label_id, newText);
       if (response.success) {
         await loadLabelsFromDB();
+        // location.reload();
+
       } else {
-        showMessage('Failed to update label on server. Please try again.');
+        // showMessage('Failed to update label on server. Please try again.');
         labelSpan.textContent = labelObj.name_label;
         labelSpan.focus();
       }
