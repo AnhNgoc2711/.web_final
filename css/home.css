@@ -32,6 +32,23 @@ body {
     white-space: normal;
 }
 
+    background-attachment: fixed;
+}
+
+.note .body {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    /* Số dòng tối đa muốn hiển thị */
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 4.2em;
+    /* Tuỳ chỉnh theo font, line-height */
+    word-break: break-word;
+    white-space: normal;
+}
+
 
 
 /* Sidebar - Menu at left */
@@ -42,13 +59,34 @@ body {
     width: 300px;
     height: 100%;
     background: rgba(255, 255, 255, 0.33);
+    left: -300px;
+    width: 300px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.33);
     backdrop-filter: blur(10px);
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    transition: left 0.3s ease;
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
     transition: left 0.3s ease;
     z-index: 1000;
 }
 
 .sidebar.active {
+    left: 0;
+}
+
+.close-sidebar {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.4rem;
+    color: #333;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close-sidebar:hover {
+    color: #fa5cbb;
     left: 0;
 }
 
@@ -86,6 +124,7 @@ body {
 
 .sidebar li:hover {
     background: #b9bcc0;
+    background: #b9bcc0;
 }
 
 .sidebar li i {
@@ -94,6 +133,8 @@ body {
 }
 
 .labels {
+    margin-top: 0.8rem;
+    margin-left: 1.2rem;
     margin-top: 0.8rem;
     margin-left: 1.2rem;
 }
@@ -145,7 +186,9 @@ body {
 .top-bar h2 i {
     font-size: 1.8rem;
     color: #fbbc04;
+    color: #fbbc04;
     margin-right: 0.5rem;
+    text-shadow: 0 0 8px #fbbc04;
     text-shadow: 0 0 8px #fbbc04;
 }
 
@@ -190,6 +233,32 @@ body {
 
 
 
+/* Note */
+
+
+.note-list.grid-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.5rem;
+    align-items: flex-start;
+}
+
+.note-list.list-view {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.note-list.list-view .note {
+    width: 100%;
+    max-width: 100%;
+}
+
+
+
+
+
+/* Note */
 .notes {
     padding: 2rem 1.5rem;
     display: block;
@@ -223,6 +292,9 @@ body {
     background: rgba(255, 251, 251, 0.885);
     backdrop-filter: blur(10px);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -276,7 +348,9 @@ body {
 .note p {
     margin: 0.3rem 0;
     color: #343538;
+    color: #343538;
     line-height: 1.3;
+    font-size: 1.1rem;
     font-size: 1.1rem;
 }
 
@@ -299,6 +373,152 @@ body {
 .note .icons i:hover {
     color: #fa5cbb;
 }
+
+/* chuyen notes sang dang danh sach */
+.notes.list-view {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.notes.list-view .note {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+
+.notes.list-view .note .icons {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    justify-content: center;
+    align-self: start;
+}
+
+.notes.list-view .note img {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.notes.list-view .note .content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.notes.list-view .note .content .title {
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: #212529;
+}
+
+.notes.list-view .note .content .body {
+    font-size: 0.95rem;
+    color: var(--text-color);
+}
+
+
+/* add note */
+.add-note-btn {
+    position: absolute;
+    top: 80px;
+    right: 20px;
+    font-size: 2rem;
+    color: #fa5cbb;
+    cursor: pointer;
+    transition: transform 0.2s, color 0.2s;
+    z-index: 1000;
+}
+
+.add-note-btn:hover {
+    color: #ff85d3;
+    transform: scale(1.1);
+}
+
+.add-note-form {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 400px;
+    z-index: 1000;
+}
+
+.add-note-form h3 {
+    margin-top: 0;
+    font-size: 20px;
+    color: #333;
+}
+
+.add-note-form label {
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.add-note-form input[type="text"],
+.add-note-form input[type="file"],
+.add-note-form textarea {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 8px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+.add-note-form textarea {
+    height: 100px;
+    resize: vertical;
+}
+
+.add-note-form button {
+    padding: 6px 12px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #f9f9f9;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.add-note-form button:hover {
+    background: #e0e0e0;
+}
+
+.add-note-form button#saveNoteBtn {
+    background: #4caf50;
+    color: #fff;
+    border: none;
+}
+
+.add-note-form button#saveNoteBtn:hover {
+    background: #45a049;
+}
+
+.add-note-form button#cancelNoteBtn {
+    background: #f44336;
+    color: #fff;
+    border: none;
+}
+
+.add-note-form button#cancelNoteBtn:hover {
+    background: #e53935;
+}
+
+
 
 /* chuyen notes sang dang danh sach */
 .notes.list-view {
@@ -535,22 +755,65 @@ body {
     display: none !important;
 }
 
-/* Personal Information Model */
-.modal-content .avatar-info {
+/* Personal Information Tab */
+.personal-info-tab {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 1150;
+    overflow: hidden;
+}
+
+.personal-info-tab.active {
+    transform: translateX(0);
+}
+
+.personal-info-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+}
+
+.personal-info-content .avatar-info {
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    margin-bottom: 0.8rem;
-    object-fit: cover;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
+    margin-bottom: 0.5rem;
+}
+
+.personal-info-content h3 {
+    margin: 0.3rem 0;
+    font-size: 1.2rem;
+}
+
+.personal-info-content p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #5f6368;
+}
+
+.personal-info-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
 }
 
 .personal-info-buttons button {
     flex: 1;
     padding: 0.5rem;
+    border: none;
     border-radius: 6px;
+    background: #fa5cbb;
+    color: #fff;
+    cursor: pointer;
     transition: background 0.2s;
 }
 
@@ -573,19 +836,6 @@ body {
 .user-dropdown-container {
     position: relative;
 }
-
-.personal-info-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1150;
-}
-
 .modal-overlay {
     position: absolute;
     top: 0;
@@ -597,7 +847,7 @@ body {
     z-index: 1;
 }
 
-.modal-content {
+.modal-personal {
     position: relative;
     z-index: 2;
     background: white;
@@ -613,33 +863,37 @@ body {
     display: none !important;
 }
 
-.modal-content .avatar-info {
+.modal-personal .avatar-info {
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.8rem;
+    /* object-fit: cover;
+    display: block;
+    margin-left: auto;
+    margin-right: auto; */
 }
 
-.modal-content h3 {
+.modal-personal h3 {
     margin: 0.5rem 0;
     font-size: 1.2rem;
 }
 
-.modal-content p {
+.modal-personal p {
     margin: 0.3rem;
     margin-bottom: 0;
     font-size: 0.9rem;
     color: #5f6368;
 }
 
-.modal-content .personal-info-buttons {
+.modal-personal .personal-info-buttons {
     display: flex;
     gap: 0.5rem;
     margin-top: 2.5rem;
 }
 
 
-.modal-content .close-personal-info {
+.modal-personal .close-personal-info {
     position: absolute;
     top: 0.8rem;
     right: 1rem;
@@ -648,7 +902,7 @@ body {
     cursor: pointer;
 }
 
-.modal-content .personal-info-buttons {
+.modal-personal .personal-info-buttons {
     display: flex;
     gap: 0.5rem;
     margin-top: 2.5rem;
@@ -841,7 +1095,7 @@ body {
     z-index: 1000;
 }
 
-.modal-content {
+.modal-personal {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -876,7 +1130,7 @@ body.dark-mode .bi:hover {
 
 
 
-body.dark-mode .modal-content {
+body.dark-mode .modal-personal {
     background: #222;
     color: #eee;
 }
@@ -911,7 +1165,7 @@ body.dark-mode .modal-content {
 }
 
 /* Hộp modal chính */
-.modal-content {
+.modal-personal {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -928,7 +1182,7 @@ body.dark-mode .modal-content {
 }
 
 /* Tiêu đề */
-.modal-content h3 {
+.modal-personal h3 {
     margin-top: 0;
     margin-bottom: 20px;
     font-size: 22px;
@@ -1043,7 +1297,7 @@ body.dark-mode .modal-content {
 }
 
 /* DARK MODE */
-body.dark-mode .modal-content {
+body.dark-mode .modal-personal {
     background: #222;
     color: #eee;
     box-shadow: 0 8px 20px rgba(255, 255, 255, 0.1);
@@ -1339,6 +1593,7 @@ body.dark-mode .radio-options label {
     color: #fff;
     transition: all 0.3s ease;
 }
+
 
 .modal-header {
     display: flex;

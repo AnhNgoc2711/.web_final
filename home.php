@@ -50,15 +50,12 @@ $is_active = $_SESSION['is_active'] ?? 0;
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="css/home.css" />
-    <!-- <link rel="manifest" href="manifest.json"> -->
-    <!-- <script src="js/connect.js"></script> -->
-    <link rel="icon" href="image/icon.png" />
+    <link rel="manifest" href="manifest.json">
+    <script src="js/connect.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 
 <body>
-
     <div id="messageBox"
         style="display:none; position:fixed; top:20px; right:20px; background:#f44336; color:#fff; padding:10px 20px; border-radius:5px; box-shadow:0 2px 8px rgba(0,0,0,0.3); z-index:9999;">
         <span id="messageText"></span>
@@ -72,6 +69,8 @@ $is_active = $_SESSION['is_active'] ?? 0;
 
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
+        <i class="bi bi-x close-sidebar" title="Close" aria-label="Close sidebar" role="button"
+            tabindex="0"></i><br><br>
         <i class="bi bi-x close-sidebar" title="Close" aria-label="Close sidebar" role="button"
             tabindex="0"></i><br><br>
         <ul>
@@ -155,10 +154,9 @@ $is_active = $_SESSION['is_active'] ?? 0;
 
         <!-- Vị trí hiển thị danh sách note -->
         <div class="notes" aria-live="polite">
-            <!-- JS sẽ render nhóm note ở đây -->
+            <!-- Vị trí hiển thị danh sách note -->
+            <div id="selected-labels"></div>
         </div>
-
-
     </div>
 
     <!-- Sidebar người dùng -->
@@ -171,9 +169,10 @@ $is_active = $_SESSION['is_active'] ?? 0;
 
             <ul class="user-menu">
                 <li id="openPersonalInfo"><i class="bi bi-person-circle"></i> Personal Information
-                <li id="openSettingBtn"><i class="bi bi-gear"></i> Setting</li>
-
-                <li id="logoutBtn"><i class="bi bi-box-arrow-right"></i> Logout</li>
+                </li>
+                <li><i class="bi bi-gear"></i> Setting</li>
+                <li></li>
+                <li><i class="bi bi-box-arrow-right"></i> Logout</li>
             </ul>
         </div>
 
@@ -212,6 +211,7 @@ $is_active = $_SESSION['is_active'] ?? 0;
                 </div>
             </div>
         </div>
+    </div>
     </div>
     <!-- Modal Setting -->
     <div class="setting-modal hidden" id="settingModal">
@@ -266,6 +266,10 @@ $is_active = $_SESSION['is_active'] ?? 0;
 
         <script src="js/home.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="js/script.js"></script>
+        <script src="js/labels.js"></script> <!-- //Xử lý label trên sliddebars -->
+        <script src="js/note_label.js"></script> <!-- //Xử lý label trên note -->
+        <script src="js/filterNotesByLabel.js"></script>
 
 </body>
 
