@@ -41,11 +41,6 @@ $is_active = $_SESSION['is_active'] ?? 0;
 <!DOCTYPE html>
 <html lang="vi">
 
-<!-- <head>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</head> -->
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -55,8 +50,8 @@ $is_active = $_SESSION['is_active'] ?? 0;
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="css/home.css" />
-    <link rel="manifest" href="manifest.json">
-    <script src="js/connect.js"></script>
+    <!-- <link rel="manifest" href="manifest.json"> -->
+    <!-- <script src="js/connect.js"></script> -->
     <link rel="icon" href="image/icon.png" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -69,10 +64,10 @@ $is_active = $_SESSION['is_active'] ?? 0;
         <span id="messageText"></span>
     </div>
     <?php if ($is_active == 0): ?>
-    <div
-        style="background: #ffcccc; color: #900; padding: 10px; text-align: center; font-weight: bold; border-bottom: 2px solid red;">
-        Your account has not been activated yet. Please check your email to activate.
-    </div>
+        <div
+            style="background: #ffcccc; color: #900; padding: 10px; text-align: center; font-weight: bold; border-bottom: 2px solid red;">
+            Your account has not been activated yet. Please check your email to activate.
+        </div>
     <?php endif; ?>
 
     <!-- Sidebar -->
@@ -115,24 +110,23 @@ $is_active = $_SESSION['is_active'] ?? 0;
         </div>
     </div>
 
-        <!-- Main -->
-        <div class="main" style="margin-left: 0; transition: margin-left 0.3s ease;">
-            <div class="top-bar">
-                <i class="bi-list" id="menuToggle" aria-label="Toggle menu" role="button" tabindex="0"></i>
-                <h2><i class="bi bi-cloudy"></i> SkyNote</h2>
-                <input type="text" placeholder="Search..." aria-label="Search notes" />
-                <i class="bi bi-list-task" id="toggleViewBtn" title="List view"></i>
-                <i class="bi bi-person-circle" title="User account"></i>
-            </div>
+    <!-- Main -->
+    <div class="main" style="margin-left: 0; transition: margin-left 0.3s ease;">
+        <div class="top-bar">
+            <i class="bi-list" id="menuToggle" aria-label="Toggle menu" role="button" tabindex="0"></i>
+            <h2><i class="bi bi-cloudy"></i> SkyNote</h2>
+            <input type="text" placeholder="Search..." aria-label="Search notes" />
+            <i class="bi bi-list-task" id="toggleViewBtn" title="List view"></i>
+            <i class="bi bi-person-circle" title="User account"></i>
+        </div>
 
-            <div class="add-note-bar">
-                <input type="text" class="add-note-input" placeholder="New note..." readonly
-                    onclick="expandAddNote()" />
-                <div class="add-note-icons">
-                    <i class="bi bi-image" title="Add picture"></i>
-                    <i class="bi bi-palette" title="Note color"></i>
-                </div>
+        <div class="add-note-bar">
+            <input type="text" class="add-note-input" placeholder="New note..." readonly onclick="expandAddNote()" />
+            <div class="add-note-icons">
+                <i class="bi bi-image" title="Add picture"></i>
+                <i class="bi bi-palette" title="Note color"></i>
             </div>
+        </div>
 
         <div class="add-note-expanded hidden">
             <input type="text" class="note-title-input" placeholder="Title">
@@ -183,66 +177,66 @@ $is_active = $_SESSION['is_active'] ?? 0;
             </ul>
         </div>
 
-            <!-- Modal thông tin cá nhân -->
-            <div class="personal-info-modal hidden" id="personalInfoModal">
-                <div class="modal-overlay">
-                    <div class="modal-content">
-                        <i class="bi bi-x close-personal-info" title="Close" role="button" tabindex="0"></i>
-                        <!-- Avatar hiện thị (vẫn hiện trong reset password) -->
-                        <img id="avatarPreview" src="image/icontitle.jpg" alt="Avatar" class="avatar-edit-preview" />
-                        <label for="avatarInput" id="avatarLabel" class="avatar-upload-btn">Chọn ảnh mới</label>
-                        <input type="file" id="avatarInput" accept="image/*" class="hidden" />
-                        <!-- Hiển thị tên -->
-                        <h3 id="displayName">Username</h3>
-                        <input type="text" class="hidden" id="nameInput" value="Tên người dùng" />
-                        <!-- Email -->
-                        <p id="emailDisplay">Email: <span id="userEmail">user@example.com</span></p>
-                        <div class="personal-info-buttons" id="viewButtons">
-                            <button class="btn-outline-pink" id="resetPasswordBtn">Reset Password</button>
-                            <button class="btn-filled-pink" id="editInfoBtn">Edit Information</button>
-                        </div>
-                        <div class="personal-info-buttons hidden" id="editActions">
-                            <button class="btn-outline-pink" id="cancelEditBtn">Cancel</button>
-                            <button class="btn-filled-pink" id="saveEditBtn">Save</button>
-                        </div>
-                        <!-- Form đổi mật khẩu (ẩn mặc định) -->
-                        <div class="reset-password-form hidden" id="resetPasswordForm">
-                            <input type="password" id="oldPassword" placeholder="Nhập mật khẩu cũ" />
-                            <input type="password" id="newPassword" placeholder="Nhập mật khẩu mới" />
-                            <input type="password" id="confirmNewPassword" placeholder="Nhập lại mật khẩu mới" />
-                            <div class="personal-info-buttons">
-                                <button class="btn-outline-pink" id="cancelResetBtn">Cancel</button>
-                                <button class="btn-filled-pink" id="saveResetBtn">Save</button>
-                            </div>
+        <!-- Modal thông tin cá nhân -->
+        <div class="personal-info-modal hidden" id="personalInfoModal">
+            <div class="modal-overlay">
+                <div class="modal-content">
+                    <i class="bi bi-x close-personal-info" title="Close" role="button" tabindex="0"></i>
+                    <!-- Avatar hiện thị (vẫn hiện trong reset password) -->
+                    <img id="avatarPreview" src="image/icontitle.jpg" alt="Avatar" class="avatar-edit-preview" />
+                    <label for="avatarInput" id="avatarLabel" class="avatar-upload-btn">Chọn ảnh mới</label>
+                    <input type="file" id="avatarInput" accept="image/*" class="hidden" />
+                    <!-- Hiển thị tên -->
+                    <h3 id="displayName">Username</h3>
+                    <input type="text" class="hidden" id="nameInput" value="Tên người dùng" />
+                    <!-- Email -->
+                    <p id="emailDisplay">Email: <span id="userEmail">user@example.com</span></p>
+                    <div class="personal-info-buttons" id="viewButtons">
+                        <button class="btn-outline-pink" id="resetPasswordBtn">Reset Password</button>
+                        <button class="btn-filled-pink" id="editInfoBtn">Edit Information</button>
+                    </div>
+                    <div class="personal-info-buttons hidden" id="editActions">
+                        <button class="btn-outline-pink" id="cancelEditBtn">Cancel</button>
+                        <button class="btn-filled-pink" id="saveEditBtn">Save</button>
+                    </div>
+                    <!-- Form đổi mật khẩu (ẩn mặc định) -->
+                    <div class="reset-password-form hidden" id="resetPasswordForm">
+                        <input type="password" id="oldPassword" placeholder="Nhập mật khẩu cũ" />
+                        <input type="password" id="newPassword" placeholder="Nhập mật khẩu mới" />
+                        <input type="password" id="confirmNewPassword" placeholder="Nhập lại mật khẩu mới" />
+                        <div class="personal-info-buttons">
+                            <button class="btn-outline-pink" id="cancelResetBtn">Cancel</button>
+                            <button class="btn-filled-pink" id="saveResetBtn">Save</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Modal Setting -->
-        <div class="setting-modal hidden" id="settingModal">
-            <div class="modal-overlay"></div>
-            <div class="modal-content">
-                <i class="bi bi-x close-setting" title="Close" role="button" tabindex="0"></i>
-                <h3>Settings</h3>
-                <div class="setting-group">
-                    <label for="fontSizeSelect">Font Size:</label>
-                    <select id="fontSizeSelect">
-                        <option value="small">Small</option>
-                        <option value="medium" selected>Medium</option>
-                        <option value="large">Large</option>
-                    </select>
-                </div>
-                <div class="setting-group">
-                    <label>Theme:</label>
-                    <div class="radio-options">
-                        <label><input type="radio" name="theme" value="light" checked> Light</label>
-                        <label><input type="radio" name="theme" value="dark"> Dark</label>
-                    </div>
-                </div>
-                <button id="saveSettingsBtn" class="btn-filled-pink">Save</button>
+    </div>
+    <!-- Modal Setting -->
+    <div class="setting-modal hidden" id="settingModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <i class="bi bi-x close-setting" title="Close" role="button" tabindex="0"></i>
+            <h3>Settings</h3>
+            <div class="setting-group">
+                <label for="fontSizeSelect">Font Size:</label>
+                <select id="fontSizeSelect">
+                    <option value="small">Small</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="large">Large</option>
+                </select>
             </div>
+            <div class="setting-group">
+                <label>Theme:</label>
+                <div class="radio-options">
+                    <label><input type="radio" name="theme" value="light" checked> Light</label>
+                    <label><input type="radio" name="theme" value="dark"> Dark</label>
+                </div>
+            </div>
+            <button id="saveSettingsBtn" class="btn-filled-pink">Save</button>
         </div>
+    </div>
 
     <!-- Giao diện chỉnh sửa note -->
     <div id="popup-modal" class="popup-modal hidden">
