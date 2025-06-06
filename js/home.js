@@ -10,24 +10,168 @@ document.addEventListener('DOMContentLoaded', function () {
     closeSidebar.addEventListener('click', () => {
         sidebar.classList.remove('active');
     });
-
-    // Sidebar người dùng 
+    // Sidebar người dùng
     const userIcon = document.querySelector(".bi-person-circle");
     const userDropdown = document.getElementById("userDropdown");
     const openPersonalInfoBtn = document.getElementById("openPersonalInfo");
-    const personalInfoTab = document.getElementById("personalInfoTab");
+    const personalInfoModal = document.getElementById("personalInfoModal");
     const closePersonalInfoBtn = document.querySelector(".close-personal-info");
 
+    // Mở Sidebar người dùng
     userIcon.addEventListener("click", () => {
         userDropdown.classList.toggle("active");
     });
 
+    // Mở modal Personal In4
     openPersonalInfoBtn.addEventListener("click", () => {
-        personalInfoTab.classList.add("show");
-        userDropdown.classList.add("hide");
+        personalInfoModal.classList.remove("hidden");
+        userDropdown.classList.remove("active");
     });
+
+    // Đóng modal Personal In4
     closePersonalInfoBtn.addEventListener("click", () => {
-        personalInfoTab.classList.remove("show");
+        personalInfoModal.classList.add("hidden");
+    });
+
+    const editBtn = document.getElementById("editInfoBtn");
+    const saveBtn = document.getElementById("saveEditBtn");
+    const cancelBtn = document.getElementById("cancelEditBtn");
+    const displayName = document.getElementById("displayName");
+    const nameInput = document.getElementById("nameInput");
+    const avatarPreview = document.getElementById("avatarPreview");
+    const avatarInput = document.getElementById("avatarInput");
+    const viewButtons = document.getElementById("viewButtons");
+    const editActions = document.getElementById("editActions");
+    let originalAvatarSrc = avatarPreview.src;
+
+    avatarInput.addEventListener("change", function () {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                avatarPreview.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    editBtn.addEventListener("click", () => {
+        originalAvatarSrc = avatarPreview.src; // lưu lại avatar cũ
+        displayName.classList.add("hidden");
+        nameInput.classList.remove("hidden");
+        viewButtons.classList.add("hidden");
+        editActions.classList.remove("hidden");
+    });
+
+    cancelBtn.addEventListener("click", () => {
+        displayName.classList.remove("hidden");
+        nameInput.classList.add("hidden");
+        avatarPreview.src = originalAvatarSrc; // khôi phục avatar gốc nếu huỷ
+        viewButtons.classList.remove("hidden");
+        editActions.classList.add("hidden");
+    });
+
+    saveBtn.addEventListener("click", () => {
+        displayName.textContent = nameInput.value;
+        displayName.classList.remove("hidden");
+        nameInput.classList.add("hidden");
+        viewButtons.classList.remove("hidden");
+        editActions.classList.add("hidden");
+    });
+    // Form Reset Password
+    const resetBtn = document.getElementById("resetPasswordBtn");
+    const resetForm = document.getElementById("resetPasswordForm");
+    const cancelResetBtn = document.getElementById("cancelResetBtn");
+    const saveResetBtn = document.getElementById("saveResetBtn");
+    const emailDisplay = document.getElementById("emailDisplay");
+    const avatarLabel = document.getElementById("avatarLabel");
+
+    function resetViewToDefault() {
+        resetForm.classList.add("hidden");
+        displayName.classList.remove("hidden");
+        emailDisplay.classList.remove("hidden");
+        avatarLabel.classList.remove("hidden");
+        avatarInput.classList.add("hidden");
+        nameInput.classList.add("hidden");
+        viewButtons.classList.remove("hidden");
+    }
+
+    resetBtn.addEventListener("click", () => {
+        // Ẩn tất cả phần không cần
+        viewButtons.classList.add("hidden");
+        editActions.classList.add("hidden");
+        nameInput.classList.add("hidden");
+        displayName.classList.add("hidden");
+        emailDisplay.classList.add("hidden");
+        avatarInput.classList.add("hidden");
+        avatarLabel.classList.add("hidden");
+        // Hiện form đổi mật khẩu
+        resetForm.classList.remove("hidden");
+    });
+
+    cancelResetBtn.addEventListener("click", resetViewToDefault);
+
+    // Form Modal Setting
+    const openSettingBtn = document.getElementById("openSettingBtn");
+    const settingModal = document.getElementById("settingModal");
+    const closeSettingBtn = document.querySelector(".close-setting");
+    const saveSettingsBtn = document.getElementById("saveSettingsBtn");
+    const fontSizeSelect = document.getElementById("fontSizeSelect");
+    const themeRadios = document.querySelectorAll("input[name='theme']");
+
+    // Mở modal Setting
+    openSettingBtn.addEventListener("click", () => {
+        settingModal.classList.remove("hidden");
+        userDropdown.classList.remove("active");
+        loadSettings();
+    });
+
+    // Đóng modal Setting
+    closeSettingBtn.addEventListener("click", () => {
+        settingModal.classList.add("hidden");
+    });
+
+    // Lưu và áp dụng setting
+    saveSettingsBtn.addEventListener("click", () => {
+        const selectedFontSize = fontSizeSelect.value;
+        let selectedTheme = "light";
+        themeRadios.forEach(radio => {
+            if (radio.checked) selectedTheme = radio.value;
+        });
+        // Lưu vào localStorage
+        localStorage.setItem("fontSize", selectedFontSize);
+        localStorage.setItem("theme", selectedTheme);
+        applySettings(selectedFontSize, selectedTheme);
+        settingModal.classList.add("hidden");
+    });
+
+    // Hàm áp dụng setting lên trang
+    function applySettings(fontSize, theme) {
+        // Xóa hết các class font-size
+        document.body.classList.remove("font-small", "font-medium", "font-large");
+        document.body.classList.add(`font-${fontSize}`);
+        // Áp theme
+        if (theme === "dark") {
+            document.body.classList.add("dark-mode");
+        } else {
+            document.body.classList.remove("dark-mode");
+        }
+    }
+
+    // Hàm tải setting từ localStorage
+    function loadSettings() {
+        const savedFontSize = localStorage.getItem("fontSize") || "medium";
+        const savedTheme = localStorage.getItem("theme") || "light";
+        fontSizeSelect.value = savedFontSize;
+        themeRadios.forEach(radio => {
+            radio.checked = radio.value === savedTheme;
+        });
+        applySettings(savedFontSize, savedTheme);
+    }
+
+    // Áp dụng setting khi load trang
+    document.addEventListener("DOMContentLoaded", () => {
+        loadSettings();
     });
 
     const toggleViewBtn = document.getElementById('toggleViewBtn');
@@ -607,4 +751,5 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
 

@@ -535,65 +535,22 @@ body {
     display: none !important;
 }
 
-/* Personal Information Tab */
-.personal-info-tab {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 300px;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(10px);
-    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-    transform: translateX(100%);
-    transition: transform 0.3s ease;
-    z-index: 1150;
-    overflow: hidden;
-}
-
-.personal-info-tab.active {
-    transform: translateX(0);
-}
-
-.personal-info-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 1rem;
-}
-
-.personal-info-content .avatar-info {
+/* Personal Information Model */
+.modal-content .avatar-info {
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    margin-bottom: 0.5rem;
-}
-
-.personal-info-content h3 {
-    margin: 0.3rem 0;
-    font-size: 1.2rem;
-}
-
-.personal-info-content p {
-    margin: 0;
-    font-size: 0.9rem;
-    color: #5f6368;
-}
-
-.personal-info-buttons {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 1rem;
+    margin-bottom: 0.8rem;
+    object-fit: cover;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .personal-info-buttons button {
     flex: 1;
     padding: 0.5rem;
-    border: none;
     border-radius: 6px;
-    background: #fa5cbb;
-    color: #fff;
-    cursor: pointer;
     transition: background 0.2s;
 }
 
@@ -617,6 +574,520 @@ body {
     position: relative;
 }
 
+.personal-info-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1150;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(5px);
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 1;
+}
+
+.modal-content {
+    position: relative;
+    z-index: 2;
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    width: 350px;
+    max-width: 90%;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.modal-content .avatar-info {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 0.5rem;
+}
+
+.modal-content h3 {
+    margin: 0.5rem 0;
+    font-size: 1.2rem;
+}
+
+.modal-content p {
+    margin: 0.3rem;
+    margin-bottom: 0;
+    font-size: 0.9rem;
+    color: #5f6368;
+}
+
+.modal-content .personal-info-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 2.5rem;
+}
+
+
+.modal-content .close-personal-info {
+    position: absolute;
+    top: 0.8rem;
+    right: 1rem;
+    font-size: 1.3rem;
+    color: #555;
+    cursor: pointer;
+}
+
+.modal-content .personal-info-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 2.5rem;
+}
+
+.btn-outline-pink {
+    background: white;
+    border: 2px solid #fa5cbb;
+    color: #fa5cbb;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    flex: 1;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-pink:hover {
+    background: #fa5cbb;
+    color: white;
+}
+
+.btn-filled-pink {
+    background: #fa5cbb;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    flex: 1;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.btn-filled-pink:hover {
+    background: #ff85d3;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Avatar file input đẹp hơn */
+#avatarInput {
+    display: block;
+    margin: 0 auto 1rem auto;
+    border: 2px dashed #fa5cbb;
+    border-radius: 8px;
+    padding: 0.5rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #fa5cbb;
+    background-color: #fff0f6;
+    cursor: pointer;
+    width: 100%;
+    max-width: 250px;
+}
+
+#avatarInput:hover {
+    background-color: #ffe3f2;
+}
+
+/* Input tên người dùng */
+#nameInput {
+    width: 100%;
+    max-width: 250px;
+    margin: 0 auto 1rem auto;
+    padding: 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    text-align: center;
+    display: block;
+    box-sizing: border-box;
+}
+
+/* Email hiển thị */
+#userEmail {
+    font-weight: normal;
+    color: #888;
+    font-size: 0.9rem;
+}
+
+/* Nút hành động chỉnh sửa */
+#editActions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+#editActions button {
+    flex: 0 1 100px;
+}
+
+.avatar-edit-preview {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto 1rem auto;
+    border: 2px solid #fa5cbb;
+}
+
+.avatar-upload-btn {
+    display: inline-block;
+    background-color: #fff0f6;
+    color: #fa5cbb;
+    border: 1px dashed #fa5cbb;
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+    margin-bottom: 1rem;
+}
+
+.avatar-upload-btn:hover {
+    background-color: #ffe3f2;
+}
+
+.hidden {
+    display: none;
+}
+
+.avatar-edit-preview {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 1rem;
+    border: 2px solid #fa5cbb;
+    display: block;
+}
+
+.avatar-upload-btn {
+    display: block;
+    margin: 0 auto 1rem;
+    padding: 0.4rem 1rem;
+    border: 1px dashed #fa5cbb;
+    background: #fff0f7;
+    color: #fa5cbb;
+    text-align: center;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.avatar-upload-btn:hover {
+    background: #fa5cbb;
+    color: white;
+}
+
+.reset-password-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    margin-top: 1.5rem;
+}
+
+.reset-password-form input {
+    padding: 0.6rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+
+/* Setting Model - giao dien toi */
+.hidden {
+    display: none;
+}
+.setting-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1000;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    z-index: 1001;
+    border-radius: 8px;
+    width: 300px;
+}
+
+body.dark-mode {
+    font-family: Arial, sans-serif;
+    background: url('../image/darksky.jpg') no-repeat center center;
+    background-size: cover;
+    color: var(--text-color);
+    background-attachment: fixed;
+    color: #eee;
+}
+
+body.dark-mode .bi,
+body.dark-mode .sidebar li {
+    color: white;
+}
+
+body.dark-mode .user-menu li:hover .bi,
+body.dark-mode .sidebar li:hover,
+body.dark-mode .bi:hover {
+    color: gold;
+    transition: color 0.3s ease;
+}
+
+
+
+body.dark-mode .modal-content {
+    background: #222;
+    color: #eee;
+}
+
+.font-small {
+    font-size: 12px;
+}
+
+.font-medium {
+    font-size: 16px;
+}
+
+.font-large {
+    font-size: 20px;
+}
+
+/* giao dien setting */
+/* Modal ẩn */
+.hidden {
+    display: none;
+}
+
+/* Nền mờ */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 100;
+}
+
+/* Hộp modal chính */
+.modal-content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    padding: 24px 28px;
+    z-index: 101;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease-in-out;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Tiêu đề */
+.modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 22px;
+    text-align: center;
+}
+
+/* Nhóm cài đặt */
+.setting-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+/* Label bên trái */
+.setting-group>label:first-child {
+    font-weight: 600;
+    flex: 1 0 40%;
+    min-width: 120px;
+    color: #333;
+}
+
+/* Select dropdown */
+#fontSizeSelect {
+    flex: 1 0 55%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+/* Radio button group */
+.setting-group .radio-options {
+    flex: 1 0 55%;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.setting-group .radio-options label {
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #555;
+}
+
+
+.setting-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+/* Select + radio */
+#fontSizeSelect,
+.setting-group input[type="radio"] {
+    margin-right: 8px;
+}
+
+#fontSizeSelect {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+/* Radio label inline */
+.setting-group input[type="radio"]+label,
+.setting-group label input[type="radio"] {
+    display: inline-block;
+    margin-right: 12px;
+    font-weight: 500;
+    color: #555;
+}
+
+/* Nút lưu */
+#saveSettingsBtn {
+    display: block;
+    width: 100%;
+    padding: 10px 0;
+    background: #ff69b4;
+    /* màu hồng */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+#saveSettingsBtn:hover {
+    background: #ff2e9a;
+}
+
+/* Nút đóng (x icon) */
+.close-setting {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #888;
+    transition: color 0.2s ease;
+}
+
+.close-setting:hover {
+    color: #ff69b4;
+}
+
+/* DARK MODE */
+body.dark-mode .modal-content {
+    background: #222;
+    color: #eee;
+    box-shadow: 0 8px 20px rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .setting-group label {
+    color: #ddd;
+}
+
+body.dark-mode #fontSizeSelect {
+    background: #333;
+    color: #eee;
+    border: 1px solid #555;
+}
+
+body.dark-mode .setting-group input[type="radio"]+label,
+body.dark-mode .setting-group label input[type="radio"] {
+    color: #ccc;
+}
+
+body.dark-mode .close-setting {
+    color: #aaa;
+}
+
+body.dark-mode .close-setting:hover {
+    color: gold;
+}
+
+body.dark-mode .setting-group>label:first-child {
+    color: #ddd;
+}
+
+body.dark-mode #fontSizeSelect {
+    background: #333;
+    color: #eee;
+    border: 1px solid #555;
+}
+
+body.dark-mode .radio-options label {
+    color: #ccc;
+}
+
+
+/* Add note */
 .add-note-expanded,
 .add-note-bar {
     margin: 0 auto;
