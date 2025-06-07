@@ -438,8 +438,8 @@ body {
     top: 5rem;
     right: 10px;
     width: 320px;
-    background: rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.4)  ;
+    backdrop-filter: blur(13px);
     border-radius: 8px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
     overflow: hidden;
@@ -820,6 +820,7 @@ body.dark-mode {
     color: #eee;
 }
 
+
 body.dark-mode .bi,
 body.dark-mode .sidebar li {
     color: white;
@@ -832,10 +833,12 @@ body.dark-mode .bi:hover {
     transition: color 0.3s ease;
 }
 
-
-
 body.dark-mode .modal-content {
     background: #222;
+    color: #eee;
+}
+body.dark-mode .user-dropdown {
+    background: rgba(31, 30, 30, 0.4);
     color: #eee;
 }
 
