@@ -138,17 +138,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     return res.ok && (await res.json());
   }
 
-  async function deleteLabel(label_id) {
-    const formData = new URLSearchParams();
-    formData.append('action', 'delete');
-    formData.append('label_id', label_id);
 
+  async function deleteLabel(label_id) {
+    const body = new URLSearchParams({
+      action: 'delete',
+      label_id: label_id
+    });
     const res = await fetch('label.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: formData.toString()
+      body: body.toString()
     });
-    return res.ok && (await res.json());
+    return await res.json();
   }
   // ----------------------------
   // 4. Gọi loadLabels lần đầu
@@ -177,6 +178,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ----------------------------
   // 6. Nhập nhãn mới bằng input
   // ----------------------------
+
   input.addEventListener('keypress', async (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -197,7 +199,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (success) {
           input.value = '';
           await loadLabelsFromDB();
-          // location.reload();
+
         } else {
           showMessage('Failed to add label.');
         }
@@ -212,7 +214,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ----------------------------
   labellist.addEventListener('click', async (e) => {
     let target = e.target;
-
     if (!target.classList.contains('edit-label') && !target.classList.contains('delete-label')) {
       target = target.closest('.edit-label, .delete-label');
       if (!target) return;
@@ -222,7 +223,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (index === undefined) return;
     const labelObj = labels[index];
 
-    // ✅ Xử lý XÓA
+    // XỬ LÝ XÓA
     if (target.classList.contains('delete-label')) {
       const result = await Swal.fire({
         title: `Delete label "${labelObj.name_label}"?`,
@@ -231,21 +232,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         confirmButtonText: 'Delete',
         cancelButtonText: 'Cancel',
       });
+      if (!result.isConfirmed) return;
 
-      if (result.isConfirmed) {
-        try {
-          const response = await deleteLabel(labelObj.label_id);
-          if (response.success) {
-            await loadLabelsFromDB();
-            location.reload();
-          } else {
-            showMessage('Delete label failed: ' + (response.error || 'Cannot delete'));
+      try {
+        const response = await deleteLabel(labelObj.label_id);
+        if (response.success) {
+          // 1) Load lại nhãn (sidebar + modal)
+          await loadLabelsFromDB();
+          renderFilterLabels();  // cập nhật sidebar
+          renderLabels();        // cập nhật modal edit nhãn
+
+          // 2) Load lại ghi chú để update UI (loại bỏ tag đã xóa)
+          if (typeof fetchNotes === 'function') {
+            fetchNotes();
           }
-        } catch (error) {
-          showMessage('Network or server error. Cannot delete label while offline.');
+        } else {
+          showMessage('Không thể xóa nhãn: ' + (response.error || ''));
         }
+      } catch (err) {
+        console.error(err);
+        showMessage('Lỗi mạng, xóa nhãn thất bại.');
       }
-      return; // Để không chạy tiếp sửa
+      return; // dừng không vào phần chỉnh sửa nhãn
     }
 
     // ✅ Xử lý SỬA
@@ -286,7 +294,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           const response = await updateLabel(labelObj.label_id, newText);
           if (response.success) {
             await loadLabelsFromDB();
-            // location.reload();
+
 
           } else {
             // showMessage('Failed to update label on server. Please try again.');
@@ -309,4 +317,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       }, { once: true });
     }
   });
+
+
+  document.addEventListener('labelsUpdatedExternally', async () => {
+    await loadLabelsFromDB();
+  });
+
 });

@@ -49,18 +49,23 @@ try {
         exit;
     }
 
-    if ($action === 'delete') {
-        $label_id = (int)($_POST['label_id'] ?? 0);
-        if ($label_id <= 0) {
-            echo json_encode(['success' => false, 'error' => 'Invalid label_id']);
+ if ($action === 'delete') {
+        $label_id = $_POST['label_id'] ?? null;
+        if (!$label_id) {
+            echo json_encode(['success' => false, 'error' => 'Thiếu label_id']);
             exit;
         }
-        // Chỉ xóa nhãn của user hiện tại
-        $stmt = $pdo->prepare("DELETE FROM label WHERE label_id = ? AND user_id = ?");
-        $stmt->execute([$label_id, $user_id]);
-        echo json_encode(['success' => $stmt->rowCount() > 0]);
+        try {
+            // Xóa nhãn — ON DELETE CASCADE sẽ lo phần note_label
+            $stmt = $pdo->prepare("DELETE FROM label WHERE label_id = ?");
+            $stmt->execute([$label_id]);
+            echo json_encode(['success' => true]);
+        } catch (PDOException $e) {
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
         exit;
     }
+
 
     echo json_encode(['success' => false, 'error' => 'Unknown action or missing parameters']);
 } catch (PDOException $e) {
