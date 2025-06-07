@@ -836,7 +836,9 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(r => r.json())
             .then(renderNotes);
     }
+
     window.fetchNotes = fetchNotes;
+    window.renderNotes = renderNotes;
 
     //load trang
     fetchNotes();

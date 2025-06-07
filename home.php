@@ -111,7 +111,7 @@ $is_active = $_SESSION['is_active'] ?? 0;
         <div class="top-bar">
             <i class="bi-list" id="menuToggle" aria-label="Toggle menu" role="button" tabindex="0"></i>
             <h2><i class="bi bi-cloudy"></i> SkyNote</h2>
-            <input type="text" placeholder="Search..." aria-label="Search notes" />
+            <input type="text" id="searchInput" placeholder="Search..." aria-label="Search notes" />
             <i class="bi bi-list-task" id="toggleViewBtn" title="List view"></i>
             <i class="bi bi-person-circle" title="User account"></i>
         </div>
@@ -273,6 +273,7 @@ $is_active = $_SESSION['is_active'] ?? 0;
 
         <!-- <script src="js/script.js"></script> -->
         <script src="js/home.js"></script>
+        <script src="js/search.js"></script>
         <script src="js/filterNotesByLabel.js"></script>
         <script src="js/labels.js"></script>
         <script src="js/note_label.js"></script>

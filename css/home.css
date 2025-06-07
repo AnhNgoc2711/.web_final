@@ -27,7 +27,6 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     max-height: 4.2em;
-    /* Tuỳ chỉnh theo font, line-height */
     word-break: break-word;
     white-space: normal;
 }
@@ -36,13 +35,11 @@ body {
 .note .body {
     display: -webkit-box;
     -webkit-line-clamp: 3;
-    /* Số dòng tối đa muốn hiển thị */
     line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
     max-height: 4.2em;
-    /* Tuỳ chỉnh theo font, line-height */
     word-break: break-word;
     white-space: normal;
 }
@@ -209,8 +206,10 @@ body {
     box-shadow: 0 0 5px rgba(250, 92, 187, 0.6);
 }
 
-/* Note */
 
+
+
+/* Note */
 
 .note-list.grid-view {
     display: grid;
@@ -231,12 +230,6 @@ body {
 }
 
 
-
-
-
-/* Note */
-
-
 .note-list.grid-view {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -254,9 +247,6 @@ body {
     width: 100%;
     max-width: 100%;
 }
-
-
-
 
 
 /* Note */
@@ -375,7 +365,7 @@ body {
     color: #fa5cbb;
 }
 
-/* chuyen notes sang dang danh sach */
+/* grid sang list */
 .notes.list-view {
     display: flex;
     flex-direction: column;
@@ -521,7 +511,7 @@ body {
 
 
 
-/* chuyen notes sang dang danh sach */
+/* Grid sang list */
 .notes.list-view {
     display: flex;
     flex-direction: column;
@@ -1295,7 +1285,6 @@ body.dark-mode .modal-personal {
     font-size: 2rem;
     cursor: pointer;
     z-index: 2000;
-    /* Đảm bảo nút đóng luôn ở trên */
     color: #333;
     transition: color 0.2s ease;
 }
@@ -1435,8 +1424,6 @@ body.dark-mode .radio-options label {
 
 
 
-
-
 .hidden {
     display: none !important;
 }
@@ -1557,8 +1544,6 @@ body.dark-mode .radio-options label {
 }
 
 
-
-
 @keyframes popup-fadein {
     from {
         opacity: 0;
@@ -1579,7 +1564,6 @@ body.dark-mode .radio-options label {
     z-index: 999;
     inset: 0;
     background: rgba(0, 0, 0, 0.3);
-    /* nền tối mờ */
     justify-content: center;
     align-items: center;
     font-family: Arial, sans-serif;
@@ -1590,13 +1574,11 @@ body.dark-mode .radio-options label {
 
 .modal-content {
     background: rgba(255, 255, 255, 0.2);
-    /* trong suốt */
     border-radius: 16px;
     padding: 20px;
     width: 360px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(20px);
-    /* mờ nội dung trong modal */
     border: 1px solid rgba(255, 255, 255, 0.3);
     color: #fff;
     transition: all 0.3s ease;
@@ -1604,13 +1586,11 @@ body.dark-mode .radio-options label {
 
 .modal-content {
     background: rgba(255, 255, 255, 0.2);
-    /* trong suốt */
     border-radius: 16px;
     padding: 20px;
     width: 360px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(20px);
-    /* mờ nội dung trong modal */
     border: 1px solid rgba(255, 255, 255, 0.3);
     color: #fff;
     transition: all 0.3s ease;
@@ -1829,29 +1809,29 @@ body.dark-mode .radio-options label {
 
 #labelModal .label-icons i:hover.delete-label {
     color: #f44336;
-    /* đỏ */
 }
 
-/* .popup-content {
-  position: relative;
-} */
- 
+/* popup xóa lable */
+.swal2-container {
+    z-index: 99999;
+}
+
 
 /* Popup nhãn sẽ hiển thị bên dưới hàng icon */
 #label-popup {
-  position: absolute;
-  top: 40px;
-  right: 16px;
-  width: 280px;
-  max-height: 400px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-  padding: 12px;
-  z-index: 1500;
-  overflow: hidden;
-  display: none;
-  transform: none;     
+    position: absolute;
+    top: 40px;
+    right: 16px;
+    width: 280px;
+    max-height: 400px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    padding: 12px;
+    z-index: 1500;
+    overflow: hidden;
+    display: none;
+    transform: none;
 }
 
 #label-popup strong {
@@ -1949,27 +1929,18 @@ body.dark-mode .radio-options label {
 /* Ẩn popup mặc định */
 .size-type-popup {
     display: none;
-    /* Ẩn khi có class .hidden */
     position: absolute;
     bottom: 100%;
-    /* Hiển ở trên icon */
     left: 0;
     margin-bottom: 8px;
-    /* Khoảng cách giữa icon và popup */
     background-color: #fff;
     border: 1px solid #ddd;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     z-index: 10;
-
-    /* ------------ THAY ĐỔI NÀY ------------ */
     display: flex;
-    /* Cho phép xếp con ngang hàng */
     flex-direction: row;
-    /* Tất cả phần tử con (H1/H2/H3) nằm 1 hàng */
     padding: 0;
-    /* Ta sẽ set padding cho từng .size-option bên dưới */
     border-radius: 4px;
-    /* Tùy chỉnh bo góc nếu cần */
 }
 
 /* Nếu vẫn còn class .hidden thì ẩn */
@@ -1977,12 +1948,12 @@ body.dark-mode .radio-options label {
     display: none !important;
 }
 
-/* Khi remove class .hidden (tức .size-type-popup) thì hiển thị flex */
+/* Khi remove class .hidden thì hiển thị flex */
 .size-type-popup:not(.hidden) {
     display: flex !important;
 }
 
-/* ----- CSS CHO CÁC PHẦN TỬ H1/H2/H3 ----- */
+/* CÁC PHẦN TỬ H1/H2/H3*/
 .size-option {
     padding: 8px 12px;
     cursor: pointer;
