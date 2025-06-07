@@ -27,7 +27,6 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        // Thay addAll bằng add từng url để bắt lỗi riêng từng url
         return Promise.all(
           URLS_TO_CACHE.map(url =>
             cache.add(url).catch(err => {
@@ -52,15 +51,10 @@ self.addEventListener('activate', event => {
   );
 });
 
+
 // Xử lý fetch request: ưu tiên fetch từ mạng, fallback cache
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
-
-  //Lấy CSS trực tiếp từ mạng
-  // if (event.request.destination === 'style' ||
-  //   event.request.url.endsWith('.css')) {
-  //   return event.respondWith(fetch(event.request));
-  // }
 
   // Chỉ xử lý GET
   if (event.request.method !== 'GET') {

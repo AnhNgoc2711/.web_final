@@ -10,10 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const addLabelBtn = document.getElementById('add-label-btn');
 
     if (newLabelInput && addLabelBtn) {
-        // ban đầu disable
         addLabelBtn.disabled = true;
-
-        // bật nút khi nhập
         newLabelInput.addEventListener('input', () => {
             addLabelBtn.disabled = newLabelInput.value.trim() === '';
         });
@@ -21,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     }
 
-    // Các phần tử DOM đã tồn tại có thể xử lý sự kiện
+    // DOM đã tồn tại có thể xử lý sự kiện
     if (labelIcon) {
         labelIcon.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -34,12 +31,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (window.currentNoteId) {
                     loadLabelsForNote(window.currentNoteId);
                 } else {
-                    console.warn('Chưa có note_id được chọn!');
+                    console.warn('No note_id selected yet!');
                 }
             }
         });
     } else {
-        console.error('Phần tử #label-icon không tồn tại trong DOM.');
+        console.error('The #label-icon element does not exist in the DOM.');
     }
 
     document.addEventListener('click', (e) => {
@@ -71,20 +68,19 @@ document.addEventListener('DOMContentLoaded', () => {
             cb.checked = selectedLabels.has(l.label_id);
 
             cb.addEventListener('change', async e => {
-                // 1) Cập nhật set của mình
+                //Cập nhật set của mình
                 if (e.target.checked) selectedLabels.add(l.label_id);
                 else selectedLabels.delete(l.label_id);
 
-                // 2) Cập nhật hiển thị tag ở dưới modal
+                //Cập nhật hiển thị tag ở dưới modal
                 updateSelectedLabelsDisplay();
 
-                // 3) Autosave ngay lập tức
+                //Autosave 
                 await saveLabelsForNote(
                     window.currentNoteId,
                     Array.from(selectedLabels)
                 );
 
-                // 4) Refresh lại danh sách note ở background (nếu cần)
                 window.fetchNotes?.();
             });
 
@@ -118,10 +114,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 labels = data.data;
                 renderLabels();
             } else {
-                showMessage('Lỗi tải nhãn từ server');
+                showMessage('Error loading label from server');
             }
         } catch (e) {
-            showMessage('Lỗi mạng khi tải nhãn');
+            showMessage('Network error while loading label');
         }
     }
 
@@ -141,12 +137,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderLabels();
                 }
             } catch (jsonErr) {
-                console.error('Không parse được JSON, response:', text);
+                console.error('Could not parse JSON, response:', text);
                 selectedLabels.clear();
                 renderLabels();
             }
         } catch (err) {
-            console.error('Lỗi load label cho ghi chú:', err);
+            console.error('Error loading label for note:', err);
         }
     }
 
@@ -164,10 +160,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             console.log('Response from saveLabelsForNote:', data); // <-- log response JSON
             if (!data.success) {
-                console.error('Lỗi khi lưu nhãn:', data.error);
+                console.error('Error saving label:', data.error);
             }
         } catch (error) {
-            console.error('Lỗi fetch saveLabelsForNote:', error);
+            console.error('Error fetch saveLabelsForNote:', error);
         }
     }
 
@@ -202,8 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
         newLabelInput.value = '';
         addLabelBtn.disabled = true;
 
-        // ✅ GỌI đúng hàm cập nhật labels của note_label.js (KHÔNG gọi window. nữa!)
-        await loadLabelsFromDB(); // cập nhật biến `labels` nội bộ
+        await loadLabelsFromDB();
         if (typeof window.currentNoteId !== 'undefined') {
             await loadLabelsForNote(window.currentNoteId); // cập nhật selected checkbox
         }
@@ -211,21 +206,20 @@ document.addEventListener('DOMContentLoaded', () => {
         // Render lại giao diện
         renderLabels();
         updateSelectedLabelsDisplay();
-        // BẮN SỰ KIỆN CHO labels.js NHẬN
+
+        //Báo cho labels.js nhận
         document.dispatchEvent(new CustomEvent('labelsUpdatedExternally'));
 
     });
 
 
-
-
-    // Cho các hàm này có thể gọi từ home.js
+    //các hàm này có thể gọi từ home.js
     window.loadLabelsForNote = loadLabelsForNote;
     window.saveLabelsForNote = saveLabelsForNote;
     window.renderLabels = renderLabels;
     window.updateSelectedLabelsDisplay = updateSelectedLabelsDisplay;
 
 
-    // Tải danh sách nhãn ban đầu
+    //load danh sách nhãn 
     loadLabelsFromDB();
 });

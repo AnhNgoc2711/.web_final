@@ -135,26 +135,72 @@ $is_active = $_SESSION['is_active'] ?? 0;
 
                 <ul class="user-menu">
                     <li id="openPersonalInfo"><i class="bi bi-person-circle"></i> Personal Information
-                    <li><i class="bi bi-gear"></i> Setting</li>
-
+                    </li>
+                    <li id="openSettingBtn"><i class="bi bi-gear"></i> Setting</li>
+                    <li></li>
                     <li id="logoutBtn"><i class="bi bi-box-arrow-right"></i> Logout</li>
                 </ul>
             </div>
 
-            <!-- Tab chứa thông tin cá nhân (ẩn ban đầu) -->
-            <div class="personal-info-tab" id="personalInfoTab">
-                <div class="personal-info-content">
-                    <i class="bi bi-x close-personal-info" title="Close" role="button" tabindex="0"></i>
-
-                    <img src="image/icontitle.jpg" alt="Avatar" class="avatar-info" />
-                    <h3>Tên người dùng</h3>
-                    <p>Email: user@example.com</p>
-
-                    <div class="personal-info-buttons">
-                        <button>Reset Password</button>
-                        <button>Edit information</button>
+            <!-- Modal thông tin cá nhân -->
+            <div class="personal-info-modal hidden" id="personalInfoModal">
+                <div class="modal-overlay">
+                    <div class="modal-personal">
+                        <i class="bi bi-x close-personal-info" title="Close" role="button" tabindex="0"></i>
+                        <!-- Avatar hiện thị -->
+                        <img id="avatarPreview" src="image/icontitle.jpg" alt="Avatar" class="avatar-edit-preview" />
+                        <label for="avatarInput" id="avatarLabel" class="avatar-upload-btn">Chọn ảnh mới</label>
+                        <input type="file" id="avatarInput" accept="image/*" class="hidden" />
+                        <!-- Hiển thị tên -->
+                        <h3 id="displayName">Username</h3>
+                        <input type="text" class="hidden" id="nameInput" value="Tên người dùng" />
+                        <!-- Email -->
+                        <p id="emailDisplay">Email: <span id="userEmail">user@example.com</span></p>
+                        <div class="personal-info-buttons" id="viewButtons">
+                            <button class="btn-outline-pink" id="resetPasswordBtn">Reset Password</button>
+                            <button class="btn-filled-pink" id="editInfoBtn">Edit Information</button>
+                        </div>
+                        <div class="personal-info-buttons hidden" id="editActions">
+                            <button class="btn-outline-pink" id="cancelEditBtn">Cancel</button>
+                            <button class="btn-filled-pink" id="saveEditBtn">Save</button>
+                        </div>
+                        <!-- Form đổi mật khẩu (ẩn mặc định) -->
+                        <div class="reset-password-form hidden" id="resetPasswordForm">
+                            <input type="password" id="oldPassword" placeholder="Nhập mật khẩu cũ" />
+                            <input type="password" id="newPassword" placeholder="Nhập mật khẩu mới" />
+                            <input type="password" id="confirmNewPassword" placeholder="Nhập lại mật khẩu mới" />
+                            <div class="personal-info-buttons">
+                                <button class="btn-outline-pink" id="cancelResetBtn">Cancel</button>
+                                <button class="btn-filled-pink" id="saveResetBtn">Save</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
+        </div>
+        <!-- Modal Setting -->
+        <div class="setting-modal hidden" id="settingModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-personal">
+                <i class="bi bi-x close-setting" title="Close" role="button" tabindex="0"></i>
+                <h3>Settings</h3>
+                <div class="setting-group">
+                    <label for="fontSizeSelect">Font Size:</label>
+                    <select id="fontSizeSelect">
+                        <option value="small">Small</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="large">Large</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label>Theme:</label>
+                    <div class="radio-options">
+                        <label><input type="radio" name="theme" value="light" checked> Light</label>
+                        <label><input type="radio" name="theme" value="dark"> Dark</label>
+                    </div>
+                </div>
+                <button id="saveSettingsBtn" class="btn-filled-pink">Save</button>
             </div>
         </div>
 

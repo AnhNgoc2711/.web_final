@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function () {
             formData.append('content', content);
             if (autosaveNoteId) formData.append('note_id', autosaveNoteId);
 
-            // Bổ sung lấy label từ bản 2
+            // lấy label 
             const checkboxes = document.querySelectorAll('#label-selection input[type="checkbox"]:checked');
             const selectedLabels = Array.from(checkboxes).map(cb => cb.value);
             formData.append('labels', JSON.stringify(selectedLabels));
@@ -327,7 +327,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const contentInput = document.getElementById('modal-content');
         const iconsDiv = popup.querySelector('.icons');
         let newNoteIconState = { pinned: 0, locked: 0, is_shared: 0, has_label: 0 };
-        let autosaveNoteId = null; // biến này được gán sau khi lần autosave đầu tiên trả về note_id
+        let autosaveNoteId = null;
 
         function updateIcons() {
             iconsDiv.innerHTML = generatePopupIconsHTML(newNoteIconState);
@@ -354,12 +354,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     });
 
-                    // **Sửa ở đây**: dùng autosaveNoteId thay cho note.note_id
+                    //dùng autosaveNoteId thay cho note.note_id
                     sizePopup.querySelectorAll('.size-option').forEach(opt => {
                         opt.onclick = function (e) {
                             e.stopPropagation();
                             const size = this.dataset.size;
-                            // Nếu autosaveNoteId chưa set (chưa tạo note lần nào), ta không làm gì
                             if (!autosaveNoteId) return;
 
                             fetch('note_test.php', {
@@ -381,10 +380,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
 
-            // Phần bind event cho pin/lock/share/tag vẫn giữ nguyên
+            // Phần bind event cho pin/lock/share/tag giữ nguyên
             iconsDiv.querySelectorAll('i[data-action]').forEach(icon => {
                 const action = icon.dataset.action;
-                if (action === 'size') return; // không đụng tới “size” nữa vì đã bind bên trên
+                if (action === 'size') return;
                 icon.onclick = function (e) {
                     e.stopPropagation();
                     if (action === 'pin') newNoteIconState.pinned ^= 1;
@@ -401,11 +400,7 @@ document.addEventListener('DOMContentLoaded', function () {
         titleInput.value = '';
         contentInput.value = '';
 
-
-        // === BỔ SUNG: Khi mới mở modal, chưa có chọn size nào, ta có thể reset class size cũ ===
         contentInput.classList.remove('size-h1', 'size-h2', 'size-h3');
-
-
 
         // Autosave – gán autosaveNoteId khi server trả về note_id
         let saveTimer = null;
@@ -462,8 +457,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const titleInput = document.getElementById('modal-title');
         const contentInput = document.getElementById('modal-content');
         const iconsDiv = popup.querySelector('.icons');
-        // Có thể lấy container label nếu cần: 
-        // const selectedLabelsContainer = document.getElementById('selected-labels');
 
         popup.classList.remove('hidden');
         titleInput.value = note.title || '';
@@ -478,7 +471,7 @@ document.addEventListener('DOMContentLoaded', function () {
             size_type: note.size_type || 'H2'
         };
 
-        // === Giữ nguyên: Khi mở modal, gán class size cho textarea
+        // Khi mở modal, gán class size cho textarea
         contentInput.classList.remove('size-h1', 'size-h2', 'size-h3');
         contentInput.classList.add('size-' + iconState.size_type.toLowerCase());
 
@@ -489,23 +482,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 e.stopPropagation();
                 const popup = document.getElementById('label-popup');
 
-                // 1) Đóng nếu đang mở
+                // Đóng nếu đang mở
                 if (popup.style.display === 'block') {
                     popup.style.display = 'none';
                     return;
                 }
 
-                // 2) Kiểm tra note đã chọn chưa
+                // Kiểm tra note đã chọn chưa
                 if (!window.currentNoteId) {
-                    return alert('Bạn chưa chọn note nào để gắn label');
+                    return alert('You have not selected any notes to label.');
                 }
 
-                // 3) Load nhãn của note -> render lên popup
+                //Load nhãn của note -> render lên popup
                 await window.loadLabelsForNote(window.currentNoteId);
                 window.renderLabels();
                 window.updateSelectedLabelsDisplay();
 
-                // 4) Hiển thị popup
                 popup.style.display = 'block';
             });
 
@@ -516,7 +508,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const sizePopup = sizeTypeWrapper.querySelector('.size-type-popup');
 
                 if (sizeIcon && sizePopup) {
-                    // Khi click vào icon size, chỉ hiện/ẩn popup
+                    // Khi click vào icon size -> hiện/ẩn popup
                     sizeIcon.onclick = function (e) {
                         e.stopPropagation();
                         sizePopup.classList.toggle('hidden');
@@ -558,14 +550,14 @@ document.addEventListener('DOMContentLoaded', function () {
                                     fetchNotes();
                                 })
                                 .catch(err => {
-                                    showMessage('Lỗi khi set_size_type: ' + err);
+                                    showMessage('Error set_size_type: ' + err);
                                 });
                         };
                     });
                 }
             }
 
-            // Gán sự kiện cho các icon pin/lock/share/tag (loại trừ icon size)
+            // Assign events to pin/lock/share/tag icons (except size icon)
             iconsDiv.querySelectorAll('i[data-action]').forEach(icon => {
                 const action = icon.dataset.action;
                 if (action === 'size') return;
@@ -598,17 +590,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
         updateIcons();
 
-        // ==== AUTOSAVE tối ưu ====
+        // AUTOSAVE
         let saveTimer = null;
         function autosaveModal() {
             clearTimeout(saveTimer);
             saveTimer = setTimeout(() => {
-                // 1. Kiểm tra mạng trước khi autosave
+                // Kiểm tra mạng trước khi autosave
                 if (!navigator.onLine) {
                     showMessage("❌ Connection lost, please check your network and try again.");
                     return;
                 }
-                // 2. Lưu nội dung note
+                //Lưu nội dung note
                 fetch('note.php', {
                     method: 'POST',
                     body: new URLSearchParams({
@@ -619,7 +611,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }).then(r => r.json())
                     .then(data => {
                         fetchNotes(); // update lại danh sách note
-                        // 3. Autosave label nếu có hàm saveLabelsForNote
+                        //  Autosave label 
                         if (typeof saveLabelsForNote === 'function') {
                             saveLabelsForNote(note.note_id);
                         }
@@ -632,7 +624,7 @@ document.addEventListener('DOMContentLoaded', function () {
         titleInput.oninput = autosaveModal;
         contentInput.oninput = autosaveModal;
 
-        // Đóng popup khi bấm nút close
+        // Đóng popup X
         const popupCloseBtn = document.getElementById('popup-close');
         if (popupCloseBtn) {
             popupCloseBtn.onclick = hideEditModal;
@@ -655,14 +647,12 @@ document.addEventListener('DOMContentLoaded', function () {
     function renderNotes(notes) {
         const container = document.querySelector('.notes');
         if (!container) return;
-
-        // Tách note thành 2 nhóm, ép kiểu string
         const pinnedNotes = notes.filter(n => String(n.pinned) === '1');
         const normalNotes = notes.filter(n => String(n.pinned) === '0');
 
         let html = "";
 
-        // Nhóm note được pin
+        // Pinned
         if (pinnedNotes.length > 0) {
             html += `
         <div class="note-group">
@@ -674,7 +664,7 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
         }
 
-        // Nhóm note bình thường
+        // Not Pinned
         if (normalNotes.length > 0) {
             html += `
         <div class="note-group">
@@ -698,7 +688,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (note.labels && Array.isArray(note.labels) && note.labels.length > 0) {
             labelHtml += `<div class="note-labels" style="margin-top: 8px;">`;
             note.labels.forEach(label => {
-                // Tương thích cả dạng string hoặc object { name_label: ... }
+
                 const labelName = typeof label === 'object' && label.name_label ? label.name_label : label;
                 labelHtml += `
                 <span class="label" style="
@@ -714,7 +704,7 @@ document.addEventListener('DOMContentLoaded', function () {
             labelHtml += `</div>`;
         }
 
-        // HTML chính, ghép labelHtml vào đúng chỗ dưới content
+        // ghép labelHtml vào đúng chỗ dưới content
         if (note.title && note.title.trim() !== "") {
             return `
             <div class="note" data-note-id="${note.note_id}">
@@ -748,7 +738,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     function saveLabelsForNote(note_id) {
-        // Giả sử bạn có checkbox đã lấy sẵn selectedLabels
         const checkboxes = document.querySelectorAll('#label-selection input[type="checkbox"]:checked');
         const selectedLabels = Array.from(checkboxes).map(cb => cb.value);
 
@@ -784,7 +773,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 const action = this.dataset.action;
 
                 if (action === 'delete') {
-                    // Mở modal xác nhận xóa
                     pendingDeleteNoteId = noteId;
                     document.getElementById('deleteConfirmModal').classList.remove('hidden');
                     return;
@@ -808,7 +796,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function attachNoteClickEvents() {
         document.querySelectorAll('.note').forEach(el => {
             el.addEventListener('click', function (e) {
-                if (e.target.closest('.icons')) return; // Không mở popup khi click icon
+                if (e.target.closest('.icons')) return;
                 const noteId = el.getAttribute('data-note-id');
                 fetch('note.php')
                     .then(r => r.json())
@@ -842,9 +830,6 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
 
-
-
-
     // Lấy danh sách note từ API
     async function fetchNotes() {
         fetch('note.php')
@@ -853,7 +838,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     window.fetchNotes = fetchNotes;
 
-    // Gọi khi load trang
+    //load trang
     fetchNotes();
 
     //Logout 

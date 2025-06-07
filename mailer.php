@@ -6,9 +6,6 @@ require 'vendor/autoload.php';
 function send_mail($to, $subject, $body)
 {
     $mail = new PHPMailer(true);
-
-    // $email = 'ngoccphamm2711@gmail.com';
-    // $password = 'alhwfvzpmldomdtg';
     $email = 'anhthunguyne@gmail.com';
     $password = 'dbkliaovfbnjzuiu';
 

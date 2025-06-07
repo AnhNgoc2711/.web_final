@@ -14,7 +14,7 @@ if ($email && $token) {
 
     if ($user) {
         if ($user['is_active']) {
-            $message = "🎉 Your account is already activated!";
+            $message = "Your account is already activated!";
             $success = true;
         } else {
             // 2. Kiểm tra token có hợp lệ trong bảng TOKEN
@@ -24,11 +24,11 @@ if ($email && $token) {
 
             if ($tokenRow) {
                 if ($tokenRow['used']) {
-                    $message = "❌ This activation link has already been used.";
+                    $message = "This activation link has already been used.";
                 } else {
                     $now = date('Y-m-d H:i:s');
                     if ($tokenRow['expires_at'] && $tokenRow['expires_at'] < $now) {
-                        $message = "❌ This activation link has expired.";
+                        $message = "This activation link has expired.";
                     } else {
                         // 3. Cập nhật active user và đánh dấu token đã dùng
                         $pdo->beginTransaction();
@@ -47,16 +47,16 @@ if ($email && $token) {
                         }
 
 
-                        $message = "🎉 Your account has been successfully activated!";
+                        $message = "Your account has been successfully activated!";
                         $success = true;
                     }
                 }
             } else {
-                $message = "❌ The verification link is invalid.";
+                $message = "The verification link is invalid.";
             }
         }
     } else {
-        $message = "❌ User not found.";
+        $message = " User not found.";
     }
 } else {
     $message = "⚠️ Missing verification details.";

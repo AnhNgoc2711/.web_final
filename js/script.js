@@ -3,7 +3,7 @@ function saveNoteOffline(note) {
     let offlineNotes = JSON.parse(localStorage.getItem('offlineNotes')) || [];
     offlineNotes.push(note);
     localStorage.setItem('offlineNotes', JSON.stringify(offlineNotes));
-    showMessage("📴 Bạn đang offline. Ghi chú đã được lưu tạm thời.");
+    showMessage(" You are offline. The note has been temporarily saved.");
 }
 
 // Tự động gửi lại khi có mạng
@@ -23,10 +23,10 @@ window.addEventListener('online', () => {
             return res.json();
         })
         .then(data => {
-            console.log('✅ Đồng bộ thành công:', data);
+            console.log('Synchronization successful:', data);
         })
         .catch(err => {
-            console.error('❌ Lỗi khi đồng bộ:', err);
+            console.error('Error while syncing:', err);
         });
     });
 
@@ -63,11 +63,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 return res.json();
             })
             .then(data => {
-                console.log('✅ Ghi chú đã lưu online:', data);
+                console.log('Notes saved online:', data);
                 location.reload();
             })
             .catch(err => {
-                console.error('❌ Lỗi khi gửi ghi chú:', err);
+                console.error('Error sending note:', err);
                 saveNoteOffline(note);
             });
         }

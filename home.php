@@ -152,8 +152,6 @@ $is_active = $_SESSION['is_active'] ?? 0;
 
         <!-- Vị trí hiển thị danh sách note -->
         <div class="notes" aria-live="polite">
-            <!-- Vị trí hiển thị danh sách note -->
-            <!-- <div id="selected-labels"></div> -->
         </div>
     </div>
 
@@ -179,7 +177,7 @@ $is_active = $_SESSION['is_active'] ?? 0;
             <div class="modal-overlay">
                 <div class="modal-personal">
                     <i class="bi bi-x close-personal-info" title="Close" role="button" tabindex="0"></i>
-                    <!-- Avatar hiện thị (vẫn hiện trong reset password) -->
+                    <!-- Avatar hiện thị -->
                     <img id="avatarPreview" src="image/icontitle.jpg" alt="Avatar" class="avatar-edit-preview" />
                     <label for="avatarInput" id="avatarLabel" class="avatar-upload-btn">Chọn ảnh mới</label>
                     <input type="file" id="avatarInput" accept="image/*" class="hidden" />

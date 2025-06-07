@@ -9,11 +9,10 @@ use PHPMailer\PHPMailer\Exception;
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $email = $_POST['email'] ?? '';
-    $name = $_POST['name'] ?? '';  // đổi thành name
+    $name = $_POST['name'] ?? '';
     $password = $_POST['password'] ?? '';
     $confirmPassword = $_POST['confirm'] ?? '';
 
-    // Kiểm tra đầu vào
     if (empty($email) || empty($name) || empty($password) || empty($confirmPassword)) {
         $_SESSION['register_error'] = "Please fill in all fields.";
         header("Location: login.php");
@@ -57,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $stmt = $pdo->prepare("INSERT INTO TOKEN (user_id, token, type, used, expires_at) VALUES (?, ?, 'activation', 0, ?)");
     $stmt->execute([$userId, $token, $expiresAt]);
 
-    // Đăng nhập tự động sau khi đăng ký (nhưng tài khoản chưa active)
+    // Đăng nhập tự động sau khi đăng ký 
     $_SESSION['user_id'] = $userId;
     $_SESSION['email'] = $email;
     $_SESSION['fullname'] = $name;

@@ -29,7 +29,7 @@ if (resetForm) {
             formData.append('email', email);
             formData.append('otp', otp);
         }
-        // Nếu có token (tức là reset qua link)
+        // Nếu có token (reset qua link)
         if (token) {
             formData.append('token', token);
         }

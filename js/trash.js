@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 });
 
-// Định nghĩa hàm renderNotes trước
+
 function renderNotes(notes) {
     const container = document.querySelector('.notes');
     if (!container) return;
@@ -63,7 +63,7 @@ function fetchTrashNotes() {
         .then(renderNotes);
 }
 
-// Gọi khi load
+//load
 fetchTrashNotes();
 
 // Xử lý icon click
@@ -86,7 +86,6 @@ document.addEventListener('click', function (e) {
     }
 
     if (action === 'delete_forever') {
-        // Mở modal xác nhận thay vì confirm
         noteIdToDelete = noteId;
         document.getElementById('deleteConfirmModal').classList.remove('hidden');
     }

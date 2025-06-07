@@ -1,7 +1,7 @@
 <?php
 session_start();
 header('Content-Type: application/json');
-require 'db.php'; // file này phải khởi tạo biến $pdo
+require 'db.php';
 
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
@@ -36,7 +36,7 @@ try {
     }
 
     if ($action === 'update') {
-        $label_id = (int)($_POST['label_id'] ?? 0);
+        $label_id = (int) ($_POST['label_id'] ?? 0);
         $name_label = trim($_POST['name_label'] ?? '');
         if ($label_id <= 0 || $name_label === '') {
             echo json_encode(['success' => false, 'error' => 'Invalid parameters']);
@@ -49,14 +49,14 @@ try {
         exit;
     }
 
- if ($action === 'delete') {
+    if ($action === 'delete') {
         $label_id = $_POST['label_id'] ?? null;
         if (!$label_id) {
             echo json_encode(['success' => false, 'error' => 'Thiếu label_id']);
             exit;
         }
         try {
-            // Xóa nhãn — ON DELETE CASCADE sẽ lo phần note_label
+            // Xóa nhãn 
             $stmt = $pdo->prepare("DELETE FROM label WHERE label_id = ?");
             $stmt->execute([$label_id]);
             echo json_encode(['success' => true]);

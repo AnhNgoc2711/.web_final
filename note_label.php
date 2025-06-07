@@ -1,7 +1,7 @@
 <?php
 ini_set('display_errors', 0);
 error_reporting(E_ALL);
-require_once 'db.php'; // Kết nối CSDL, tạo biến $pdo
+require_once 'db.php';
 
 header('Content-Type: application/json');
 
@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-// Lấy nhãn theo note_id (GET)
+// Lấy nhãn theo note_id
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $note_id = $_GET['note_id'] ?? null;
 
@@ -60,4 +60,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 
 // Không đúng phương thức
-echo json_encode(['success' => false, 'error' => 'Phương thức không hợp lệ']);
+echo json_encode(['success' => false, 'error' => 'Invalid method']);

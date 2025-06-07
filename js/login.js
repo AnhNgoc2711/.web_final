@@ -3,6 +3,7 @@ function showTab(formId, event) {
   document.querySelectorAll('.home-right form').forEach(f => f.classList.remove('active'));
   document.getElementById(formId).classList.add('active');
 }
+
 // Ẩn/hiện Password
 document.querySelectorAll('.toggle-password').forEach(icon => {
   icon.addEventListener('click', () => {

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'db.php'; // Đảm bảo đã có biến $pdo
+require 'db.php'; 
 
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    // === LẤY DANH SÁCH NOTE ===
+    //LẤY DANH SÁCH NOTE 
     $stmt = $pdo->prepare("SELECT * FROM note WHERE user_id = ? AND is_deleted = 0 ORDER BY pinned DESC, updated_at DESC");
     $stmt->execute([$user_id]);
     $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // === TẠO HOẶC UPDATE NOTE (AUTOSAVE) ===
+    // AUTOSAVE
     $title = $_POST['title'] ?? '';
     $content = $_POST['content'] ?? '';
     $color = $_POST['color'] ?? null;
@@ -76,7 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-// Nếu không phải GET hoặc POST thì báo lỗi:
 http_response_code(405);
 echo json_encode(['error' => 'Method not allowed']);
 exit;

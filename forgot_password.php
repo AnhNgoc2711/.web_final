@@ -5,7 +5,7 @@ header('Content-Type: application/json');
 date_default_timezone_set('Asia/Ho_Chi_Minh');
 
 
-// 1. XÁC NHẬN OTP
+// XÁC NHẬN OTP
 if (isset($_POST['action']) && $_POST['action'] === 'verify_otp') {
     $email = $_POST['email'] ?? '';
     $otp = $_POST['otp'] ?? '';
@@ -31,7 +31,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'verify_otp') {
     exit;
 }
 
-// 2. ĐẶT LẠI MẬT KHẨU (sau khi xác thực OTP hoặc qua link)
+//ĐẶT LẠI MẬT KHẨU
 if (isset($_POST['action']) && $_POST['action'] === 'reset_password') {
     $email = $_POST['email'] ?? '';
     $otp = $_POST['otp'] ?? '';
@@ -91,7 +91,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'reset_password') {
     exit;
 }
 
-// 3. GỬI OTP HOẶC LINK
+// GỬI OTP HOẶC LINK
 $email = $_POST['email'] ?? '';
 $method = $_POST['method'] ?? '';
 

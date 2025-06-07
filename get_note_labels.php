@@ -1,5 +1,5 @@
 <?php
-require_once 'db.php'; // Kết nối CSDL, tạo biến $pdo
+require_once 'db.php';
 
 header('Content-Type: application/json');
 
