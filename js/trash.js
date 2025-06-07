@@ -50,13 +50,14 @@ function generateNoteHTML(note) {
             <i class="bi bi-trash-fill" data-action="delete_forever" title="Delete"></i>
         </div>
         <div class="content">
-            <div class="title">${note.title || note.content || "()"}</div>
+            <div class="title">${note.title || note.content}</div>
             <div class="body">${note.content || ""}</div>
         </div>
     </div>
     `;
 }
 
+let noteIdToDelete = null;
 function fetchTrashNotes() {
     fetch('note.php?trash=1')
         .then(r => r.json())
@@ -87,7 +88,7 @@ document.addEventListener('click', function (e) {
 
     if (action === 'delete_forever') {
         noteIdToDelete = noteId;
-        document.getElementById('deleteConfirmModal').classList.remove('hidden');
+        document.getElementById('deleteConfirmModal').classList.add('show');
     }
 });
 
@@ -103,14 +104,14 @@ document.getElementById('confirmDeleteBtn').onclick = function () {
     })
         .then(r => r.json())
         .then(() => {
-            document.getElementById('deleteConfirmModal').classList.add('hidden');
+            document.getElementById('deleteConfirmModal').classList.remove('show');
             fetchTrashNotes();
             noteIdToDelete = null;
         });
 };
 
 document.getElementById('cancelDeleteBtn').onclick = function () {
-    document.getElementById('deleteConfirmModal').classList.add('hidden');
+    document.getElementById('deleteConfirmModal').classList.remove('show');
     noteIdToDelete = null;
 };
 

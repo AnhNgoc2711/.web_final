@@ -268,7 +268,7 @@ $is_active = $_SESSION['is_active'] ?? 0;
     </div>
 
     <!-- Modal xác nhận xóa -->
-    <div id="deleteConfirmModal" class="modal-confirm hidden">
+    <div id="deleteConfirmModal" class="modal-confirm ">
         <div class="modal-content-confirm">
             <div class="modal-title">Delete note?</div>
             <div class="modal-body">

@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const menuToggle = document.getElementById('menuToggle');
     const mainContent = document.querySelector('.main');
     const closeSidebar = document.querySelector('.close-sidebar');
+    let pendingDeleteNoteId = null;
 
     function showMessage(msg, duration = 3000) {
         const msgBox = document.getElementById('messageBox');
@@ -224,12 +225,18 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Mở form tạo note
+    // window.expandAddNote = function () {
+    //     addNoteBar.classList.add('hidden');
+    //     addNoteExpanded.classList.remove('hidden');
+    //     resetAddNoteForm();
+    //     contentInput.focus();
+    // };
+
     window.expandAddNote = function () {
-        addNoteBar.classList.add('hidden');
-        addNoteExpanded.classList.remove('hidden');
-        resetAddNoteForm();
-        contentInput.focus();
+        showCreateNoteModal();
     };
+
+
 
     // Đóng form khi click close
     closeBtn.addEventListener('click', function (e) {
@@ -321,122 +328,108 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let newNoteIconState = { pinned: 0, locked: 0, is_shared: 0, has_label: 0 };
 
+
     function showCreateNoteModal() {
         const popup = document.getElementById('popup-modal');
         const titleInput = document.getElementById('modal-title');
         const contentInput = document.getElementById('modal-content');
         const iconsDiv = popup.querySelector('.icons');
-        let newNoteIconState = { pinned: 0, locked: 0, is_shared: 0, has_label: 0 };
+        const inner = popup.querySelector('.popup-content');
+
         let autosaveNoteId = null;
 
-        const inner = popup.querySelector('.popup-content');
+        // Reset mọi thứ mỗi lần mở
+        titleInput.value = '';
+        contentInput.value = '';
+        contentInput.classList.remove('size-h1', 'size-h2', 'size-h3');
         if (inner) inner.style.backgroundColor = '#ffffff';
+        newNoteIconState = { pinned: 0, locked: 0, is_shared: 0, has_label: 0 };
 
+        // Hiển thị popup
+        popup.classList.remove('hidden');
 
-        popup.style.backgroundColor = '#ffffff';
+        // Nhảy con trỏ vào ô content
+        setTimeout(() => contentInput.focus(), 50);
 
-
+        // Hàm cập nhật icon và bind sự kiện click
         function updateIcons() {
             iconsDiv.innerHTML = generatePopupIconsHTML(newNoteIconState);
 
-            // Color palette icon
-            const paletteIcon = iconsDiv.querySelector('i[data-action="palette"]');
-            if (paletteIcon) {
-                paletteIcon.onclick = function (e) {
-                    e.stopPropagation();
-                    if (!autosaveNoteId) return;
-                    createColorPopup(paletteIcon, autosaveNoteId);
-                };
-            }
-
-
-            // size type icon
+            // Size (Aa)
             const sizeWrapper = iconsDiv.querySelector('.size-type-wrapper');
             if (sizeWrapper) {
                 const sizeIcon = sizeWrapper.querySelector('i[data-action="size"]');
                 const sizePopup = sizeWrapper.querySelector('.size-type-popup');
-                if (sizeIcon && sizePopup) {
-                    // Khi click vào icon “Aa”
-                    sizeIcon.onclick = function (e) {
-                        e.stopPropagation();
-                        sizePopup.classList.toggle('hidden');
-                    };
 
-                    // Đóng popup nếu click ra ngoài
-                    document.addEventListener('mousedown', function handler(evt) {
-                        if (
-                            !sizePopup.classList.contains('hidden') &&
-                            !sizePopup.contains(evt.target) &&
-                            evt.target !== sizeIcon
-                        ) {
-                            sizePopup.classList.add('hidden');
-                            document.removeEventListener('mousedown', handler);
-                        }
-                    });
+                sizeIcon.onclick = e => {
+                    e.stopPropagation();
+                    sizePopup.classList.toggle('hidden');
+                };
 
-                    //dùng autosaveNoteId thay cho note.note_id
-                    sizePopup.querySelectorAll('.size-option').forEach(opt => {
-                        opt.onclick = function (e) {
-                            e.stopPropagation();
-                            const size = this.dataset.size;
-                            if (!autosaveNoteId) return;
+                document.addEventListener('mousedown', function handler(evt) {
+                    if (
+                        !sizePopup.classList.contains('hidden') &&
+                        !sizePopup.contains(evt.target) &&
+                        evt.target !== sizeIcon
+                    ) {
+                        sizePopup.classList.add('hidden');
+                        document.removeEventListener('mousedown', handler);
+                    }
+                });
 
-                            fetch('note_test.php', {
-                                method: 'POST',
-                                body: new URLSearchParams({
-                                    action: 'set_size_type',
-                                    note_id: autosaveNoteId,
-                                    size_type: size
-                                })
+                sizePopup.querySelectorAll('.size-option').forEach(opt => {
+                    opt.onclick = () => {
+                        if (!autosaveNoteId) return;
+                        const size = opt.dataset.size;
+
+                        fetch('note_test.php', {
+                            method: 'POST',
+                            body: new URLSearchParams({
+                                action: 'set_size_type',
+                                note_id: autosaveNoteId,
+                                size_type: size
                             })
-                                .then(r => r.json())
-                                .then(() => {
-                                    sizePopup.classList.add('hidden');
-                                    fetchNotes();
-                                })
-                                .catch(console.error);
-                        };
-                    });
-                }
+                        })
+                            .then(r => r.json())
+                            .then(() => {
+                                sizePopup.classList.add('hidden');
+                                fetchNotes();
+                            });
+                    };
+                });
             }
 
-            // Phần bind event cho pin/lock/share/tag giữ nguyên
-            iconsDiv.querySelectorAll('i[data-action]').forEach(icon => {
-                const action = icon.dataset.action;
-                if (action === 'size' || action === 'palette') return;
-                icon.onclick = function (e) {
-                    e.stopPropagation();
-                    if (action === 'pin') newNoteIconState.pinned ^= 1;
-                    if (action === 'lock') newNoteIconState.locked ^= 1;
-                    if (action === 'share') newNoteIconState.is_shared ^= 1;
-                    if (action === 'tag') newNoteIconState.has_label ^= 1;
-                    updateIcons();
-                };
-            });
-
-
-            // Palette icon
-            paletteIcon = iconsDiv.querySelector('i[data-action="palette"]');
+            // Color
+            const paletteIcon = iconsDiv.querySelector('i[data-action="palette"]');
             if (paletteIcon) {
                 paletteIcon.onclick = function (e) {
                     e.stopPropagation();
-                    createColorPopup(paletteIcon, note.note_id);
+                    if (!autosaveNoteId) return alert("Note chưa lưu!");
+                    createColorPopup(paletteIcon, autosaveNoteId);
                 };
             }
 
+            // Tag
+            iconsDiv.querySelectorAll('i[data-action]').forEach(icon => {
+                const action = icon.dataset.action;
+                if (action === 'palette' || action === 'size') return;
 
+                icon.onclick = e => {
+                    e.stopPropagation();
+                    if (action === 'pin') newNoteIconState.pinned ^= 1;
+                    else if (action === 'lock') newNoteIconState.locked ^= 1;
+                    else if (action === 'share') newNoteIconState.is_shared ^= 1;
+                    else if (action === 'tag') newNoteIconState.has_label ^= 1;
+
+                    updateIcons(); // Giao diện phản hồi ngay
+                };
+            });
         }
 
+        // Gọi lần đầu để render icons
         updateIcons();
-        popup.classList.remove('hidden');
-        popup.style.backgroundColor = note.color || '#ffffff';
 
-        titleInput.value = '';
-        contentInput.value = '';
-
-        contentInput.classList.remove('size-h1', 'size-h2', 'size-h3');
-
-        // Autosave – gán autosaveNoteId khi server trả về note_id
+        // Autosave khi nhập
         let saveTimer = null;
         function autosaveCreateNote() {
             clearTimeout(saveTimer);
@@ -444,13 +437,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 const title = titleInput.value.trim();
                 const content = contentInput.value.trim();
                 if (!title && !content) return;
+
                 const formData = new FormData();
                 formData.append('title', title);
                 formData.append('content', content);
+
+                //Thêm icon state
                 formData.append('pinned', newNoteIconState.pinned);
                 formData.append('locked', newNoteIconState.locked);
                 formData.append('is_shared', newNoteIconState.is_shared);
                 formData.append('has_label', newNoteIconState.has_label);
+
                 if (autosaveNoteId) formData.append('note_id', autosaveNoteId);
 
                 fetch('note.php', {
@@ -459,28 +456,30 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
                     .then(r => r.json())
                     .then(data => {
-                        if (data.note_id) {
-                            autosaveNoteId = data.note_id;
-                        }
-                        fetchNotes();
-                    })
-                    .catch(console.error);
+                        if (data.note_id) autosaveNoteId = data.note_id;
+                        fetchNotes(); // Update giao diện
+                    });
             }, 400);
         }
+
         titleInput.oninput = autosaveCreateNote;
         contentInput.oninput = autosaveCreateNote;
 
-        // Đóng modal tạo note
-        document.getElementById('popup-close').onclick = hideCreateModal;
+        // Đóng popup
         popup.onclick = function (e) {
             if (e.target === popup) hideCreateModal();
         };
+
+        document.getElementById('popup-close').onclick = hideCreateModal;
+
         function hideCreateModal() {
             popup.classList.add('hidden');
             autosaveNoteId = null;
             newNoteIconState = { pinned: 0, locked: 0, is_shared: 0, has_label: 0 };
         }
+
     }
+
 
 
     function showNoteModal(note) {
@@ -834,9 +833,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (action === 'delete') {
                     pendingDeleteNoteId = noteId;
-                    document.getElementById('deleteConfirmModal').classList.remove('hidden');
+
+                    const modal = document.getElementById('deleteConfirmModal');
+                    modal.classList.add('show'); // Hiện lên
+
                     return;
                 }
+
+
                 fetch('note.php', {
                     method: 'POST',
                     body: new URLSearchParams({
@@ -872,6 +876,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.getElementById('confirmDeleteBtn').onclick = function () {
         if (!pendingDeleteNoteId) return;
+
         fetch('note.php', {
             method: 'POST',
             body: new URLSearchParams({
@@ -879,14 +884,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 note_id: pendingDeleteNoteId
             })
         }).then(r => r.json()).then(data => {
-            document.getElementById('deleteConfirmModal').classList.add('hidden');
+            document.getElementById('deleteConfirmModal').classList.remove('show');
             pendingDeleteNoteId = null;
             fetchNotes();
         });
     };
     document.getElementById('cancelDeleteBtn').onclick = function () {
-        document.getElementById('deleteConfirmModal').classList.add('hidden');
-        pendingDeleteNoteId = null;
+        document.getElementById('deleteConfirmModal').classList.remove('show');
     };
 
     // Change Password
@@ -947,7 +951,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const colorPopup = document.createElement('div');
         colorPopup.className = 'color-popup';
 
-        // Gán CSS để hiện dưới icon 🎨
+        // Gán CSS để hiện dưới icon 
         colorPopup.style.position = 'absolute';
         colorPopup.style.top = `${targetIcon.offsetTop + targetIcon.offsetHeight + 6}px`;
         colorPopup.style.left = `${targetIcon.offsetLeft}px`;
