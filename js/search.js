@@ -28,11 +28,11 @@ window.addEventListener("load", () => {
                     if (typeof window.renderNotes === "function" && document.querySelector(".notes")) {
                         window.renderNotes(filteredNotes);
                     } else {
-                        console.error("renderNotes hoặc .notes không khả dụng.");
+                        console.error("Not available");
                     }
                 })
                 .catch(err => {
-                    console.error("Lỗi khi tìm kiếm ghi chú:", err);
+                    console.error("Error searching for notes:", err);
                 });
         }, 300);
     });
