@@ -24,10 +24,6 @@ if (isset($_SESSION['just_registered'])) {
     unset($_SESSION['just_registered']);
 }
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit;
-}
 
 if (isset($_SESSION['just_registered'])) {
     echo "<script>alert('Welcome! You have successfully registered!');</script>";
@@ -51,6 +47,8 @@ $is_active = $_SESSION['is_active'] ?? 0;
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="css/home.css" />
     <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/connect.js"> </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
@@ -72,14 +70,16 @@ $is_active = $_SESSION['is_active'] ?? 0;
         <i class="bi bi-x close-sidebar" title="Close" aria-label="Close sidebar" role="button"
             tabindex="0"></i><br><br>
         <ul>
-            <li><i class="bi bi-sticky"></i> Note</li>
+            <li><i class="bi bi-sticky"></i> <a href="home.php" style="color: inherit; text-decoration: none;"></i>
+                    Note</li>
             <li><i class="bi bi-bell"></i> Reminder</li>
-            <li><i class="bi bi-trash"></i> <a href="trash.php" style="color: inherit; text-decoration: none;">Trash</a></li>
+            <li><i class="bi bi-trash"></i> <a href="trash.php" style="color: inherit; text-decoration: none;">Trash</a>
+            </li>
             <li><i class="bi bi-tag"></i> Labels</li>
 
         </ul>
         <div class="labels">
-            
+
             <ul id="labelList"></ul>
             <ul>
                 <li id="openLabelModalBtn" style="cursor:pointer;">
@@ -143,7 +143,8 @@ $is_active = $_SESSION['is_active'] ?? 0;
                 <i class="bi bi-pin-angle" title="Pin"></i>
                 <i class="bi bi-share" title="Share"></i>
                 <i class="bi bi-lock" title="Lock"></i>
-                <i class="bi bi-tag" title="Label"></i>
+                <i id="label-icon" class="bi bi-tag" data-action="tag" title="Label"></i>
+
                 <button class="close-add-note" type="button" title="Close">Close</button>
             </div>
         </div>
@@ -152,7 +153,7 @@ $is_active = $_SESSION['is_active'] ?? 0;
         <!-- Vị trí hiển thị danh sách note -->
         <div class="notes" aria-live="polite">
             <!-- Vị trí hiển thị danh sách note -->
-            <div id="selected-labels"></div>
+            <!-- <div id="selected-labels"></div> -->
         </div>
     </div>
 
@@ -240,7 +241,18 @@ $is_active = $_SESSION['is_active'] ?? 0;
         <div class="add-note-expanded popup-content">
             <input type="text" id="modal-title" class="note-title-input" placeholder="Title">
             <textarea id="modal-content" class="note-content-input" placeholder="Content..."></textarea>
+            <div id="selected-labels" style="margin-top:10px; display:none;"></div>
             <div class="icons">
+            </div>
+            <div id="label-popup"
+                style="display:none; position:absolute; background:#fff; border:1px solid #ccc; padding:8px; border-radius:4px; z-index:1000;">
+                <strong>Labels</strong>
+                <ul id="label-list"
+                    style="list-style:none; padding:0; margin:4px 0; max-height:120px; overflow-y:auto;"></ul>
+                <div style="display:flex; gap:6px; margin-top:8px;">
+                    <input type="text" id="new-label-input" placeholder="Enter name label" style="flex:1;" />
+                    <button id="add-label-btn" disabled>Add</button>
+                </div>
             </div>
             <button class="close-add-note" id="popup-close">Close</button>
         </div>
@@ -261,13 +273,13 @@ $is_active = $_SESSION['is_active'] ?? 0;
 
 
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="js/home.js"></script>
         <!-- <script src="js/script.js"></script> -->
-        <script src="js/labels.js"></script> <!-- //Xử lý label trên sliddebars -->
-        <!-- <script src="js/note_label.js"></script> 
-        <script src="js/filterNotesByLabel.js"></script> -->
-        <script src="js/connect.js"></script>
+        <script src="js/home.js"></script>
+        <script src="js/filterNotesByLabel.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/note_label.js"></script>
+
+
 
 </body>
 

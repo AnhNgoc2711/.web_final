@@ -253,34 +253,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     let openedNote = null
 
-    // Autosave note khi nhập
-    // function triggerAutosave() {
-    //     clearTimeout(autosaveTimeout);
-    //     autosaveTimeout = setTimeout(() => {
-    //         const title = titleInput.value.trim();
-    //         const content = contentInput.value.trim();
-    //         if (!title && !content) return;
-    //         const formData = new FormData();
-    //         formData.append('title', title);
-    //         formData.append('content', content);
-    //         if (autosaveNoteId) formData.append('note_id', autosaveNoteId);
-
-    //         fetch('note.php', {
-    //             method: 'POST',
-    //             body: formData
-    //         })
-    //             .then(r => r.json())
-    //             .then(data => {
-    //                 if (data.note_id) autosaveNoteId = data.note_id;
-    //                 fetchNotes();
-    //             });
-    //     }, 400);
-    // }
-    // titleInput.addEventListener('input', triggerAutosave);
-    // contentInput.addEventListener('input', triggerAutosave);
-
-
-
     function triggerAutosave() {
         clearTimeout(autosaveTimeout);
         autosaveTimeout = setTimeout(() => {
@@ -318,7 +290,6 @@ document.addEventListener('DOMContentLoaded', function () {
     function generateCardIconsHTML(note) {
         return `
         <i class="bi bi-trash" data-action="delete"></i>
-        <i class="bi ${note.has_label == 1 ? "bi-tag-fill active" : "bi-tag"}" data-action="tag"></i>
         <i class="bi ${note.locked == 1 ? "bi-lock-fill active" : "bi-lock"}" data-action="lock"></i>
         <i class="bi ${note.is_shared == 1 ? "bi-share-fill active" : "bi-share"}" data-action="share"></i>
         <i class="bi ${note.pinned == 1 ? "bi-pin-angle-fill active" : "bi-pin-angle"}" data-action="pin"></i>
@@ -342,6 +313,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <i class="bi ${state.is_shared == 1 ? "bi-share-fill active" : "bi-share"}" data-action="share"></i>
         <i class="bi ${state.locked == 1 ? "bi-lock-fill active" : "bi-lock"}" data-action="lock"></i>
         <i class="bi ${state.has_label == 1 ? "bi-tag-fill active" : "bi-tag"}" data-action="tag"></i>
+        
     `;
     }
 
@@ -432,7 +404,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // === BỔ SUNG: Khi mới mở modal, chưa có chọn size nào, ta có thể reset class size cũ ===
         contentInput.classList.remove('size-h1', 'size-h2', 'size-h3');
-        // (Nếu muốn mặc định H2 thì thêm:) contentInput.classList.add('size-h2');
+
 
 
         // Autosave – gán autosaveNoteId khi server trả về note_id
@@ -482,168 +454,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
-
-    // show popup chỉnh note
-    // function showNoteModal(note) {
-    //     const popup = document.getElementById('popup-modal');
-    //     popup.setAttribute('data-note-id', note.note_id);
-
-    //     const titleInput = document.getElementById('modal-title');
-    //     const contentInput = document.getElementById('modal-content');
-    //     const iconsDiv = popup.querySelector('.icons');
-
-    //     popup.classList.remove('hidden');
-    //     titleInput.value = note.title || '';
-    //     contentInput.value = note.content || '';
-    //     titleInput.focus();
-
-    //     let iconState = {
-    //         pinned: note.pinned || 0,
-    //         locked: note.locked || 0,
-    //         is_shared: note.is_shared || 0,
-    //         has_label: note.has_label || 0,
-    //         size_type: note.size_type || 'H2'
-    //     };
-
-
-    //     // === BỔ SUNG 1: Khi mở modal, gán ngay class size cho textarea ===
-    //     contentInput.classList.remove('size-h1', 'size-h2', 'size-h3');
-    //     contentInput.classList.add('size-' + iconState.size_type.toLowerCase());
-    //     // === KẾT THÚC BỔ SUNG 1 ===
-
-    //     function updateIcons() {
-    //         iconsDiv.innerHTML = generatePopupIconsHTML(iconState);
-
-    //         const sizeTypeWrapper = iconsDiv.querySelector('.size-type-wrapper');
-    //         if (sizeTypeWrapper) {
-    //             const sizeIcon = sizeTypeWrapper.querySelector('i[data-action="size"]');
-    //             const sizePopup = sizeTypeWrapper.querySelector('.size-type-popup');
-
-    //             if (sizeIcon && sizePopup) {
-    //                 // Khi click vào icon size, chỉ hiện/ẩn popup
-    //                 sizeIcon.onclick = function (e) {
-    //                     e.stopPropagation();
-    //                     sizePopup.classList.toggle('hidden');
-    //                 };
-
-    //                 // Nếu click bất kỳ chỗ nào bên ngoài popup, ẩn đi
-    //                 document.addEventListener('click', function onClickOutside(e) {
-    //                     if (
-    //                         !sizePopup.classList.contains('hidden') &&
-    //                         !sizePopup.contains(e.target) &&
-    //                         e.target !== sizeIcon
-    //                     ) {
-    //                         sizePopup.classList.add('hidden');
-    //                         document.removeEventListener('click', onClickOutside);
-    //                     }
-    //                 });
-
-
-    //                 sizePopup.querySelectorAll('.size-option').forEach(opt => {
-    //                     opt.onclick = function (e) {
-    //                         e.stopPropagation();
-    //                         const newSize = this.dataset.size; // “H1” hoặc “H2” hoặc “H3”
-
-    //                         // === BỔ SUNG 2: Gán class ngay cho <textarea id="modal-content">
-    //                         contentInput.classList.remove('size-h1', 'size-h2', 'size-h3');
-    //                         contentInput.classList.add('size-' + newSize.toLowerCase());
-    //                         // === KẾT THÚC BỔ SUNG 2 ===
-
-    //                         fetch('note.php', {
-    //                             method: 'POST',
-    //                             body: new URLSearchParams({
-    //                                 action: 'set_size_type',
-    //                                 note_id: note.note_id,
-    //                                 size_type: newSize
-    //                             })
-    //                         })
-    //                             .then(r => r.json())
-    //                             .then(res => {
-    //                                 // Bạn có thể log để debug:
-    //                                 console.log('set_size_type response:', res);
-    //                                 // Ẩn popup
-    //                                 sizePopup.classList.add('hidden');
-    //                                 // Cập nhật lại iconState để render lại đúng icon (nếu cần)
-    //                                 iconState.size_type = newSize;
-    //                                 updateIcons();   // render lại icon với size mới
-    //                                 // Lấy lại danh sách note để hiển thị size mới
-    //                                 fetchNotes();
-    //                             })
-    //                             .catch(err => {
-    //                                 console.error('Lỗi khi set_size_type:', err);
-    //                             });
-    //                     };
-    //                 });
-    //             }
-    //         }
-
-
-    //         // 3. Gán sự kiện cho các icon pin/lock/share/tag (loại trừ icon size)
-    //         iconsDiv.querySelectorAll('i[data-action]').forEach(icon => {
-    //             const action = icon.dataset.action;
-    //             if (action === 'size') return; // Bỏ qua, vì đã gán riêng bên trên
-
-    //             icon.onclick = function (e) {
-    //                 e.stopPropagation();
-    //                 fetch('note.php', {
-    //                     method: 'POST',
-    //                     body: new URLSearchParams({
-    //                         action: 'toggle_icon',
-    //                         note_id: note.note_id,
-    //                         icon: action
-    //                     })
-    //                 })
-    //                     .then(r => r.json())
-    //                     .then(res => {
-    //                         console.log('toggle_icon response:', res);
-    //                         // Sau khi toggle icon xong, cập nhật lại trạng thái iconState và render lại
-    //                         if (action === 'pin') iconState.pinned ^= 1;
-    //                         else if (action === 'lock') iconState.locked ^= 1;
-    //                         else if (action === 'share') iconState.is_shared ^= 1;
-    //                         else if (action === 'tag') iconState.has_label ^= 1;
-    //                         updateIcons();
-    //                         fetchNotes();
-    //                     })
-    //                     .catch(err => {
-    //                         console.error('Lỗi khi toggle_icon:', err);
-    //                     });
-    //             };
-    //         });
-    //     }
-
-    //     updateIcons();
-
-    //     // Autosave nội dung note
-    //     let saveTimer = null;
-    //     function autosaveModal() {
-    //         clearTimeout(saveTimer);
-    //         saveTimer = setTimeout(() => {
-    //             fetch('note.php', {
-    //                 method: 'POST',
-    //                 body: new URLSearchParams({
-    //                     note_id: note.note_id,
-    //                     title: titleInput.value,
-    //                     content: contentInput.value
-    //                 })
-    //             }).then(r => r.json())
-    //                 .then(data => fetchNotes());
-    //         }, 400);
-    //     }
-
-    //     titleInput.oninput = autosaveModal;
-    //     contentInput.oninput = autosaveModal;
-
-    //     document.getElementById('popup-close').onclick = hideEditModal;
-    //     popup.onclick = function (e) {
-    //         if (e.target === popup) hideEditModal();
-    //     };
-
-    //     function hideEditModal() {
-    //         popup.classList.add('hidden');
-    //     }
-    // }
-
     function showNoteModal(note) {
+        window.currentNoteId = note.note_id;
         const popup = document.getElementById('popup-modal');
         popup.setAttribute('data-note-id', note.note_id);
 
@@ -672,6 +484,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
         function updateIcons() {
             iconsDiv.innerHTML = generatePopupIconsHTML(iconState);
+            const tagIcon = iconsDiv.querySelector('i[data-action="tag"]');
+            tagIcon.addEventListener('click', async e => {
+                e.stopPropagation();
+                const popup = document.getElementById('label-popup');
+
+                // 1) Đóng nếu đang mở
+                if (popup.style.display === 'block') {
+                    popup.style.display = 'none';
+                    return;
+                }
+
+                // 2) Kiểm tra note đã chọn chưa
+                if (!window.currentNoteId) {
+                    return alert('Bạn chưa chọn note nào để gắn label');
+                }
+
+                // 3) Load nhãn của note -> render lên popup
+                await window.loadLabelsForNote(window.currentNoteId);
+                window.renderLabels();
+                window.updateSelectedLabelsDisplay();
+
+                // 4) Hiển thị popup
+                popup.style.display = 'block';
+            });
+
 
             const sizeTypeWrapper = iconsDiv.querySelector('.size-type-wrapper');
             if (sizeTypeWrapper) {
@@ -856,36 +693,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
-
-    function generateNoteHTML(note) {
-        if (note.title && note.title.trim() !== "") {
-            return `
-            <div class="note" data-note-id="${note.note_id}">
-                <div class="icons">
-                    ${generateCardIconsHTML(note)}
-                </div>
-                <div class="content">
-                    <div class="title">${note.title}</div>
-                    <div class="body size-${(note.size_type || 'H2').toLowerCase()}">${note.content || ''}</div>
-                </div>
-            </div>
-        `;
-        } else {
-            return `
-            <div class="note" data-note-id="${note.note_id}">
-                <div class="icons">
-                    ${generateCardIconsHTML(note)}
-                </div>
-                <div class="content">
-                    <div class="title">${note.content || ''}</div>
-                    <div class="body size-${(note.size_type || 'H2').toLowerCase()}"></div>
-                </div>
-            </div>
-        `;
-        }
-    }
-
-
     function generateNoteHTML(note) {
         let labelHtml = '';
         if (note.labels && Array.isArray(note.labels) && note.labels.length > 0) {
@@ -936,6 +743,7 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
         }
     }
+    window.generateNoteHTML = generateNoteHTML;
 
 
 
@@ -994,6 +802,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+    window.attachIconEvents = attachIconEvents;
 
 
     function attachNoteClickEvents() {
@@ -1010,6 +819,8 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
+    window.attachNoteClickEvents = attachNoteClickEvents;
+
 
     document.getElementById('confirmDeleteBtn').onclick = function () {
         if (!pendingDeleteNoteId) return;
@@ -1032,12 +843,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
+
+
     // Lấy danh sách note từ API
-    function fetchNotes() {
+    async function fetchNotes() {
         fetch('note.php')
             .then(r => r.json())
             .then(renderNotes);
     }
+    window.fetchNotes = fetchNotes;
 
     // Gọi khi load trang
     fetchNotes();

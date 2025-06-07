@@ -3,9 +3,6 @@ session_start();
 require 'db.php'; // $pdo
 
 header('Content-Type: application/json');
-require 'db.php'; // $pdo
-
-header('Content-Type: application/json');
 
 // Check login  
 if (!isset($_SESSION['user_id'])) {

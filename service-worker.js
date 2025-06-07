@@ -5,6 +5,7 @@ const URLS_TO_CACHE = [
   'login.php',
   'note.php',
   'label.php',
+  'trash.php',
   'manifest.json',
   'note_label.php',
   'add_label.php',
@@ -13,6 +14,7 @@ const URLS_TO_CACHE = [
   'js/script.js',
   'js/labels.js',
   'js/note_label.js',
+  'js/connect.js',
   'css/home.css',
   'css/login.css',
   'image/Anh1.jpg',
@@ -53,6 +55,12 @@ self.addEventListener('activate', event => {
 // Xử lý fetch request: ưu tiên fetch từ mạng, fallback cache
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
+
+  //Lấy CSS trực tiếp từ mạng
+  // if (event.request.destination === 'style' ||
+  //   event.request.url.endsWith('.css')) {
+  //   return event.respondWith(fetch(event.request));
+  // }
 
   // Chỉ xử lý GET
   if (event.request.method !== 'GET') {

@@ -2,27 +2,48 @@ let labels = [];
 let selectedLabels = new Set();
 
 document.addEventListener('DOMContentLoaded', () => {
+
   const labelIcon = document.getElementById('label-icon');
   const labelPopup = document.getElementById('label-popup');
   const labelList = document.getElementById('label-list');
   const newLabelInput = document.getElementById('new-label-input');
   const addLabelBtn = document.getElementById('add-label-btn');
 
-  labelIcon.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (labelPopup.style.display === 'block') {
-      labelPopup.style.display = 'none';
-    } else {
-      labelPopup.style.display = 'block';
-      updateSelectedLabelsDisplay();
+  if (newLabelInput && addLabelBtn) {
+    // ban đầu disable
+    addLabelBtn.disabled = true;
 
-      if (window.currentNoteId) {
-        loadLabelsForNote(window.currentNoteId);
+    // bật nút khi nhập
+    newLabelInput.addEventListener('input', () => {
+      addLabelBtn.disabled = newLabelInput.value.trim() === '';
+    });
+
+    // click Add
+    addLabelBtn.addEventListener('click', async () => {
+      // POST tạo mới label, rồi reload list
+    });
+  }
+
+  // Các phần tử DOM đã tồn tại có thể xử lý sự kiện
+  if (labelIcon) {
+    labelIcon.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (labelPopup.style.display === 'block') {
+        labelPopup.style.display = 'none';
       } else {
-        console.warn('Chưa có note_id được chọn!');
+        labelPopup.style.display = 'block';
+        updateSelectedLabelsDisplay();
+
+        if (window.currentNoteId) {
+          loadLabelsForNote(window.currentNoteId);
+        } else {
+          console.warn('Chưa có note_id được chọn!');
+        }
       }
-    }
-  });
+    });
+  } else {
+    console.error('Phần tử #label-icon không tồn tại trong DOM.');
+  }
 
   document.addEventListener('click', (e) => {
     if (!labelPopup.contains(e.target) && !labelIcon.contains(e.target)) {
@@ -42,35 +63,39 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderLabels() {
-    labelList.innerHTML = '';
+    const ul = document.getElementById('label-list');
+    ul.innerHTML = '';
 
-    labels.forEach(label => {
+    labels.forEach(l => {
       const li = document.createElement('li');
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.value = l.label_id;
+      cb.checked = selectedLabels.has(l.label_id);
 
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.value = label.label_id;
+      cb.addEventListener('change', async e => {
+        // 1) Cập nhật set của mình
+        if (e.target.checked) selectedLabels.add(l.label_id);
+        else selectedLabels.delete(l.label_id);
 
-      // Đánh dấu checkbox nếu label hiện tại có trong selectedLabels
-      checkbox.checked = selectedLabels.has(label.label_id);
-
-      checkbox.addEventListener('change', e => {
-        if (e.target.checked) selectedLabels.add(label.label_id);
-        else selectedLabels.delete(label.label_id);
+        // 2) Cập nhật hiển thị tag ở dưới modal
         updateSelectedLabelsDisplay();
 
-        // Tự động lưu khi thay đổi
-        if (window.currentNoteId) {
-          saveLabelsForNote(window.currentNoteId, Array.from(selectedLabels));
-        }
+        // 3) Autosave ngay lập tức
+        await saveLabelsForNote(
+          window.currentNoteId,
+          Array.from(selectedLabels)
+        );
+
+        // 4) Refresh lại danh sách note ở background (nếu cần)
+        window.fetchNotes?.();
       });
 
-      const labelText = document.createElement('span');
-      labelText.textContent = label.name_label;
+      const span = document.createElement('span');
+      span.textContent = l.name_label;
 
-      li.appendChild(checkbox);
-      li.appendChild(labelText);
-      labelList.appendChild(li);
+      li.append(cb, span);
+      ul.append(li);
     });
   }
 
@@ -103,50 +128,50 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-async function loadLabelsForNote(note_id) {
-  try {
-    const res = await fetch(`note_label.php?note_id=${note_id}`);
-    const text = await res.text();  // đọc raw text trước
+  async function loadLabelsForNote(note_id) {
     try {
-      const data = JSON.parse(text);
-      if (data.success && Array.isArray(data.labels)) {
-        selectedLabels = new Set(data.labels.map(l => l.label_id));
-        renderLabels();
-        updateSelectedLabelsDisplay();
-      } else {
+      const res = await fetch(`note_label.php?note_id=${note_id}`);
+      const text = await res.text();  // đọc raw text trước
+      try {
+        const data = JSON.parse(text);
+        if (data.success && Array.isArray(data.labels)) {
+          selectedLabels = new Set(data.labels.map(l => l.label_id));
+          renderLabels();
+          updateSelectedLabelsDisplay();
+        } else {
+          selectedLabels.clear();
+          renderLabels();
+        }
+      } catch (jsonErr) {
+        console.error('Không parse được JSON, response:', text);
         selectedLabels.clear();
         renderLabels();
       }
-    } catch (jsonErr) {
-      console.error('Không parse được JSON, response:', text);
-      selectedLabels.clear();
-      renderLabels();
+    } catch (err) {
+      console.error('Lỗi load label cho ghi chú:', err);
     }
-  } catch (err) {
-    console.error('Lỗi load label cho ghi chú:', err);
   }
-}
 
-async function saveLabelsForNote(note_id, label_ids) {
-  console.log(`saveLabelsForNote called for note_id: ${note_id}`);
-  try {
-    const response = await fetch('note_label.php', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      body: new URLSearchParams({
-        note_id: note_id,
-        label_ids: JSON.stringify(label_ids),
-      }),
-    });
-    const data = await response.json();
-    console.log('Response from saveLabelsForNote:', data); // <-- log response JSON
-    if (!data.success) {
-      console.error('Lỗi khi lưu nhãn:', data.error);
+  async function saveLabelsForNote(note_id, label_ids) {
+    console.log(`saveLabelsForNote called for note_id: ${note_id}`);
+    try {
+      const response = await fetch('note_label.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          note_id: note_id,
+          label_ids: JSON.stringify(label_ids),
+        }),
+      });
+      const data = await response.json();
+      console.log('Response from saveLabelsForNote:', data); // <-- log response JSON
+      if (!data.success) {
+        console.error('Lỗi khi lưu nhãn:', data.error);
+      }
+    } catch (error) {
+      console.error('Lỗi fetch saveLabelsForNote:', error);
     }
-  } catch (error) {
-    console.error('Lỗi fetch saveLabelsForNote:', error);
   }
-}
 
   addLabelBtn.disabled = true;
   newLabelInput.addEventListener('input', () => {
@@ -190,6 +215,13 @@ async function saveLabelsForNote(note_id, label_ids) {
       showMessage('Lỗi thêm nhãn!');
     }
   });
+
+  // Cho các hàm này có thể gọi từ home.js
+  window.loadLabelsForNote = loadLabelsForNote;
+  window.saveLabelsForNote = saveLabelsForNote;
+  window.renderLabels = renderLabels;
+  window.updateSelectedLabelsDisplay = updateSelectedLabelsDisplay;
+
 
   // Tải danh sách nhãn ban đầu
   loadLabelsFromDB();

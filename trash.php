@@ -74,7 +74,7 @@ $is_active = $_SESSION['is_active'] ?? 0;
                         Note</li>
                 <li><i class="bi bi-bell"></i> Reminder</li>
                 <li><i class="bi bi-trash"></i> <a href="trash.php"
-                        style="color: inherit; text-decoration: none;">Trash</a></li>
+                        style="color: inherit; text-decoration: none;">Trash</a>
                 <li><i class="bi bi-tag"></i> Labels</li>
 
             </ul>
