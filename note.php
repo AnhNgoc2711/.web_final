@@ -144,6 +144,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    // 7. Chỉnh màu note
+    if ($_POST['action'] === 'set_color') {
+        $note_id = $_POST['note_id'] ?? null;
+        $color = $_POST['color'] ?? null;
+
+        if (!$note_id || !$color) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Thiếu note_id hoặc color']);
+            exit;
+        }
+
+        try {
+            $stmt = $pdo->prepare("UPDATE note SET color = ? WHERE note_id = ?");
+            $stmt->execute([$color, $note_id]);
+            echo json_encode(['success' => true]);
+        } catch (PDOException $e) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Lỗi DB: ' . $e->getMessage()]);
+        }
+
+        exit;
+    }
+
+
     http_response_code(400);
     echo json_encode(['error' => 'Invalid action']);
     exit;

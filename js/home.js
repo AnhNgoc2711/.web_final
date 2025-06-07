@@ -329,8 +329,28 @@ document.addEventListener('DOMContentLoaded', function () {
         let newNoteIconState = { pinned: 0, locked: 0, is_shared: 0, has_label: 0 };
         let autosaveNoteId = null;
 
+        const inner = popup.querySelector('.popup-content');
+        if (inner) inner.style.backgroundColor = '#ffffff';
+
+
+        popup.style.backgroundColor = '#ffffff';
+
+
         function updateIcons() {
             iconsDiv.innerHTML = generatePopupIconsHTML(newNoteIconState);
+
+            // Color palette icon
+            const paletteIcon = iconsDiv.querySelector('i[data-action="palette"]');
+            if (paletteIcon) {
+                paletteIcon.onclick = function (e) {
+                    e.stopPropagation();
+                    if (!autosaveNoteId) return;
+                    createColorPopup(paletteIcon, autosaveNoteId);
+                };
+            }
+
+
+            // size type icon
             const sizeWrapper = iconsDiv.querySelector('.size-type-wrapper');
             if (sizeWrapper) {
                 const sizeIcon = sizeWrapper.querySelector('i[data-action="size"]');
@@ -383,7 +403,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Phần bind event cho pin/lock/share/tag giữ nguyên
             iconsDiv.querySelectorAll('i[data-action]').forEach(icon => {
                 const action = icon.dataset.action;
-                if (action === 'size') return;
+                if (action === 'size' || action === 'palette') return;
                 icon.onclick = function (e) {
                     e.stopPropagation();
                     if (action === 'pin') newNoteIconState.pinned ^= 1;
@@ -393,10 +413,24 @@ document.addEventListener('DOMContentLoaded', function () {
                     updateIcons();
                 };
             });
+
+
+            // Palette icon
+            paletteIcon = iconsDiv.querySelector('i[data-action="palette"]');
+            if (paletteIcon) {
+                paletteIcon.onclick = function (e) {
+                    e.stopPropagation();
+                    createColorPopup(paletteIcon, note.note_id);
+                };
+            }
+
+
         }
 
         updateIcons();
         popup.classList.remove('hidden');
+        popup.style.backgroundColor = note.color || '#ffffff';
+
         titleInput.value = '';
         contentInput.value = '';
 
@@ -453,10 +487,12 @@ document.addEventListener('DOMContentLoaded', function () {
         window.currentNoteId = note.note_id;
         const popup = document.getElementById('popup-modal');
         popup.setAttribute('data-note-id', note.note_id);
-
         const titleInput = document.getElementById('modal-title');
         const contentInput = document.getElementById('modal-content');
         const iconsDiv = popup.querySelector('.icons');
+
+        const inner = popup.querySelector('.popup-content');
+        if (inner) inner.style.backgroundColor = note.color || '#ffffff';
 
         popup.classList.remove('hidden');
         titleInput.value = note.title || '';
@@ -477,6 +513,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
         function updateIcons() {
             iconsDiv.innerHTML = generatePopupIconsHTML(iconState);
+
+            // Color palette icon
+            let paletteIcon = iconsDiv.querySelector('i[data-action="palette"]');
+            if (paletteIcon) {
+                paletteIcon.onclick = function (e) {
+                    e.stopPropagation();
+                    createColorPopup(paletteIcon, note.note_id);
+                };
+            }
+
+            // Tag icon
             const tagIcon = iconsDiv.querySelector('i[data-action="tag"]');
             tagIcon.addEventListener('click', async e => {
                 e.stopPropagation();
@@ -501,7 +548,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 popup.style.display = 'block';
             });
 
-
+            // Size type icon
             const sizeTypeWrapper = iconsDiv.querySelector('.size-type-wrapper');
             if (sizeTypeWrapper) {
                 const sizeIcon = sizeTypeWrapper.querySelector('i[data-action="size"]');
@@ -560,7 +607,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Assign events to pin/lock/share/tag icons (except size icon)
             iconsDiv.querySelectorAll('i[data-action]').forEach(icon => {
                 const action = icon.dataset.action;
-                if (action === 'size') return;
+                if (action === 'size' || action === 'palette') return;
 
                 icon.onclick = function (e) {
                     e.stopPropagation();
@@ -585,7 +632,18 @@ document.addEventListener('DOMContentLoaded', function () {
                             showMessage('Lỗi khi toggle_icon: ' + err);
                         });
                 };
+
             });
+
+            // Palette icon
+            paletteIcon = iconsDiv.querySelector('i[data-action="palette"]');
+            if (paletteIcon) {
+                paletteIcon.onclick = function (e) {
+                    e.stopPropagation();
+                    createColorPopup(paletteIcon, note.note_id);
+                };
+            }
+
         }
 
         updateIcons();
@@ -707,7 +765,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // ghép labelHtml vào đúng chỗ dưới content
         if (note.title && note.title.trim() !== "") {
             return `
-            <div class="note" data-note-id="${note.note_id}">
+            <div class="note" data-note-id="${note.note_id}" style="background-color: ${note.color || '#ffffff'}">
+
                 <div class="icons">
                     ${generateCardIconsHTML(note)}
                 </div>
@@ -720,7 +779,8 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
         } else {
             return `
-            <div class="note" data-note-id="${note.note_id}">
+            <div class="note" data-note-id="${note.note_id}" style="background-color: ${note.color || '#ffffff'}">
+
                 <div class="icons">
                     ${generateCardIconsHTML(note)}
                 </div>
@@ -828,6 +888,106 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('deleteConfirmModal').classList.add('hidden');
         pendingDeleteNoteId = null;
     };
+
+    // Change Password
+    document.getElementById("saveResetBtn").addEventListener("click", async () => {
+        const oldPassword = document.getElementById("oldPassword").value;
+        const newPassword = document.getElementById("newPassword").value;
+        const confirmNewPassword = document.getElementById("confirmNewPassword").value;
+
+        if (!oldPassword || !newPassword || !confirmNewPassword) {
+            showMessage("Please fill in all the password fields.");
+            return;
+        }
+        if (newPassword !== confirmNewPassword) {
+            showMessage("New passwords do not match.");
+            return;
+        }
+
+        try {
+            const response = await fetch("change_password.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                // credentials: "include",
+                body: JSON.stringify({
+                    action: "reset", // Gửi action nếu PHP yêu cầu
+                    oldPassword,
+                    newPassword,
+                    confirmNewPassword
+                })
+            });
+
+            const result = await response.json();
+
+            // Hiển thị thông báo thành công hoặc lỗi
+            if (result.success) {
+                showMessage(result.message || "Password changed successfully."); document.getElementById("oldPassword").value = "";
+                document.getElementById("newPassword").value = "";
+                document.getElementById("confirmNewPassword").value = "";
+            } else {
+                showMessage(result.error || result.message || "Failed to change password.");
+            }
+
+        } catch (err) {
+            console.error("Fetch error:", err);
+            showMessage("Unexpected error occurred. Please try again.");
+        }
+    });
+
+
+    // Change note color
+    function createColorPopup(targetIcon, note_id) {
+        // Xoá popup cũ nếu đang mở
+        const existing = document.querySelector('.color-popup');
+        if (existing) existing.remove();
+
+        const colors = ['#ffffff', '#f28b82', '#fbbc04', '#fff475', '#ccff90', '#a7ffeb', '#aecbfa'];
+        const colorPopup = document.createElement('div');
+        colorPopup.className = 'color-popup';
+
+        // Gán CSS để hiện dưới icon 🎨
+        colorPopup.style.position = 'absolute';
+        colorPopup.style.top = `${targetIcon.offsetTop + targetIcon.offsetHeight + 6}px`;
+        colorPopup.style.left = `${targetIcon.offsetLeft}px`;
+
+        colors.forEach(color => {
+            const colorDiv = document.createElement('div');
+            colorDiv.className = 'color-option';
+            colorDiv.style.backgroundColor = color;
+            colorDiv.dataset.color = color;
+
+            colorDiv.onclick = function (e) {
+                e.stopPropagation();
+                fetch('note.php', {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        action: 'set_color',
+                        note_id: note_id,
+                        color: color
+                    })
+                })
+                    .then(r => r.json())
+                    .then(() => {
+                        // Gán lại màu cho modal đang mở
+                        const popup = document.getElementById('popup-modal');
+                        const inner = popup.querySelector('.popup-content');
+                        if (inner) inner.style.backgroundColor = color;
+
+                        colorPopup.remove();
+                        fetchNotes();
+                    });
+            };
+
+
+            colorPopup.appendChild(colorDiv);
+        });
+
+        // Gắn popup vào đúng chỗ
+        targetIcon.parentElement.appendChild(colorPopup);
+    }
+
 
 
     // Lấy danh sách note từ API

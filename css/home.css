@@ -1991,3 +1991,49 @@ textarea.size-h3,
 .body.size-h3 {
     font-size: 0.9rem;
 }
+
+/* Change password */
+.password-field {
+    position: relative;
+}
+
+.password-field input {
+    width: 100%;
+    padding-right: 40px;
+}
+
+.password-field .toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+
+/* Color palette */
+.color-popup {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    display: flex;
+    gap: 8px;
+    padding: 8px 10px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    z-index: 9999;
+}
+
+.color-option {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.color-option:hover {
+    border-color: #333;
+}

@@ -187,18 +187,29 @@ $is_active = $_SESSION['is_active'] ?? 0;
                     <!-- Email -->
                     <p id="emailDisplay">Email: <span id="userEmail">user@example.com</span></p>
                     <div class="personal-info-buttons" id="viewButtons">
-                        <button class="btn-outline-pink" id="resetPasswordBtn">Reset Password</button>
+                        <button class="btn-outline-pink" id="resetPasswordBtn">Change Password</button>
                         <button class="btn-filled-pink" id="editInfoBtn">Edit Information</button>
                     </div>
                     <div class="personal-info-buttons hidden" id="editActions">
                         <button class="btn-outline-pink" id="cancelEditBtn">Cancel</button>
                         <button class="btn-filled-pink" id="saveEditBtn">Save</button>
                     </div>
-                    <!-- Form đổi mật khẩu (ẩn mặc định) -->
+
+                    
+                    <!-- Form đổi mật khẩu -->
                     <div class="reset-password-form hidden" id="resetPasswordForm">
-                        <input type="password" id="oldPassword" placeholder="Nhập mật khẩu cũ" />
-                        <input type="password" id="newPassword" placeholder="Nhập mật khẩu mới" />
-                        <input type="password" id="confirmNewPassword" placeholder="Nhập lại mật khẩu mới" />
+                        <div class="password-field">
+                            <input type="password" id="oldPassword" placeholder="Enter old password" />
+                            <i class="bi bi-eye-slash toggle-password"></i>
+                        </div>
+                        <div class="password-field">
+                            <input type="password" id="newPassword" placeholder="Enter new password" />
+                            <i class="bi bi-eye-slash toggle-password"></i>
+                        </div>
+                        <div class="password-field">
+                            <input type="password" id="confirmNewPassword" placeholder="Re-enter new password" />
+                            <i class="bi bi-eye-slash toggle-password"></i>
+                        </div>
                         <div class="personal-info-buttons">
                             <button class="btn-outline-pink" id="cancelResetBtn">Cancel</button>
                             <button class="btn-filled-pink" id="saveResetBtn">Save</button>
@@ -272,6 +283,7 @@ $is_active = $_SESSION['is_active'] ?? 0;
 
 
         <!-- <script src="js/script.js"></script> -->
+        <script src="js/login.js"></script>
         <script src="js/home.js"></script>
         <script src="js/search.js"></script>
         <script src="js/filterNotesByLabel.js"></script>
