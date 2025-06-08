@@ -70,7 +70,15 @@ $is_active = $_SESSION['is_active'] ?? 0;
         style="display:none; position:fixed; top:20px; right:20px; background:#f44336; color:#fff; padding:10px 20px; border-radius:5px; box-shadow:0 2px 8px rgba(0,0,0,0.3); z-index:9999;">
         <span id="messageText"></span>
     </div>
+    <div id="messageBox"
+        style="display:none; position:fixed; top:20px; right:20px; background:#f44336; color:#fff; padding:10px 20px; border-radius:5px; box-shadow:0 2px 8px rgba(0,0,0,0.3); z-index:9999;">
+        <span id="messageText"></span>
+    </div>
     <?php if ($is_active == 0): ?>
+        <div
+            style="background: #ffcccc; color: #900; padding: 10px; text-align: center; font-weight: bold; border-bottom: 2px solid red;">
+            Your account has not been activated yet. Please check your email to activate.
+        </div>
         <div
             style="background: #ffcccc; color: #900; padding: 10px; text-align: center; font-weight: bold; border-bottom: 2px solid red;">
             Your account has not been activated yet. Please check your email to activate.
@@ -174,6 +182,48 @@ $is_active = $_SESSION['is_active'] ?? 0;
         <div class="notes" aria-live="polite">
         </div>
     </div>
+        <!-- Vị trí hiển thị danh sách note -->
+        <div class="notes" aria-live="polite">
+        </div>
+
+    </div>
+    <!-- Model phân quyền chia sẽ note -->
+    <div id="shareModal" class="modal-share hidden">
+        <div>
+            <h3>Share Note With</h3>
+    
+            <div class="input-row">
+                <input type="email" id="emailInput" placeholder="Enter email address">
+                <select id="permissionSelect">
+                    <option value="view">View only</option>
+                    <option value="edit">Can edit</option>
+                </select>
+                <button class="btn" onclick="addUser()">Add</button>
+            </div>
+    
+            <!-- Shared user list -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Permission</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <!-- Rendered by JS -->
+                </tbody>
+            </table>
+    
+            <!-- Footer -->
+            <div class="footer">
+                <button class="btn-outline-submit" onclick="closeModal()">Cancel</button>
+                <button class="btn-submit" onclick="saveShareSettings()">Done</button>
+            </div>
+        </div>
+    </div>
+
+
 
     <!-- Sidebar người dùng -->
     <div class="user-dropdown-container">
@@ -183,6 +233,14 @@ $is_active = $_SESSION['is_active'] ?? 0;
                 <div class="user-name" id="userName"><?= htmlspecialchars($user['name']) ?></div>
             </div>
 
+            <ul class="user-menu">
+                <li id="openPersonalInfo"><i class="bi bi-person-circle"></i> Personal Information
+                </li>
+                <li id="openSettingBtn"><i class="bi bi-gear"></i> Setting</li>
+                <li></li>
+                <li id="logoutBtn"><i class="bi bi-box-arrow-right"></i> Logout</li>
+            </ul>
+        </div>
             <ul class="user-menu">
                 <li id="openPersonalInfo"><i class="bi bi-person-circle"></i> Personal Information
                 </li>
@@ -281,22 +339,23 @@ $is_active = $_SESSION['is_active'] ?? 0;
                 <div style="display:flex; gap:6px; margin-top:8px;">
                     <input type="text" id="new-label-input" placeholder="Enter name label" style="flex:1;" />
                     <button id="add-label-btn" disabled>Add</button>
+    <!-- Giao diện chỉnh sửa note -->
+    <div id="popup-modal" class="popup-modal hidden">
+        <div class="add-note-expanded popup-content">
+            <input type="text" id="modal-title" class="note-title-input" placeholder="Title">
+            <textarea id="modal-content" class="note-content-input" placeholder="Content..."></textarea>
+            <div id="selected-labels" style="margin-top:10px; display:none;"></div>
+            <div class="icons">
+            </div>
+            <div id="label-popup"
+                style="display:none; position:absolute; background:#fff; border:1px solid #ccc; padding:8px; border-radius:4px; z-index:1000;">
+                <strong>Labels</strong>
+                <ul id="label-list"
+                    style="list-style:none; padding:0; margin:4px 0; max-height:120px; overflow-y:auto;"></ul>
+                <div style="display:flex; gap:6px; margin-top:8px;">
+                    <input type="text" id="new-label-input" placeholder="Enter name label" style="flex:1;" />
+                    <button id="add-label-btn" disabled>Add</button>
                 </div>
-            </div>
-            <button class="close-add-note" id="popup-close">Close</button>
-        </div>
-    </div>
-
-    <!-- Modal xác nhận xóa -->
-    <div id="deleteConfirmModal" class="modal-confirm ">
-        <div class="modal-content-confirm">
-            <div class="modal-title">Delete note?</div>
-            <div class="modal-body">
-                Are you sure you want to delete this note? <br>
-            </div>
-            <div class="modal-actions">
-                <button id="confirmDeleteBtn" class="btn btn-danger">Delete</button>
-                <button id="cancelDeleteBtn" class="btn btn-secondary">Cancel</button>
             </div>
         </div>
 
@@ -359,5 +418,7 @@ $is_active = $_SESSION['is_active'] ?? 0;
 
 
 </body>
+</body>
 
+</html>
 </html>

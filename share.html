@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyNote - Share</title>
+    <link rel="icon" href="image/icon.png" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="css/home.css" />
+    <link rel="stylesheet" href="css/share.css" />
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <i class="bi bi-x close-sidebar" title="Close" aria-label="Close sidebar" role="button"
+            tabindex="0"></i><br><br>
+        <ul>
+            <li><i class="bi bi-sticky"></i> Note</li>
+            <li><i class="bi bi-bell"></i> Reminder</li>
+            <li><i class="bi bi-archive"></i> Storage</li>
+            <li><i class="bi bi-trash"></i> Trash</li>
+        </ul>
+        <div class="labels">
+            <h4><i class="bi bi-tag"></i> Labels</h4>
+            <ul>
+                <li><i class="bi bi-tag"></i> Study</li>
+                <li><i class="bi bi-tag"></i> Work</li>
+                <li><i class="bi bi-plus-circle"></i>Add Label</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="main" style="margin-left: 0; transition: margin-left 0.3s ease;">
+        <div class="top-bar">
+            <i class="bi bi-list" id="menuToggle" aria-label="Toggle menu" role="button" tabindex="0"></i>
+            <h2><i class="bi bi-cloudy"></i> SkyNote</h2>
+            <input type="text" placeholder="Search..." aria-label="Search notes" />
+            <i class="bi bi-list-task" id="toggleViewBtn" title="List view"></i>
+            <i class="bi bi-person-circle" title="User account"></i>
+        </div>
+
+        <!-- Notes người khác chia sẻ với bạn -->
+        <div class="notes" id="sharedWithMe">
+            <div class="notes-header">
+                <h4><i class="bi bi-share"></i> Share with me</h4>
+            </div>
+            <div class="notes-list grid-view ">
+                <!-- Console sẽ lưu data-id vào để đánh dấu là note đó đã là note cũ -->
+                <div class="note-card" data-id="note-1" data-shared="true">
+                    <span class="new-tag">New</span>
+                    <h5 class="note-title">Project Plan</h5>
+                    <p class="note-share">From: Alice</p>
+                    <p class="note-time">Share on: Jun 06, 2025</p>
+                    <p class="note-content">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
+                        tempor
+                        incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                        ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                    <span class="permission-tag can-view">Can view</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notes bạn chia sẻ cho người khác -->
+        <div class="notes" id="mySharedNotes">
+            <div class="notes-header">
+                <h4><i class="bi bi-send"></i> My sharing notes</h4>
+            </div>
+            <div class="notes-list grid-view">
+                <div class="note-card">
+                    <h5 class="note-title">Project Plan</h5>
+                    <p class="note-share">Share with: Alice</p>
+                    <p class="note-time">Share on: Jun 06, 2025</p>
+                    <p class="note-content">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
+                        tempor
+                        incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                        ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Modal chi tiết ghi chú -->
+<div id="noteModal" class="modal hidden">
+    <div class="note-box">
+        <div class="note-header">
+            <div>
+                <h3 id="note-title">Note Title</h3>
+                <p id="note-from" class="note-meta"></p>
+                <p id="note-date" class="note-meta"></p>
+            </div>
+
+            <!-- Bên phải -->
+            <div class="note-actions">
+                <span class="note-permission can-view">Can view</span>
+                <i class="bi bi-clock-history history-icon" title="History"></i>
+            </div>
+        </div>
+
+        <div class="note-content-wrap">
+            <div class="note-body">
+                <p id="note-text"></p>
+            </div>
+        </div>
+
+        <span class="close-btn">&times;</span>
+    </div>
+    <div class="note-history-panel hidden" id="note-history">
+        <h4>Edit History</h4>
+        <ul class="history-list" id="history-list"></ul>
+    </div>
+</div>
+
+
+    <!-- Sidebar người dùng -->
+    <div class="user-dropdown-container">
+        <div class="user-dropdown" id="userDropdown">
+            <div class="user-header">
+                <img src="image/background.jpg" alt="Avatar" class="user-avatar" />
+                <div class="user-name">Username</div>
+            </div>
+
+            <ul class="user-menu">
+                <li id="openPersonalInfo"><i class="bi bi-person-circle"></i> Personal Information
+                </li>
+                <li id="openSettingBtn"><i class="bi bi-gear"></i> Setting</li>
+                <li></li>
+                <li><i class="bi bi-box-arrow-right"></i> Logout</li>
+            </ul>
+        </div>
+
+        <!-- Modal thông tin cá nhân -->
+        <div class="personal-info-modal hidden" id="personalInfoModal">
+            <div class="modal-overlay">
+                <div class="modal-content">
+                    <i class="bi bi-x close-personal-info" title="Close" role="button" tabindex="0"></i>
+                    <!-- Avatar hiện thị (vẫn hiện trong reset password) -->
+                    <img id="avatarPreview" src="image/icontitle.jpg" alt="Avatar" class="avatar-edit-preview" />
+                    <label for="avatarInput" id="avatarLabel" class="avatar-upload-btn">Chọn ảnh mới</label>
+                    <input type="file" id="avatarInput" accept="image/*" class="hidden" />
+                    <!-- Hiển thị tên -->
+                    <h3 id="displayName">Username</h3>
+                    <input type="text" class="hidden" id="nameInput" value="Tên người dùng" />
+                    <!-- Email -->
+                    <p id="emailDisplay">Email: <span id="userEmail">user@example.com</span></p>
+                    <div class="personal-info-buttons" id="viewButtons">
+                        <button class="btn-outline-pink" id="resetPasswordBtn">Reset Password</button>
+                        <button class="btn-filled-pink" id="editInfoBtn">Edit Information</button>
+                    </div>
+                    <div class="personal-info-buttons hidden" id="editActions">
+                        <button class="btn-outline-pink" id="cancelEditBtn">Cancel</button>
+                        <button class="btn-filled-pink" id="saveEditBtn">Save</button>
+                    </div>
+                    <!-- Form đổi mật khẩu (ẩn mặc định) -->
+                    <div class="reset-password-form hidden" id="resetPasswordForm">
+                        <input type="password" id="oldPassword" placeholder="Nhập mật khẩu cũ" />
+                        <input type="password" id="newPassword" placeholder="Nhập mật khẩu mới" />
+                        <input type="password" id="confirmNewPassword" placeholder="Nhập lại mật khẩu mới" />
+                        <div class="personal-info-buttons">
+                            <button class="btn-outline-pink" id="cancelResetBtn">Cancel</button>
+                            <button class="btn-filled-pink" id="saveResetBtn">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Setting -->
+    <div class="setting-modal hidden" id="settingModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <i class="bi bi-x close-setting" title="Close" role="button" tabindex="0"></i>
+            <h3>Settings</h3>
+            <div class="setting-group">
+                <label for="fontSizeSelect">Font Size:</label>
+                <select id="fontSizeSelect">
+                    <option value="small">Small</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="large">Large</option>
+                </select>
+            </div>
+            <div class="setting-group">
+                <label>Theme:</label>
+                <div class="radio-options">
+                    <label><input type="radio" name="theme" value="light" checked> Light</label>
+                    <label><input type="radio" name="theme" value="dark"> Dark</label>
+                </div>
+            </div>
+            <button id="saveSettingsBtn" class="btn-filled-pink">Save</button>
+        </div>
+    </div>
+
+    <!-- Giao diện chỉnh sửa note -->
+    <div id="popup-modal" class="popup-modal hidden">
+        <div class="add-note-expanded popup-content">
+            <input type="text" id="modal-title" class="note-title-input" placeholder="Title">
+            <textarea id="modal-content" class="note-content-input" placeholder="Content..."></textarea>
+            <div class="expanded-note-icons">
+                <i class="bi bi-type" title="Font size"></i>
+                <i class="bi bi-image" title="Add picture"></i>
+                <i class="bi bi-palette" title="Note color"></i>
+                <i class="bi bi-pin-angle" title="Pin"></i>
+                <i class="bi bi-share" title="Share"></i>
+                <i class="bi bi-lock" title="Lock"></i>
+                <i class="bi bi-tag" title="Label"></i>
+                <i class="bi bi-trash" title="Delete"></i>
+                <button class="close-add-note" id="popup-close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/share.js"></script>
+    <script src="js/home.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
