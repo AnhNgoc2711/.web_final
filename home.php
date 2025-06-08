@@ -2,6 +2,8 @@
 session_set_cookie_params(0);
 session_start();
 
+require 'db.php';
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
@@ -12,6 +14,14 @@ if (isset($_GET['logout'])) {
     session_destroy();
     header("Location: login.php");
     exit;
+}
+
+if ($_SESSION['user_id']) {
+    $stmt = $pdo->prepare("SELECT name, email, avatar FROM user WHERE user_id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+} else {
+    $user = ['name' => 'Username', 'email' => 'user@example.com', 'avatar' => 'default-avatar.png'];
 }
 
 
@@ -116,7 +126,13 @@ $is_active = $_SESSION['is_active'] ?? 0;
             <h2><i class="bi bi-cloudy"></i> SkyNote</h2>
             <input type="text" id="searchInput" placeholder="Search..." aria-label="Search notes" />
             <i class="bi bi-list-task" id="toggleViewBtn" title="List view"></i>
-            <i class="bi bi-person-circle" title="User account"></i>
+            <?php if (!empty($user['avatar'])): ?>
+                <img src="<?= htmlspecialchars($user['avatar']) ?>" id="topAvatar" title="User account" alt="User Avatar"
+                    style="width:30px; height:40px; border-radius:50%;" />
+            <?php else: ?>
+                <i class="bi bi-person-circle" id="topAvatar" title="User account" style="font-size:30px;"></i>
+            <?php endif; ?>
+
         </div>
 
         <div class="add-note-bar">
@@ -153,6 +169,7 @@ $is_active = $_SESSION['is_active'] ?? 0;
         </div>
 
 
+
         <!-- Vị trí hiển thị danh sách note -->
         <div class="notes" aria-live="polite">
         </div>
@@ -163,7 +180,7 @@ $is_active = $_SESSION['is_active'] ?? 0;
         <div class="user-dropdown" id="userDropdown">
             <div class="user-header">
                 <img src="image/background.jpg" alt="Avatar" class="user-avatar" />
-                <div class="user-name">Username</div>
+                <div class="user-name" id="userName"><?= htmlspecialchars($user['name']) ?></div>
             </div>
 
             <ul class="user-menu">
@@ -182,13 +199,13 @@ $is_active = $_SESSION['is_active'] ?? 0;
                     <i class="bi bi-x close-personal-info" title="Close" role="button" tabindex="0"></i>
                     <!-- Avatar hiện thị -->
                     <img id="avatarPreview" src="image/icontitle.jpg" alt="Avatar" class="avatar-edit-preview" />
-                    <label for="avatarInput" id="avatarLabel" class="avatar-upload-btn">Chọn ảnh mới</label>
+                    <label for="avatarInput" id="avatarLabel" class="avatar-upload-btn">Change my avatar </label>
                     <input type="file" id="avatarInput" accept="image/*" class="hidden" />
                     <!-- Hiển thị tên -->
-                    <h3 id="displayName">Username</h3>
+                    <h3 id="displayName"><?= htmlspecialchars($user['name']) ?></h3>
                     <input type="text" class="hidden" id="nameInput" value="Tên người dùng" />
                     <!-- Email -->
-                    <p id="emailDisplay">Email: <span id="userEmail">user@example.com</span></p>
+                    <p id="emailDisplay">Email: <span id="userEmail"><?= htmlspecialchars($user['email']) ?></span></p>
                     <div class="personal-info-buttons" id="viewButtons">
                         <button class="btn-outline-pink" id="resetPasswordBtn">Change Password</button>
                         <button class="btn-filled-pink" id="editInfoBtn">Edit Information</button>
@@ -283,15 +300,61 @@ $is_active = $_SESSION['is_active'] ?? 0;
             </div>
         </div>
 
+    </div>
+
+    <!-- Tạo MK cho note  -->
+    <div class="reset-password-form hidden" id="firstPasswordForm">
+        <div class="password-field">
+            <input type="password" id="firstPassword" placeholder="Enter new password" />
+            <i class="bi bi-eye-slash toggle-password"></i>
+        </div>
+        <div class="password-field">
+            <input type="password" id="firstPasswordConfirm" placeholder="Confirm password" />
+            <i class="bi bi-eye-slash toggle-password"></i>
+        </div>
+        <div class="personal-info-buttons">
+            <button class="btn-outline-pink" id="cancelFirst">Cancel</button>
+            <button class="btn-filled-pink" id="saveFirst">Save</button>
+        </div>
+    </div>
+
+    <!-- Lock / Change Options -->
+    <div id="lockOptionsForm" class="options-menu hidden">
+        <button class="btn-outline-pink" id="lockNote">Lock note</button>
+        <button class="btn-filled-pink" id="changePwd">Change password</button>
+    </div>
 
 
-        <!-- <script src="js/script.js"></script> -->
-        <script src="js/login.js"></script>
-        <script src="js/home.js"></script>
-        <script src="js/search.js"></script>
-        <script src="js/filterNotesByLabel.js"></script>
-        <script src="js/labels.js"></script>
-        <script src="js/note_label.js"></script>
+    <!-- Change Password -->
+    <div class="reset-password-form hidden" id="changePasswordForm">
+        <div class="password-field">
+            <input type="password" id="oldPwd" placeholder="Current password" />
+            <i class="bi bi-eye-slash toggle-password"></i>
+        </div>
+        <div class="password-field">
+            <input type="password" id="newPwd" placeholder="New password" />
+            <i class="bi bi-eye-slash toggle-password"></i>
+        </div>
+        <div class="password-field">
+            <input type="password" id="confirmNewPwd" placeholder="Confirm new password" />
+            <i class="bi bi-eye-slash toggle-password"></i>
+        </div>
+        <div class="personal-info-buttons">
+            <button class="btn-outline-pink" id="cancelChange">Cancel</button>
+            <button class="btn-filled-pink" id="saveChange">Save</button>
+        </div>
+    </div>
+
+
+    <!-- <script src="js/script.js"></script> -->
+    <script src="js/login.js"></script>
+    <script src="js/home.js"></script>
+    <script src="js/search.js"></script>
+    <script src="js/filterNotesByLabel.js"></script>
+    <script src="js/labels.js"></script>
+    <script src="js/note_label.js"></script>
+    <!-- <script src="js/avatar.js"></script> -->
+    <script src="js/name_email.js"></script>
 
 
 

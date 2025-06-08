@@ -21,65 +21,46 @@ $pdo->prepare("
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
-    // 1. Autosave (chỉ title/content/size_type)
+    // 1. Autosave:
     if ($action === '' && isset($_POST['title'])) {
-        $note_id = $_POST['note_id'] ?? null;
         $title = $_POST['title'] ?? '';
         $content = $_POST['content'] ?? '';
+        $color = $_POST['color'] ?? null;
         $size_type = $_POST['size_type'] ?? 'H2';
+        $note_id = $_POST['note_id'] ?? null;
+
+        $labels = [];
+        if (isset($_POST['labels'])) {
+            $labels = json_decode($_POST['labels'], true);
+            if (!is_array($labels))
+                $labels = [];
+        }
 
         if ($note_id) {
-            // CHỈ 1 câu UPDATE duy nhất
-            $stmt = $pdo->prepare("
-          UPDATE note
-             SET title      = ?,
-                 content    = ?,
-                 size_type  = ?,
-                 updated_at = NOW()
-           WHERE note_id = ?
-             AND user_id = ?
-        ");
-            $stmt->execute([
-                $title,
-                $content,
-                $size_type,
-                $note_id,
-                $user_id
-            ]);
+            $stmt = $pdo->prepare("UPDATE note SET title=?, content=?, color=?, size_type=?, updated_at=NOW() WHERE note_id=? AND user_id=?");
+            $stmt->execute([$title, $content, $color, $size_type, $note_id, $user_id]);
 
-            // nếu có labels thì xóa/insert như bạn đang làm
-            if (!empty($_POST['labels'])) {
-                $labels = json_decode($_POST['labels'], true);
-                if (is_array($labels)) {
-                    $pdo->prepare("DELETE FROM note_label WHERE note_id=?")
-                        ->execute([$note_id]);
-                    $ins = $pdo->prepare("INSERT INTO note_label (note_id,label_id) VALUES (?,?)");
-                    foreach ($labels as $lbl) {
-                        $ins->execute([$note_id, $lbl]);
-                    }
-                }
+            // Cập nhật labels
+            $pdo->prepare("DELETE FROM note_label WHERE note_id=?")->execute([$note_id]);
+            $stmtInsert = $pdo->prepare("INSERT INTO note_label (note_id, label_id) VALUES (?, ?)");
+            foreach ($labels as $label_id) {
+                $stmtInsert->execute([$note_id, $label_id]);
             }
-
             echo json_encode(['note_id' => $note_id, 'status' => 'updated']);
         } else {
-            // tạo mới note (đã có color mặc định và size_type)
-            $stmt = $pdo->prepare("
-          INSERT INTO note (user_id, title, content, color, size_type)
-          VALUES (?, ?, ?, ?, ?)
-        ");
-            $stmt->execute([
-                $user_id,
-                $title,
-                $content,
-                '#ffffff',   // default color khi tạo mới
-                $size_type
-            ]);
-            $new_id = $pdo->lastInsertId();
-            echo json_encode(['note_id' => $new_id, 'status' => 'created']);
+            $stmt = $pdo->prepare("INSERT INTO note (user_id, title, content, color, size_type) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([$user_id, $title, $content, $color, $size_type]);
+            $new_note_id = $pdo->lastInsertId();
+
+            // Gán label cho note mới
+            $stmtInsert = $pdo->prepare("INSERT INTO note_label (note_id, label_id) VALUES (?, ?)");
+            foreach ($labels as $label_id) {
+                $stmtInsert->execute([$new_note_id, $label_id]);
+            }
+            echo json_encode(['note_id' => $new_note_id, 'status' => 'created']);
         }
         exit;
     }
-
 
     // 2. Toggle icon (pin, lock, share, tag) 
     if ($action === 'toggle_icon') {
@@ -185,60 +166,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         exit;
     }
-
-
-    //8. Thêm ảnh 
-// trong note.php, xử lý action = 'upload_images'
-    if ($action === 'upload_images') {
-        $note_id = intval($_POST['note_id'] ?? 0);
-        if (!$note_id || empty($_FILES['images'])) {
-            http_response_code(400);
-            echo json_encode(['error' => 'Missing note_id or no files']);
-            exit;
-        }
-
-        // 1) Thư mục lưu: image/ (tạo nếu chưa có)
-        $uploadDir = __DIR__ . '/image/';
-        if (!is_dir($uploadDir))
-            mkdir($uploadDir, 0777, true);
-
-        $uploaded = [];
-        foreach ($_FILES['images']['tmp_name'] as $idx => $tmpName) {
-            if ($_FILES['images']['error'][$idx] === UPLOAD_ERR_OK) {
-                // Tên gốc + extension
-                $origName = basename($_FILES['images']['name'][$idx]);
-                $ext = pathinfo($origName, PATHINFO_EXTENSION);
-
-                // 2) Lưu bản ghi trống trước để lấy attach_id
-                $stmt = $pdo->prepare(
-                    "INSERT INTO attachment (note_id, img) VALUES (?, '')"
-                );
-                $stmt->execute([$note_id]);
-                $attachId = $pdo->lastInsertId();
-
-                // 3) Đặt tên file mới dựa trên ID
-                $newName = $attachId . '.' . $ext;
-                $target = $uploadDir . $newName;
-
-                // 4) Di chuyển file lên thư mục image/
-                if (move_uploaded_file($tmpName, $target)) {
-                    // 5) Cập nhật lại đường dẫn chính xác vào DB
-                    $path = 'image/' . $newName;
-                    $stmt2 = $pdo->prepare(
-                        "UPDATE attachment SET img = ? WHERE attach_id = ?"
-                    );
-                    $stmt2->execute([$path, $attachId]);
-                    $uploaded[] = $path;
-                }
-            }
-        }
-
-        echo json_encode(['success' => true, 'uploaded' => $uploaded]);
-        exit;
-    }
-
-
-
 
 
     http_response_code(400);

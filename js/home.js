@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const closeSidebar = document.querySelector('.close-sidebar');
     let pendingDeleteNoteId = null;
 
-
     function showMessage(msg, duration = 3000) {
         const msgBox = document.getElementById('messageBox');
         const msgText = document.getElementById('messageText');
@@ -225,6 +224,13 @@ document.addEventListener('DOMContentLoaded', function () {
         autosaveNoteId = null;
     }
 
+    // Mở form tạo note
+    // window.expandAddNote = function () {
+    //     addNoteBar.classList.add('hidden');
+    //     addNoteExpanded.classList.remove('hidden');
+    //     resetAddNoteForm();
+    //     contentInput.focus();
+    // };
 
     window.expandAddNote = function () {
         showCreateNoteModal();
@@ -347,7 +353,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Hàm cập nhật icon và bind sự kiện click
         function updateIcons() {
-
             iconsDiv.innerHTML = generatePopupIconsHTML(newNoteIconState);
 
             // Size (Aa)
@@ -407,8 +412,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Tag
             iconsDiv.querySelectorAll('i[data-action]').forEach(icon => {
                 const action = icon.dataset.action;
-                if (['palette', 'size', 'image'].includes(action)) return;
-
+                if (action === 'palette' || action === 'size') return;
 
                 icon.onclick = e => {
                     e.stopPropagation();
@@ -420,7 +424,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     updateIcons(); // Giao diện phản hồi ngay
                 };
             });
-
         }
 
         // Gọi lần đầu để render icons
@@ -495,7 +498,6 @@ document.addEventListener('DOMContentLoaded', function () {
         contentInput.value = note.content || '';
         titleInput.focus();
 
-        
         let iconState = {
             pinned: note.pinned || 0,
             locked: note.locked || 0,
@@ -504,14 +506,11 @@ document.addEventListener('DOMContentLoaded', function () {
             size_type: note.size_type || 'H2'
         };
 
-
-
         // Khi mở modal, gán class size cho textarea
         contentInput.classList.remove('size-h1', 'size-h2', 'size-h3');
         contentInput.classList.add('size-' + iconState.size_type.toLowerCase());
 
         function updateIcons() {
-
             iconsDiv.innerHTML = generatePopupIconsHTML(iconState);
 
             // Color palette icon
@@ -547,7 +546,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 popup.style.display = 'block';
             });
-
 
             // Size type icon
             const sizeTypeWrapper = iconsDiv.querySelector('.size-type-wrapper');
@@ -605,11 +603,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
 
-
             // Assign events to pin/lock/share/tag icons (except size icon)
             iconsDiv.querySelectorAll('i[data-action]').forEach(icon => {
                 const action = icon.dataset.action;
-                if (['palette', 'size', 'image'].includes(action)) return;
+                if (action === 'size' || action === 'palette') return;
 
                 icon.onclick = function (e) {
                     e.stopPropagation();
@@ -650,52 +647,39 @@ document.addEventListener('DOMContentLoaded', function () {
 
         updateIcons();
 
-        // AUTOSAVE 
+        // AUTOSAVE
         let saveTimer = null;
         function autosaveModal() {
             clearTimeout(saveTimer);
             saveTimer = setTimeout(() => {
+                // Kiểm tra mạng trước khi autosave
                 if (!navigator.onLine) {
-                    showMessage("Connection lost, please check your network and try again.");
+                    showMessage("❌ Connection lost, please check your network and try again.");
                     return;
                 }
-                // Chỉ update title, content, size_type 
-                const params = new URLSearchParams({
-                    note_id: note.note_id,
-                    title: titleInput.value,
-                    content: contentInput.value,
-                    size_type: iconState.value
-                });
+                //Lưu nội dung note
                 fetch('note.php', {
                     method: 'POST',
-                    body: params
-                })
-                    .then(r => r.json())
+                    body: new URLSearchParams({
+                        note_id: note.note_id,
+                        title: titleInput.value,
+                        content: contentInput.value
+                    })
+                }).then(r => r.json())
                     .then(data => {
-                        const card = document.querySelector(`.note[data-note-id="${note.note_id}"]`);
-                        if (card) {
-                            // giữ nguyên màu cũ, chỉ update text
-                            card.querySelector('.title').textContent = titleInput.value;
-                            card.querySelector('.body').textContent = contentInput.value;
-                        }
+                        fetchNotes(); // update lại danh sách note
+                        //  Autosave label 
                         if (typeof saveLabelsForNote === 'function') {
                             saveLabelsForNote(note.note_id);
                         }
-                    })
-                    .catch(err => showMessage('Lỗi autosave: ' + err));
+                    }).catch(err => {
+                        showMessage('Lỗi autosave: ' + err);
+                    });
             }, 400);
         }
 
-        // đảm bảo bạn vẫn gắn event:
-        titleInput.addEventListener('input', autosaveModal);
-        contentInput.addEventListener('input', autosaveModal);
-
-
-
-        // Cuối cùng nhớ gọi autosaveModal() mỗi khi người dùng thay đổi title/content, ví dụ:
-        titleInput.addEventListener('input', autosaveModal);
-        contentInput.addEventListener('input', autosaveModal);
-        inner.addEventListener('input', autosaveModal);
+        titleInput.oninput = autosaveModal;
+        contentInput.oninput = autosaveModal;
 
         // Đóng popup X
         const popupCloseBtn = document.getElementById('popup-close');
@@ -1031,5 +1015,3 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
-
-
