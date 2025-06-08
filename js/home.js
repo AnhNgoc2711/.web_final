@@ -224,13 +224,6 @@ document.addEventListener('DOMContentLoaded', function () {
         autosaveNoteId = null;
     }
 
-    // Mở form tạo note
-    // window.expandAddNote = function () {
-    //     addNoteBar.classList.add('hidden');
-    //     addNoteExpanded.classList.remove('hidden');
-    //     resetAddNoteForm();
-    //     contentInput.focus();
-    // };
 
     window.expandAddNote = function () {
         showCreateNoteModal();
@@ -647,39 +640,66 @@ document.addEventListener('DOMContentLoaded', function () {
 
         updateIcons();
 
-        // AUTOSAVE
+        // AUTOSAVE 
         let saveTimer = null;
         function autosaveModal() {
             clearTimeout(saveTimer);
             saveTimer = setTimeout(() => {
-                // Kiểm tra mạng trước khi autosave
                 if (!navigator.onLine) {
-                    showMessage("❌ Connection lost, please check your network and try again.");
+                    showMessage("Connection lost, please check your network and try again.");
                     return;
                 }
-                //Lưu nội dung note
+                // Chỉ update title, content, size_type 
+                const params = new URLSearchParams({
+                    note_id: note.note_id,
+                    title: titleInput.value,
+                    content: contentInput.value,
+                    size_type: sizeTypeSelect.value
+                });
                 fetch('note.php', {
                     method: 'POST',
-                    body: new URLSearchParams({
-                        note_id: note.note_id,
-                        title: titleInput.value,
-                        content: contentInput.value
-                    })
-                }).then(r => r.json())
+                    body: params
+                })
+                    .then(r => r.json())
                     .then(data => {
-                        fetchNotes(); // update lại danh sách note
-                        //  Autosave label 
+                        const card = document.querySelector(`.note[data-note-id="${note.note_id}"]`);
+                        if (card) {
+                            // giữ nguyên màu cũ, chỉ update text
+                            card.querySelector('.title').textContent = titleInput.value;
+                            card.querySelector('.body').textContent = contentInput.value;
+                        }
                         if (typeof saveLabelsForNote === 'function') {
                             saveLabelsForNote(note.note_id);
                         }
-                    }).catch(err => {
-                        showMessage('Lỗi autosave: ' + err);
-                    });
+                    })
+                    .catch(err => showMessage('Lỗi autosave: ' + err));
             }, 400);
         }
 
-        titleInput.oninput = autosaveModal;
-        contentInput.oninput = autosaveModal;
+        // đảm bảo bạn vẫn gắn event:
+        titleInput.addEventListener('input', autosaveModal);
+        contentInput.addEventListener('input', autosaveModal);
+
+        colorPicker.addEventListener('change', () => {
+            inner.style.backgroundColor = colorPicker.value;
+            // Gửi riêng request set_color
+            fetch('note.php', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    action: 'set_color',
+                    note_id: note.note_id,
+                    color: colorPicker.value
+                })
+            });
+        });
+
+
+
+
+        // Cuối cùng nhớ gọi autosaveModal() mỗi khi người dùng thay đổi title/content, ví dụ:
+        titleInput.addEventListener('input', autosaveModal);
+        contentInput.addEventListener('input', autosaveModal);
+        inner.addEventListener('input', autosaveModal);
 
         // Đóng popup X
         const popupCloseBtn = document.getElementById('popup-close');

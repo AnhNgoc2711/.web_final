@@ -21,46 +21,65 @@ $pdo->prepare("
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
-    // 1. Autosave:
+    // 1. Autosave (chỉ title/content/size_type)
     if ($action === '' && isset($_POST['title'])) {
+        $note_id = $_POST['note_id'] ?? null;
         $title = $_POST['title'] ?? '';
         $content = $_POST['content'] ?? '';
-        $color = $_POST['color'] ?? null;
         $size_type = $_POST['size_type'] ?? 'H2';
-        $note_id = $_POST['note_id'] ?? null;
-
-        $labels = [];
-        if (isset($_POST['labels'])) {
-            $labels = json_decode($_POST['labels'], true);
-            if (!is_array($labels))
-                $labels = [];
-        }
 
         if ($note_id) {
-            $stmt = $pdo->prepare("UPDATE note SET title=?, content=?, color=?, size_type=?, updated_at=NOW() WHERE note_id=? AND user_id=?");
-            $stmt->execute([$title, $content, $color, $size_type, $note_id, $user_id]);
+            // CHỈ 1 câu UPDATE duy nhất
+            $stmt = $pdo->prepare("
+          UPDATE note
+             SET title      = ?,
+                 content    = ?,
+                 size_type  = ?,
+                 updated_at = NOW()
+           WHERE note_id = ?
+             AND user_id = ?
+        ");
+            $stmt->execute([
+                $title,
+                $content,
+                $size_type,
+                $note_id,
+                $user_id
+            ]);
 
-            // Cập nhật labels
-            $pdo->prepare("DELETE FROM note_label WHERE note_id=?")->execute([$note_id]);
-            $stmtInsert = $pdo->prepare("INSERT INTO note_label (note_id, label_id) VALUES (?, ?)");
-            foreach ($labels as $label_id) {
-                $stmtInsert->execute([$note_id, $label_id]);
+            // nếu có labels thì xóa/insert như bạn đang làm
+            if (!empty($_POST['labels'])) {
+                $labels = json_decode($_POST['labels'], true);
+                if (is_array($labels)) {
+                    $pdo->prepare("DELETE FROM note_label WHERE note_id=?")
+                        ->execute([$note_id]);
+                    $ins = $pdo->prepare("INSERT INTO note_label (note_id,label_id) VALUES (?,?)");
+                    foreach ($labels as $lbl) {
+                        $ins->execute([$note_id, $lbl]);
+                    }
+                }
             }
+
             echo json_encode(['note_id' => $note_id, 'status' => 'updated']);
         } else {
-            $stmt = $pdo->prepare("INSERT INTO note (user_id, title, content, color, size_type) VALUES (?, ?, ?, ?, ?)");
-            $stmt->execute([$user_id, $title, $content, $color, $size_type]);
-            $new_note_id = $pdo->lastInsertId();
-
-            // Gán label cho note mới
-            $stmtInsert = $pdo->prepare("INSERT INTO note_label (note_id, label_id) VALUES (?, ?)");
-            foreach ($labels as $label_id) {
-                $stmtInsert->execute([$new_note_id, $label_id]);
-            }
-            echo json_encode(['note_id' => $new_note_id, 'status' => 'created']);
+            // tạo mới note (đã có color mặc định và size_type)
+            $stmt = $pdo->prepare("
+          INSERT INTO note (user_id, title, content, color, size_type)
+          VALUES (?, ?, ?, ?, ?)
+        ");
+            $stmt->execute([
+                $user_id,
+                $title,
+                $content,
+                '#ffffff',   // default color khi tạo mới
+                $size_type
+            ]);
+            $new_id = $pdo->lastInsertId();
+            echo json_encode(['note_id' => $new_id, 'status' => 'created']);
         }
         exit;
     }
+
 
     // 2. Toggle icon (pin, lock, share, tag) 
     if ($action === 'toggle_icon') {
