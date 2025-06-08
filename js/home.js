@@ -5,6 +5,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const closeSidebar = document.querySelector('.close-sidebar');
     let pendingDeleteNoteId = null;
 
+
+
+
     function showMessage(msg, duration = 3000) {
         const msgBox = document.getElementById('messageBox');
         const msgText = document.getElementById('messageText');
@@ -331,6 +334,110 @@ document.addEventListener('DOMContentLoaded', function () {
 
         let autosaveNoteId = null;
 
+        // Thêm ảnh vào note
+        function createImagePopup(targetIcon) {
+            // Remove popup cũ nếu có
+            const old = document.querySelector('.image-popup');
+            if (old) old.remove();
+
+            const popup = document.createElement('div');
+            popup.className = 'image-popup';
+            popup.style.position = 'absolute';
+            popup.style.top = `${targetIcon.offsetTop + targetIcon.offsetHeight + 6}px`;
+            popup.style.left = `${targetIcon.offsetLeft}px`;
+            popup.style.padding = '8px';
+            popup.style.boxShadow = '0 2px 6px rgba(0,0,0,0.2)';
+            popup.style.background = '#fff';
+            popup.style.zIndex = 1000;
+
+            // Buttons
+            const btn1 = document.createElement('button');
+            btn1.textContent = 'Add 1 image';
+            btn1.style.marginRight = '8px';
+            const btn2 = document.createElement('button');
+            btn2.textContent = 'Add multiple images';
+
+            popup.append(btn1, btn2);
+
+            // Container preview
+            const preview = document.createElement('div');
+            preview.className = 'image-preview';
+            preview.style.marginTop = '8px';
+            preview.style.display = 'flex';
+            preview.style.flexWrap = 'wrap';
+            preview.style.gap = '8px';
+            popup.append(preview);
+
+            // File input (hidden)
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            fileInput.style.display = 'none';
+            popup.append(fileInput);
+
+            // Handle selection
+            function selectFiles(multiple) {
+                if (!autosaveNoteId) {
+                    alert('Please save note first');
+                    return;
+                }
+                fileInput.multiple = multiple;
+                fileInput.click();
+            }
+
+            // Preview & upload
+            fileInput.onchange = () => {
+                const files = Array.from(fileInput.files);
+                preview.innerHTML = ''; // clear trước
+                const formData = new FormData();
+                formData.append('action', 'upload_images');
+                formData.append('note_id', autosaveNoteId);
+                files.forEach(file => {
+                    // preview local
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.style.width = '80px';
+                        img.style.height = '80px';
+                        img.style.objectFit = 'cover';
+                        preview.append(img);
+                    };
+                    reader.readAsDataURL(file);
+                    // chuẩn bị upload
+                    formData.append('images[]', file);
+                });
+
+                // upload
+                fetch('note.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(r => r.json())
+                    .then(res => {
+                        if (!res.success) console.error(res.error || 'Upload failed');
+                        // nếu server trả về đường dẫn, có thể update preview từ server
+                    })
+                    .catch(err => console.error('Error uploading images:', err));
+            };
+
+            // Bind button
+            btn1.onclick = () => { selectFiles(false); };
+            btn2.onclick = () => { selectFiles(true); };
+
+            // Khi click ngoài popup thì đóng
+            document.addEventListener('mousedown', function handler(evt) {
+                if (!popup.contains(evt.target) && evt.target !== targetIcon) {
+                    popup.remove();
+                    document.removeEventListener('mousedown', handler);
+                }
+            });
+
+            targetIcon.parentElement.append(popup);
+        }
+
+
+
         // Reset mọi thứ mỗi lần mở
         titleInput.value = '';
         contentInput.value = '';
@@ -346,6 +453,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Hàm cập nhật icon và bind sự kiện click
         function updateIcons() {
+
             iconsDiv.innerHTML = generatePopupIconsHTML(newNoteIconState);
 
             // Size (Aa)
@@ -405,7 +513,8 @@ document.addEventListener('DOMContentLoaded', function () {
             // Tag
             iconsDiv.querySelectorAll('i[data-action]').forEach(icon => {
                 const action = icon.dataset.action;
-                if (action === 'palette' || action === 'size') return;
+                if (['palette', 'size', 'image'].includes(action)) return;
+
 
                 icon.onclick = e => {
                     e.stopPropagation();
@@ -417,6 +526,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     updateIcons(); // Giao diện phản hồi ngay
                 };
             });
+
+
+            // Image
+            const imgIcon = iconsDiv.querySelector('i[data-action="image"]');
+            if (imgIcon) {
+                imgIcon.onclick = e => {
+                    e.stopPropagation();
+                    createImagePopup(imgIcon);
+                };
+            }
+
         }
 
         // Gọi lần đầu để render icons
@@ -491,6 +611,110 @@ document.addEventListener('DOMContentLoaded', function () {
         contentInput.value = note.content || '';
         titleInput.focus();
 
+        // Gán ID note cho autosave
+        function createImagePopup(targetIcon) {
+            // Remove popup cũ nếu có
+            const old = document.querySelector('.image-popup');
+            if (old) old.remove();
+
+            const popup = document.createElement('div');
+            popup.className = 'image-popup';
+            popup.style.position = 'absolute';
+            popup.style.top = `${targetIcon.offsetTop + targetIcon.offsetHeight + 6}px`;
+            popup.style.left = `${targetIcon.offsetLeft}px`;
+            popup.style.padding = '8px';
+            popup.style.boxShadow = '0 2px 6px rgba(0,0,0,0.2)';
+            popup.style.background = '#fff';
+            popup.style.zIndex = 1000;
+
+            // Buttons
+            const btn1 = document.createElement('button');
+            btn1.textContent = 'Add 1 image';
+            btn1.style.marginRight = '8px';
+            const btn2 = document.createElement('button');
+            btn2.textContent = 'Add multiple images';
+
+            popup.append(btn1, btn2);
+
+            // Container preview
+            const preview = document.createElement('div');
+            preview.className = 'image-preview';
+            preview.style.marginTop = '8px';
+            preview.style.display = 'flex';
+            preview.style.flexWrap = 'wrap';
+            preview.style.gap = '8px';
+            popup.append(preview);
+
+            // File input (hidden)
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            fileInput.style.display = 'none';
+            popup.append(fileInput);
+
+            // Handle selection
+            function selectFiles(multiple) {
+                if (!autosaveNoteId) {
+                    alert('Please save note first');
+                    return;
+                }
+                fileInput.multiple = multiple;
+                fileInput.click();
+            }
+
+            // Preview & upload
+            fileInput.onchange = () => {
+                const files = Array.from(fileInput.files);
+                preview.innerHTML = ''; // clear trước
+                const formData = new FormData();
+                formData.append('action', 'upload_images');
+                formData.append('note_id', autosaveNoteId);
+                files.forEach(file => {
+                    // preview local
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.style.width = '80px';
+                        img.style.height = '80px';
+                        img.style.objectFit = 'cover';
+                        preview.append(img);
+                    };
+                    reader.readAsDataURL(file);
+                    // chuẩn bị upload
+                    formData.append('images[]', file);
+                });
+
+                // upload
+                fetch('note.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(r => r.json())
+                    .then(res => {
+                        if (!res.success) console.error(res.error || 'Upload failed');
+                        // nếu server trả về đường dẫn, có thể update preview từ server
+                    })
+                    .catch(err => console.error('Error uploading images:', err));
+            };
+
+            // Bind button
+            btn1.onclick = () => { selectFiles(false); };
+            btn2.onclick = () => { selectFiles(true); };
+
+            // Khi click ngoài popup thì đóng
+            document.addEventListener('mousedown', function handler(evt) {
+                if (!popup.contains(evt.target) && evt.target !== targetIcon) {
+                    popup.remove();
+                    document.removeEventListener('mousedown', handler);
+                }
+            });
+
+            targetIcon.parentElement.append(popup);
+        }
+
+
+
         let iconState = {
             pinned: note.pinned || 0,
             locked: note.locked || 0,
@@ -499,11 +723,14 @@ document.addEventListener('DOMContentLoaded', function () {
             size_type: note.size_type || 'H2'
         };
 
+
+
         // Khi mở modal, gán class size cho textarea
         contentInput.classList.remove('size-h1', 'size-h2', 'size-h3');
         contentInput.classList.add('size-' + iconState.size_type.toLowerCase());
 
         function updateIcons() {
+
             iconsDiv.innerHTML = generatePopupIconsHTML(iconState);
 
             // Color palette icon
@@ -539,6 +766,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 popup.style.display = 'block';
             });
+
 
             // Size type icon
             const sizeTypeWrapper = iconsDiv.querySelector('.size-type-wrapper');
@@ -596,10 +824,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
 
+
+            // Image icon
+            const imgIcon = iconsDiv.querySelector('i[data-action="image"]');
+            if (imgIcon) {
+                imgIcon.onclick = e => {
+                    e.stopPropagation();
+                    createImagePopup(imgIcon);
+                };
+            }
+
+
             // Assign events to pin/lock/share/tag icons (except size icon)
             iconsDiv.querySelectorAll('i[data-action]').forEach(icon => {
                 const action = icon.dataset.action;
-                if (action === 'size' || action === 'palette') return;
+                if (['palette', 'size', 'image'].includes(action)) return;
 
                 icon.onclick = function (e) {
                     e.stopPropagation();
@@ -654,7 +893,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     note_id: note.note_id,
                     title: titleInput.value,
                     content: contentInput.value,
-                    size_type: sizeTypeSelect.value
+                    size_type: iconState.value
                 });
                 fetch('note.php', {
                     method: 'POST',
@@ -679,20 +918,6 @@ document.addEventListener('DOMContentLoaded', function () {
         // đảm bảo bạn vẫn gắn event:
         titleInput.addEventListener('input', autosaveModal);
         contentInput.addEventListener('input', autosaveModal);
-
-        colorPicker.addEventListener('change', () => {
-            inner.style.backgroundColor = colorPicker.value;
-            // Gửi riêng request set_color
-            fetch('note.php', {
-                method: 'POST',
-                body: new URLSearchParams({
-                    action: 'set_color',
-                    note_id: note.note_id,
-                    color: colorPicker.value
-                })
-            });
-        });
-
 
 
 

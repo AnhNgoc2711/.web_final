@@ -187,6 +187,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
 
+    //8. Thêm ảnh 
+// trong note.php, xử lý action = 'upload_images'
+    if ($action === 'upload_images') {
+        $note_id = intval($_POST['note_id'] ?? 0);
+        if (!$note_id || empty($_FILES['images'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Missing note_id or no files']);
+            exit;
+        }
+
+        // 1) Thư mục lưu: image/ (tạo nếu chưa có)
+        $uploadDir = __DIR__ . '/image/';
+        if (!is_dir($uploadDir))
+            mkdir($uploadDir, 0777, true);
+
+        $uploaded = [];
+        foreach ($_FILES['images']['tmp_name'] as $idx => $tmpName) {
+            if ($_FILES['images']['error'][$idx] === UPLOAD_ERR_OK) {
+                // Tên gốc + extension
+                $origName = basename($_FILES['images']['name'][$idx]);
+                $ext = pathinfo($origName, PATHINFO_EXTENSION);
+
+                // 2) Lưu bản ghi trống trước để lấy attach_id
+                $stmt = $pdo->prepare(
+                    "INSERT INTO attachment (note_id, img) VALUES (?, '')"
+                );
+                $stmt->execute([$note_id]);
+                $attachId = $pdo->lastInsertId();
+
+                // 3) Đặt tên file mới dựa trên ID
+                $newName = $attachId . '.' . $ext;
+                $target = $uploadDir . $newName;
+
+                // 4) Di chuyển file lên thư mục image/
+                if (move_uploaded_file($tmpName, $target)) {
+                    // 5) Cập nhật lại đường dẫn chính xác vào DB
+                    $path = 'image/' . $newName;
+                    $stmt2 = $pdo->prepare(
+                        "UPDATE attachment SET img = ? WHERE attach_id = ?"
+                    );
+                    $stmt2->execute([$path, $attachId]);
+                    $uploaded[] = $path;
+                }
+            }
+        }
+
+        echo json_encode(['success' => true, 'uploaded' => $uploaded]);
+        exit;
+    }
+
+
+
+
+
     http_response_code(400);
     echo json_encode(['error' => 'Invalid action']);
     exit;

@@ -50,6 +50,9 @@ $is_active = $_SESSION['is_active'] ?? 0;
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/connect.js"> </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
+
 </head>
 
 <body>
@@ -195,7 +198,7 @@ $is_active = $_SESSION['is_active'] ?? 0;
                         <button class="btn-filled-pink" id="saveEditBtn">Save</button>
                     </div>
 
-                    
+
                     <!-- Form đổi mật khẩu -->
                     <div class="reset-password-form hidden" id="resetPasswordForm">
                         <div class="password-field">
