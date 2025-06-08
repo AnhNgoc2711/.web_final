@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
         sidebar.classList.remove('active');
     });
     // Sidebar người dùng
-    const userIcon = document.querySelector(".bi-person-circle");
+    const userIcon = document.querySelector("#topAvatar");
     const userDropdown = document.getElementById("userDropdown");
     const openPersonalInfoBtn = document.getElementById("openPersonalInfo");
     const personalInfoModal = document.getElementById("personalInfoModal");

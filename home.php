@@ -2,7 +2,7 @@
 session_set_cookie_params(0);
 session_start();
 
-require 'db.php';
+require 'db.php'; // Thêm dòng này để có biến $pdo
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -70,15 +70,7 @@ $is_active = $_SESSION['is_active'] ?? 0;
         style="display:none; position:fixed; top:20px; right:20px; background:#f44336; color:#fff; padding:10px 20px; border-radius:5px; box-shadow:0 2px 8px rgba(0,0,0,0.3); z-index:9999;">
         <span id="messageText"></span>
     </div>
-    <div id="messageBox"
-        style="display:none; position:fixed; top:20px; right:20px; background:#f44336; color:#fff; padding:10px 20px; border-radius:5px; box-shadow:0 2px 8px rgba(0,0,0,0.3); z-index:9999;">
-        <span id="messageText"></span>
-    </div>
     <?php if ($is_active == 0): ?>
-        <div
-            style="background: #ffcccc; color: #900; padding: 10px; text-align: center; font-weight: bold; border-bottom: 2px solid red;">
-            Your account has not been activated yet. Please check your email to activate.
-        </div>
         <div
             style="background: #ffcccc; color: #900; padding: 10px; text-align: center; font-weight: bold; border-bottom: 2px solid red;">
             Your account has not been activated yet. Please check your email to activate.
@@ -138,7 +130,8 @@ $is_active = $_SESSION['is_active'] ?? 0;
                 <img src="<?= htmlspecialchars($user['avatar']) ?>" id="topAvatar" title="User account" alt="User Avatar"
                     style="width:30px; height:40px; border-radius:50%;" />
             <?php else: ?>
-                <i class="bi bi-person-circle" id="topAvatar" title="User account" style="font-size:30px;"></i>
+                <img src="image/icon.png" id="topAvatar" title="User account"
+                    style="width:30px; height:40px; border-radius:50%;"></img>
             <?php endif; ?>
 
         </div>
@@ -177,70 +170,20 @@ $is_active = $_SESSION['is_active'] ?? 0;
         </div>
 
 
-
         <!-- Vị trí hiển thị danh sách note -->
         <div class="notes" aria-live="polite">
         </div>
     </div>
-        <!-- Vị trí hiển thị danh sách note -->
-        <div class="notes" aria-live="polite">
-        </div>
-
-    </div>
-    <!-- Model phân quyền chia sẽ note -->
-    <div id="shareModal" class="modal-share hidden">
-        <div>
-            <h3>Share Note With</h3>
-    
-            <div class="input-row">
-                <input type="email" id="emailInput" placeholder="Enter email address">
-                <select id="permissionSelect">
-                    <option value="view">View only</option>
-                    <option value="edit">Can edit</option>
-                </select>
-                <button class="btn" onclick="addUser()">Add</button>
-            </div>
-    
-            <!-- Shared user list -->
-            <table>
-                <thead>
-                    <tr>
-                        <th>Email</th>
-                        <th>Permission</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="userTableBody">
-                    <!-- Rendered by JS -->
-                </tbody>
-            </table>
-    
-            <!-- Footer -->
-            <div class="footer">
-                <button class="btn-outline-submit" onclick="closeModal()">Cancel</button>
-                <button class="btn-submit" onclick="saveShareSettings()">Done</button>
-            </div>
-        </div>
-    </div>
-
-
 
     <!-- Sidebar người dùng -->
     <div class="user-dropdown-container">
         <div class="user-dropdown" id="userDropdown">
             <div class="user-header">
-                <img src="image/background.jpg" alt="Avatar" class="user-avatar" />
-                <div class="user-name" id="userName"><?= htmlspecialchars($user['name']) ?></div>
+                <img src="<?= htmlspecialchars($user['avatar'] ?: 'image/background.jpg') ?>" alt="Avatar"
+                    class="user-avatar" id="topAvatar" title="User account"
+                    style="width:50px; height:50px; border-radius:50%;" />
+                <div class="user-name" id="userName"><?= htmlspecialchars($user['name'] ?: 'Username') ?></div>
             </div>
-
-            <ul class="user-menu">
-                <li id="openPersonalInfo"><i class="bi bi-person-circle"></i> Personal Information
-                </li>
-                <li id="openSettingBtn"><i class="bi bi-gear"></i> Setting</li>
-                <li></li>
-                <li id="logoutBtn"><i class="bi bi-box-arrow-right"></i> Logout</li>
-            </ul>
-        </div>
             <ul class="user-menu">
                 <li id="openPersonalInfo"><i class="bi bi-person-circle"></i> Personal Information
                 </li>
@@ -256,9 +199,11 @@ $is_active = $_SESSION['is_active'] ?? 0;
                 <div class="modal-personal">
                     <i class="bi bi-x close-personal-info" title="Close" role="button" tabindex="0"></i>
                     <!-- Avatar hiện thị -->
-                    <img id="avatarPreview" src="image/icontitle.jpg" alt="Avatar" class="avatar-edit-preview" />
-                    <label for="avatarInput" id="avatarLabel" class="avatar-upload-btn">Change my avatar </label>
+                    <img src="<?= htmlspecialchars($user['avatar'] ?: 'image/icontitle.jpg') ?>" alt="Avatar"
+                        class="avatar-edit-preview" id="avatarPreview" />
+                    <label for="avatarInput" id="avatarLabel" class="avatar-upload-btn">Change my avatar</label>
                     <input type="file" id="avatarInput" accept="image/*" class="hidden" />
+
                     <!-- Hiển thị tên -->
                     <h3 id="displayName"><?= htmlspecialchars($user['name']) ?></h3>
                     <input type="text" class="hidden" id="nameInput" value="Tên người dùng" />
@@ -339,86 +284,40 @@ $is_active = $_SESSION['is_active'] ?? 0;
                 <div style="display:flex; gap:6px; margin-top:8px;">
                     <input type="text" id="new-label-input" placeholder="Enter name label" style="flex:1;" />
                     <button id="add-label-btn" disabled>Add</button>
-    <!-- Giao diện chỉnh sửa note -->
-    <div id="popup-modal" class="popup-modal hidden">
-        <div class="add-note-expanded popup-content">
-            <input type="text" id="modal-title" class="note-title-input" placeholder="Title">
-            <textarea id="modal-content" class="note-content-input" placeholder="Content..."></textarea>
-            <div id="selected-labels" style="margin-top:10px; display:none;"></div>
-            <div class="icons">
-            </div>
-            <div id="label-popup"
-                style="display:none; position:absolute; background:#fff; border:1px solid #ccc; padding:8px; border-radius:4px; z-index:1000;">
-                <strong>Labels</strong>
-                <ul id="label-list"
-                    style="list-style:none; padding:0; margin:4px 0; max-height:120px; overflow-y:auto;"></ul>
-                <div style="display:flex; gap:6px; margin-top:8px;">
-                    <input type="text" id="new-label-input" placeholder="Enter name label" style="flex:1;" />
-                    <button id="add-label-btn" disabled>Add</button>
                 </div>
             </div>
-        </div>
-
-    </div>
-
-    <!-- Tạo MK cho note  -->
-    <div class="reset-password-form hidden" id="firstPasswordForm">
-        <div class="password-field">
-            <input type="password" id="firstPassword" placeholder="Enter new password" />
-            <i class="bi bi-eye-slash toggle-password"></i>
-        </div>
-        <div class="password-field">
-            <input type="password" id="firstPasswordConfirm" placeholder="Confirm password" />
-            <i class="bi bi-eye-slash toggle-password"></i>
-        </div>
-        <div class="personal-info-buttons">
-            <button class="btn-outline-pink" id="cancelFirst">Cancel</button>
-            <button class="btn-filled-pink" id="saveFirst">Save</button>
+            <button class="close-add-note" id="popup-close">Close</button>
         </div>
     </div>
 
-    <!-- Lock / Change Options -->
-    <div id="lockOptionsForm" class="options-menu hidden">
-        <button class="btn-outline-pink" id="lockNote">Lock note</button>
-        <button class="btn-filled-pink" id="changePwd">Change password</button>
-    </div>
+    <!-- Modal xác nhận xóa -->
+    <div id="deleteConfirmModal" class="modal-confirm ">
+        <div class="modal-content-confirm">
+            <div class="modal-title">Delete note?</div>
+            <div class="modal-body">
+                Are you sure you want to delete this note? <br>
+            </div>
+            <div class="modal-actions">
+                <button id="confirmDeleteBtn" class="btn btn-danger">Delete</button>
+                <button id="cancelDeleteBtn" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
 
 
-    <!-- Change Password -->
-    <div class="reset-password-form hidden" id="changePasswordForm">
-        <div class="password-field">
-            <input type="password" id="oldPwd" placeholder="Current password" />
-            <i class="bi bi-eye-slash toggle-password"></i>
-        </div>
-        <div class="password-field">
-            <input type="password" id="newPwd" placeholder="New password" />
-            <i class="bi bi-eye-slash toggle-password"></i>
-        </div>
-        <div class="password-field">
-            <input type="password" id="confirmNewPwd" placeholder="Confirm new password" />
-            <i class="bi bi-eye-slash toggle-password"></i>
-        </div>
-        <div class="personal-info-buttons">
-            <button class="btn-outline-pink" id="cancelChange">Cancel</button>
-            <button class="btn-filled-pink" id="saveChange">Save</button>
-        </div>
-    </div>
 
+        <!-- <script src="js/script.js"></script> -->
+        <script src="js/login.js"></script>
+        <script src="js/home.js"></script>
+        <script src="js/search.js"></script>
+        <script src="js/filterNotesByLabel.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/note_label.js"></script>
+        <script src="js/avatar.js"></script>
+        <script src="js/name_email.js"></script>
 
-    <!-- <script src="js/script.js"></script> -->
-    <script src="js/login.js"></script>
-    <script src="js/home.js"></script>
-    <script src="js/search.js"></script>
-    <script src="js/filterNotesByLabel.js"></script>
-    <script src="js/labels.js"></script>
-    <script src="js/note_label.js"></script>
-    <!-- <script src="js/avatar.js"></script> -->
-    <script src="js/name_email.js"></script>
 
 
 
 </body>
-</body>
 
-</html>
 </html>
