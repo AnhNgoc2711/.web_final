@@ -1538,7 +1538,7 @@ body.dark-mode .radio-options label {
 }
 
 .add-note-expanded.popup-content .note-content-input {
-    min-height: 120px;
+    min-height: 250px;
     height: 160px;
     font-size: 1.12rem;
 }
@@ -1584,17 +1584,6 @@ body.dark-mode .radio-options label {
     transition: all 0.3s ease;
 }
 
-.modal-content {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 16px;
-    padding: 20px;
-    width: 360px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: #fff;
-    transition: all 0.3s ease;
-}
 
 .modal-header {
     display: flex;
@@ -2056,7 +2045,7 @@ textarea.size-h3,
 
 
 /* image */
-.images-container img {
+/* .images-container img {
     max-width: 100%;
     height: auto;
     object-fit: cover;
@@ -2076,4 +2065,42 @@ textarea.size-h3,
     height: auto;
     border: 1px solid #ccc;
     border-radius: 5px;
+} */
+
+
+/* Vùng contenteditable: bỏ viền, nền trong suốt để hiện màu popup */
+.contenteditable {
+    min-height: 150px;
+    padding: 8px;
+    outline: none;
+    overflow-y: auto;
+    background: transparent;
+    /* thay #fff => trong suốt */
+    border: none;
+    /* bỏ viền xám */
 }
+
+/* Cho textarea cũ (nếu còn dùng) và div mới */
+.note-content-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.6rem;
+    min-height: 10rem;
+    text-align: left;
+    vertical-align: top;
+    overflow-y: auto;
+    background: transparent;
+    /* nền trong suốt */
+    border: none;
+    /* bỏ viền */
+}
+
+/* CHANGED: ép ảnh trong contenteditable co max 100% chiều ngang */
+#modal-content img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 8px auto;
+    /* căn giữa nếu muốn */
+}
+

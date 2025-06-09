@@ -167,9 +167,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    //Thêm ảnh
-
-    // --- 1) XỬ LÝ UPLOAD HÌNH ẢNH ---
+    // 8. UPLOAD ẢNH
     if ($action === 'upload_image') {
         // Nội dung upload
         if (empty($_POST['note_id']) || empty($_FILES['images'])) {
@@ -204,19 +202,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-
-
-
-
     http_response_code(400);
     echo json_encode(['error' => 'Invalid action']);
     exit;
 }
 
+
+
+
+
 //GET: Lấy notes
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
-    // 1) GET ảnh cho modal edit
+    // GET ảnh cho modal edit
     if (isset($_GET['action']) && $_GET['action'] === 'get_images' && isset($_GET['note_id'])) {
         $nid = intval($_GET['note_id']);
         $stmt = $pdo->prepare("SELECT attach_id, img FROM attachment WHERE note_id = ?");
@@ -245,6 +243,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         echo json_encode($notes);
         exit;
     }
+
     // Trang home: note chưa xóa
     $stmt = $pdo->prepare("SELECT * FROM note WHERE user_id = ? AND is_deleted = 0 ORDER BY pinned DESC, updated_at DESC");
     $stmt->execute([$user_id]);
