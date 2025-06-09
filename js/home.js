@@ -474,9 +474,9 @@ document.addEventListener('DOMContentLoaded', function () {
             autosaveNoteId = null;
         }
         popup.onclick = e => {
-            if (e.target === popup) hideEditModal();
+            if (e.target === popup) hideCreateModal();
         };
-        document.getElementById('popup-close').onclick = hideEditModal;
+        document.getElementById('popup-close').onclick = hideCreateModal;
     }
 
 
