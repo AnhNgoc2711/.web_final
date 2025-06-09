@@ -481,6 +481,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     function showNoteModal(note) {
+        window.currentNoteId = note.note_id;
         const popup = document.getElementById('popup-modal');
         const titleInput = document.getElementById('modal-title');
         const contentDiv = document.getElementById('modal-content');
