@@ -55,9 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <body>
   <div class="container">
     <div class="home-left">
-      <img src="image/Anh1.jpg" alt="Hình 1" class="active" loading="lazy" />
-      <img src="image/Anh2 copy.jpg" alt="Hình 2" loading="lazy" />
-      <img src="image/Anh3.jpg" alt="Hình 3" loading="lazy" />
+      <img src="image/nen.jpg" alt="Hình 1" class="active" loading="lazy" />
     </div>
 
     <div class="home-right">

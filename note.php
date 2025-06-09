@@ -167,6 +167,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    //Thêm ảnh
+
+    // --- 1) XỬ LÝ UPLOAD HÌNH ẢNH ---
+    if ($action === 'upload_image') {
+        // Nội dung upload
+        if (empty($_POST['note_id']) || empty($_FILES['images'])) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Missing note_id or images']);
+            exit;
+        }
+        $note_id = intval($_POST['note_id']);
+        $uploadsDir = __DIR__ . '/image/';
+        if (!is_dir($uploadsDir))
+            mkdir($uploadsDir, 0777, true);
+
+        $results = [];
+        foreach ($_FILES['images']['tmp_name'] as $i => $tmp) {
+            if ($_FILES['images']['error'][$i] !== UPLOAD_ERR_OK)
+                continue;
+            $ext = pathinfo($_FILES['images']['name'][$i], PATHINFO_EXTENSION);
+            $filename = uniqid('img_', true) . ".$ext";
+            $dest = $uploadsDir . $filename;
+            if (!move_uploaded_file($tmp, $dest))
+                continue;
+
+            // insert vào db
+            $stmt = $pdo->prepare("INSERT INTO attachment (note_id, img) VALUES (?,?)");
+            $stmt->execute([$note_id, 'image/' . $filename]);
+            $attach_id = $pdo->lastInsertId();
+
+            $results[] = ['attach_id' => $attach_id, 'img' => 'image/' . $filename];
+        }
+
+        echo json_encode(['success' => true, 'images' => $results]);
+        exit;
+    }
+
+
+
+
 
     http_response_code(400);
     echo json_encode(['error' => 'Invalid action']);
@@ -175,6 +215,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 //GET: Lấy notes
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+
+    // 1) GET ảnh cho modal edit
+    if (isset($_GET['action']) && $_GET['action'] === 'get_images' && isset($_GET['note_id'])) {
+        $nid = intval($_GET['note_id']);
+        $stmt = $pdo->prepare("SELECT attach_id, img FROM attachment WHERE note_id = ?");
+        $stmt->execute([$nid]);
+        $imgs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode(['success' => true, 'images' => $imgs]);
+        exit;
+    }
+
     // Trash
     if (isset($_GET['trash']) && $_GET['trash'] == 1) {
         $stmt = $pdo->prepare("SELECT * FROM note WHERE user_id = ? AND is_deleted = 1 ORDER BY pinned DESC, deleted_at DESC");

@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showMessage(msg, duration = 3000) {
         const msgBox = document.getElementById('messageBox');
-        const msgText = document.getElementById('messageText');
+        // const msgText = document.getElementById('messageText');
         msgText.textContent = msg;
         msgBox.style.display = 'block';
 

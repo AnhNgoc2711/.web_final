@@ -268,11 +268,13 @@ $is_active = $_SESSION['is_active'] ?? 0;
         </div>
     </div>
 
+
     <!-- Giao diện chỉnh sửa note -->
     <div id="popup-modal" class="popup-modal hidden">
         <div class="add-note-expanded popup-content">
             <input type="text" id="modal-title" class="note-title-input" placeholder="Title">
             <textarea id="modal-content" class="note-content-input" placeholder="Content..."></textarea>
+            <div id="image-preview" class="images-container"></div>
             <div id="selected-labels" style="margin-top:10px; display:none;"></div>
             <div class="icons">
             </div>

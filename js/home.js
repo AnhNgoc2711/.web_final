@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function showMessage(msg, duration = 3000) {
         const msgBox = document.getElementById('messageBox');
-        const msgText = document.getElementById('messageText');
+        // const msgText = document.getElementById('messageText');
         msgText.textContent = msg;
         msgBox.style.display = 'block';
 
@@ -224,13 +224,6 @@ document.addEventListener('DOMContentLoaded', function () {
         autosaveNoteId = null;
     }
 
-    // Mở form tạo note
-    // window.expandAddNote = function () {
-    //     addNoteBar.classList.add('hidden');
-    //     addNoteExpanded.classList.remove('hidden');
-    //     resetAddNoteForm();
-    //     contentInput.focus();
-    // };
 
     window.expandAddNote = function () {
         showCreateNoteModal();
@@ -338,6 +331,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         let autosaveNoteId = null;
 
+        // lấy container để hiển thị các ảnh đã chọn
+        const previewContainer = popup.querySelector('#image-preview');
+
+
         // Reset mọi thứ mỗi lần mở
         titleInput.value = '';
         contentInput.value = '';
@@ -354,6 +351,28 @@ document.addEventListener('DOMContentLoaded', function () {
         // Hàm cập nhật icon và bind sự kiện click
         function updateIcons() {
             iconsDiv.innerHTML = generatePopupIconsHTML(newNoteIconState);
+
+            // ← THÊM: gắn chức năng chọn ảnh vào icon image
+            bindImageUpload(iconsDiv, async () => {
+                // nếu chưa có note_id, autosave ngay
+                if (autosaveNoteId) return autosaveNoteId;
+                // Tạo mới note
+                const formData = new FormData();
+                formData.append('title', titleInput.value.trim());
+                formData.append('content', contentInput.value.trim());
+                formData.append('pinned', newNoteIconState.pinned);
+                formData.append('locked', newNoteIconState.locked);
+                formData.append('is_shared', newNoteIconState.is_shared);
+                formData.append('has_label', newNoteIconState.has_label);
+
+                const res = await fetch('note.php', { method: 'POST', body: formData });
+                const data = await res.json();
+                autosaveNoteId = data.note_id;
+                fetchNotes();
+                return autosaveNoteId;
+            }, previewContainer);
+            // ← KẾT THÚC THÊM
+
 
             // Size (Aa)
             const sizeWrapper = iconsDiv.querySelector('.size-type-wrapper');
@@ -412,7 +431,8 @@ document.addEventListener('DOMContentLoaded', function () {
             // Tag
             iconsDiv.querySelectorAll('i[data-action]').forEach(icon => {
                 const action = icon.dataset.action;
-                if (action === 'palette' || action === 'size') return;
+
+                if (action === 'palette' || action === 'size' || action === 'image') return;
 
                 icon.onclick = e => {
                     e.stopPropagation();
@@ -424,6 +444,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     updateIcons(); // Giao diện phản hồi ngay
                 };
             });
+
+
         }
 
         // Gọi lần đầu để render icons
@@ -476,6 +498,7 @@ document.addEventListener('DOMContentLoaded', function () {
             popup.classList.add('hidden');
             autosaveNoteId = null;
             newNoteIconState = { pinned: 0, locked: 0, is_shared: 0, has_label: 0 };
+            previewContainer.innerHTML = '';
         }
 
     }
@@ -492,6 +515,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const inner = popup.querySelector('.popup-content');
         if (inner) inner.style.backgroundColor = note.color || '#ffffff';
+
+
+        // sau const iconsDiv = popup.querySelector('.icons');
+        const previewContainer = popup.querySelector('#image-preview');
+        // load ảnh cũ để preview
+        loadNoteImages(note.note_id, previewContainer);
+
 
         popup.classList.remove('hidden');
         titleInput.value = note.title || '';
@@ -510,8 +540,15 @@ document.addEventListener('DOMContentLoaded', function () {
         contentInput.classList.remove('size-h1', 'size-h2', 'size-h3');
         contentInput.classList.add('size-' + iconState.size_type.toLowerCase());
 
+
         function updateIcons() {
             iconsDiv.innerHTML = generatePopupIconsHTML(iconState);
+
+            // ← THÊM: bind upload cho icon image
+            bindImageUpload(iconsDiv,
+                () => Promise.resolve(note.note_id),
+                previewContainer
+            );
 
             // Color palette icon
             let paletteIcon = iconsDiv.querySelector('i[data-action="palette"]');
@@ -606,7 +643,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Assign events to pin/lock/share/tag icons (except size icon)
             iconsDiv.querySelectorAll('i[data-action]').forEach(icon => {
                 const action = icon.dataset.action;
-                if (action === 'size' || action === 'palette') return;
+                if (action === 'palette' || action === 'size' || action === 'image') return;
 
                 icon.onclick = function (e) {
                     e.stopPropagation();
@@ -628,7 +665,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             fetchNotes();
                         })
                         .catch(err => {
-                            showMessage('Lỗi khi toggle_icon: ' + err);
+                            // showMessage('Lỗi khi toggle_icon: ' + err);
                         });
                 };
 
@@ -991,6 +1028,80 @@ document.addEventListener('DOMContentLoaded', function () {
         // Gắn popup vào đúng chỗ
         targetIcon.parentElement.appendChild(colorPopup);
     }
+
+    // ---------------------------
+    // 1) Hàm bind sự kiện chọn & upload ảnh
+    function bindImageUpload(iconsDiv, getNoteId, previewContainer) {
+        // chuẩn bị input[type=file]
+        let fileInput = iconsDiv.querySelector('input.image-input');
+        if (!fileInput) {
+            fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            fileInput.multiple = true;
+            fileInput.className = 'image-input';
+            fileInput.style.display = 'none';
+            iconsDiv.appendChild(fileInput);
+        }
+        const imgIcon = iconsDiv.querySelector('i[data-action="image"]');
+        if (!imgIcon) return;
+
+        imgIcon.onclick = async e => {
+            e.stopPropagation();
+            const noteId = await getNoteId();
+            if (!noteId) return alert('Please save note first.');
+            fileInput.onchange = () => {
+                if (fileInput.files.length) {
+                    uploadImages(noteId, fileInput.files, previewContainer);
+                    fileInput.value = '';
+                }
+            };
+            fileInput.click();
+        };
+    }
+
+    // 2) Hàm upload lên server rồi preview
+    async function uploadImages(noteId, files, previewContainer) {
+        const fd = new FormData();
+        fd.append('action', 'upload_image');
+        fd.append('note_id', noteId);
+        for (let f of files) fd.append('images[]', f);
+
+        try {
+            const res = await fetch('note.php', { method: 'POST', body: fd });
+            const data = await res.json();
+            if (!data.success) throw new Error(data.error || 'Upload failed');
+            data.images.forEach(img => {
+                const el = document.createElement('img');
+                el.src = img.img;
+                el.dataset.attachId = img.attach_id;
+                previewContainer.appendChild(el);
+            });
+        } catch (err) {
+            alert('Image upload error: ' + err.message);
+        }
+    }
+
+    // 3) Hàm load ảnh cũ khi edit note
+    async function loadNoteImages(noteId, previewContainer) {
+        previewContainer.innerHTML = '';
+        try {
+            const res = await fetch(`note.php?action=get_images&note_id=${noteId}`);
+            const data = await res.json();
+            if (data.success) {
+                data.images.forEach(img => {
+                    const el = document.createElement('img');
+                    el.src = img.img;
+                    el.dataset.attachId = img.attach_id;
+                    previewContainer.appendChild(el);
+                });
+            }
+        } catch (err) {
+            console.error('Load images error', err);
+        }
+    }
+    // ---------------------------
+
 
 
 
