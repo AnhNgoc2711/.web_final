@@ -17,7 +17,8 @@ $pdo->prepare("
     DELETE FROM note WHERE is_deleted=1 AND deleted_at IS NOT NULL AND deleted_at < (NOW() - INTERVAL 7 DAY)
 ")->execute();
 
-//POST: Hành động với note 
+
+// POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
@@ -105,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    //3. Di chuyển vào trash (xóa mềm) 
+    //3. Di chuyển vào trash 
     if ($action === 'move_to_trash') {
         $note_id = intval($_POST['note_id']);
         $stmt = $pdo->prepare("UPDATE note SET is_deleted = 1, deleted_at = NOW() WHERE note_id = ? AND user_id=?");
@@ -202,6 +203,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+
+    
+    // 9. Lock note
+
+    if ($action === 'set_note_password') {
+        $note_id = intval($_POST['note_id'] ?? 0);
+        $newPass = trim($_POST['new_password'] ?? '');
+        if ($note_id <= 0 || $newPass === '') {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Missing data']);
+            exit;
+        }
+        $stmt = $pdo->prepare("
+        UPDATE note
+        SET lock_password = ?, locked = 1, updated_at = NOW()
+        WHERE note_id = ? AND user_id = ?
+    ");
+        $stmt->execute([$newPass, $note_id, $user_id]);
+        echo json_encode(['success' => true]);
+        exit;
+    }
+
+    
+    // 10. Verify password 
+    if ($action === 'verify_note_password') {
+        $note_id = intval($_POST['note_id'] ?? 0);
+        $pwd = trim($_POST['password'] ?? '');
+        if ($note_id <= 0 || $pwd === '') {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Missing data']);
+            exit;
+        }
+        $stmt = $pdo->prepare("SELECT lock_password FROM note WHERE note_id=? AND user_id=?");
+        $stmt->execute([$note_id, $user_id]);
+        $real = $stmt->fetchColumn();
+        if ($real !== false && $real === $pwd) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Wrong password']);
+        }
+        exit;
+    }
+
     http_response_code(400);
     echo json_encode(['error' => 'Invalid action']);
     exit;
@@ -209,9 +253,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 
-
-
-//GET: Lấy notes
+// GET
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     // GET ảnh cho modal edit
@@ -240,11 +282,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $stmtLabel->execute([$note_id, $user_id]);
             $note['labels'] = $stmtLabel->fetchAll(PDO::FETCH_ASSOC);
         }
+
+        
+        foreach ($notes as &$note) {
+            $note['has_password'] = !empty($note['lock_password']) ? 1 : 0;
+            unset($note['lock_password']);
+        }
+
         echo json_encode($notes);
         exit;
     }
 
-    // Trang home: note chưa xóa
+
+    // Trang home
     $stmt = $pdo->prepare("SELECT * FROM note WHERE user_id = ? AND is_deleted = 0 ORDER BY pinned DESC, updated_at DESC");
     $stmt->execute([$user_id]);
     $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -259,6 +309,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $stmtLabel->execute([$note_id, $user_id]);
         $note['labels'] = $stmtLabel->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    foreach ($notes as &$note) {
+        $note['has_password'] = !empty($note['lock_password']) ? 1 : 0;
+        unset($note['lock_password']);
+    }
+
     echo json_encode($notes);
     exit;
 }

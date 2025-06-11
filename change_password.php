@@ -3,7 +3,7 @@ session_start();
 header('Content-Type: application/json');
 require 'db.php';
 
-$data = json_decode(file_get_contents('php://input'), true); // Đọc JSON input
+$data = json_decode(file_get_contents('php://input'), true);
 
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);

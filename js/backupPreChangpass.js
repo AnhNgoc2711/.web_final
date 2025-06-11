@@ -289,6 +289,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function generateCardIconsHTML(note) {
         return `
         <i class="bi bi-trash" data-action="delete"></i>
+        <i class="bi ${note.locked == 1 ? "bi-lock-fill active" : "bi-lock"}" data-action="lock"></i>
         <i class="bi ${note.is_shared == 1 ? "bi-share-fill active" : "bi-share"}" data-action="share"></i>
         <i class="bi ${note.pinned == 1 ? "bi-pin-angle-fill active" : "bi-pin-angle"}" data-action="pin"></i>
     `;
@@ -329,9 +330,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
         let autosaveNoteId = null;
 
+        // đặt placeholder và reset
         titleInput.value = '';
         contentDiv.innerHTML = '';
         inner.style.backgroundColor = '#ffffff';
+        popup.classList.remove('hidden');
+
+
+        // Hiển thị popup
         popup.classList.remove('hidden');
 
         // Nhảy con trỏ vào ô content
@@ -414,7 +420,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 };
             }
 
-
             // Tag
             iconsDiv.querySelectorAll('i[data-action]').forEach(icon => {
                 const action = icon.dataset.action;
@@ -428,9 +433,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     else if (action === 'share') newNoteIconState.is_shared ^= 1;
                     else if (action === 'tag') newNoteIconState.has_label ^= 1;
 
-                    updateIcons();
+                    updateIcons(); // Giao diện phản hồi ngay
                 };
             });
+
+
         }
 
         updateIcons();
@@ -588,6 +595,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             })
                                 .then(r => r.json())
                                 .then(res => {
+                                    // Cập nhật lại iconState, render lại icon, update notes
                                     iconState.size_type = newSize;
                                     updateIcons();
                                     fetchNotes();
@@ -608,12 +616,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (action === 'palette' || action === 'size' || action === 'image') return;
 
                 if (action === 'lock') {
+                    // Khi click icon khóa ⇒ show menu động
                     icon.onclick = e => {
                         e.stopPropagation();
                         createNoteOptionsPopup(icon, note.note_id, inner, hasPassword);
                     };
                     return;
                 }
+
 
 
                 icon.onclick = function (e) {
@@ -653,26 +663,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
         updateIcons();
 
-        // Ẩn 2 form lúc mới mở modal
-        const createForm = inner.querySelector('#createNotePasswordForm');
+        // Nếu backend trả về trường has_password (0 | 1)
+        let hasPassword = note.has_password === 1;
+
         const changeForm = inner.querySelector('#changeNotePasswordForm');
-        createForm.classList.add('hidden');
-        changeForm.classList.add('hidden');
-        const cancelCreateBtn = createForm.querySelector('#cancelCreateNotePassword');
+        const createForm = inner.querySelector('#createNotePasswordForm');
         const cancelChangeBtn = changeForm.querySelector('#cancelChangeNotePassword');
+        const cancelCreateBtn = createForm.querySelector('#cancelCreateNotePassword');
 
-        // Check note đã có password chưa
-        let hasPassword = note.has_password == 1;
-
-        // Bắt event cho icon lock
-        iconsDiv.querySelector('i[data-action="lock"]').onclick = e => {
-            e.stopPropagation();
-            createNoteOptionsPopup(e.currentTarget, note.note_id, inner, hasPassword);
-        };
-
+        const changeBtn = inner.querySelector('#noteChangePasswordOption');
         const lockUnlockBtn = inner.querySelector('#noteLockUnlockOption');
 
-        // Cancel button trong từng form
+        // 1) Cancel button trong từng form
         cancelChangeBtn.onclick = e => {
             e.stopPropagation();
             changeForm.classList.add('hidden');
@@ -685,7 +687,7 @@ document.addEventListener('DOMContentLoaded', function () {
         };
 
 
-        // Click ngoài để đóng form (và clear luôn)
+        // 2) Click ngoài để đóng form (và clear luôn)
         document.addEventListener('mousedown', function outsideHandler(evt) {
             if (!inner.contains(evt.target)) {
                 [changeForm, createForm].forEach(form => {
@@ -696,68 +698,98 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        // Save “Create Password”
-        createForm.querySelector('#saveCreateNotePassword').onclick = async e => {
-            e.preventDefault();
-            const pwd = createForm.querySelector('#newCreateNotePassword').value.trim();
-            const confirm = createForm.querySelector('#confirmCreateNotePassword').value.trim();
-
-            if (!pwd) return showMessage('Please enter a password.');
-            if (pwd !== confirm) return showMessage('Passwords do not match.');
-            const res = await fetch('note.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({
-                    action: 'set_note_password',
-                    note_id: note.note_id,
-                    new_password: pwd
-                })
+        // 3) Save button trong từng form
+        // Save trên form Change Password
+        const saveChangeBtn = inner.querySelector('#saveChangeNotePassword');
+        if (saveChangeBtn) {
+            saveChangeBtn.addEventListener('click', async e => {
+                e.stopPropagation();
+                const oldPwd = changeForm.querySelector('#oldNotePassword').value;
+                const newPwd = changeForm.querySelector('#newNotePassword').value;
+                const confirm = changeForm.querySelector('#confirmNewNotePassword').value;
+                if (!oldPwd || !newPwd || newPwd !== confirm) {
+                    return showMessage('Please fill/confirm passwords correctly.');
+                }
+                // Gọi endpoint set_note_password
+                const res = await fetch('note.php', {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        action: 'set_note_password',
+                        note_id: note.note_id,
+                        new_password: newPwd
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showMessage('Password updated');
+                    changeForm.classList.add('hidden');
+                    await fetchNotes();           // reload để cập nhật hasPassword
+                    hasPassword = true;           // đánh dấu đã có mật khẩu
+                    iconState.locked = 1;         // bật icon khóa
+                    updateIcons();
+                } else {
+                    showMessage(data.error || 'Error changing password');
+                }
+                // clear input
+                changeForm.querySelectorAll('input[type="password"]').forEach(i => i.value = '');
             });
-            const data = await res.json();
+        }
 
-            if (data.success) {
-                showMessage('Password saved.');
-                createForm.classList.add('hidden');
-                hasPassword = true;
-                await fetchNotes();
-            } else {
-                showMessage(data.error || 'Error saving password.');
-            }
-            createForm.querySelector('#newCreateNotePassword').value = '';
-            createForm.querySelector('#confirmCreateNotePassword').value = '';
+        const saveCreateBtn = inner.querySelector('#saveCreateNotePassword');
+        if (saveCreateBtn) {
+            saveCreateBtn.addEventListener('click', async e => {
+                e.stopPropagation();
+                const newPwdInput = createForm.querySelector('#newCreateNotePassword');
+                const confirmPwdInput = createForm.querySelector('#confirmCreateNotePassword');
+                const newPwd = newPwdInput.value.trim();
+                const confirmPwd = confirmPwdInput.value.trim();
 
-        };
+                // 1. Make sure the user entered a password
+                if (!newPwd) {
+                    return showMessage('Please enter a new password.');
+                }
+                // 2. Verify both fields match
+                if (newPwd !== confirmPwd) {
+                    return showMessage('Password and confirmation do not match.');
+                }
 
-        // Save “Change Password”
-        changeForm.querySelector('#saveChangeNotePassword').onclick = async e => {
-            e.preventDefault();
-            const pwdOld = changeForm.querySelector('#oldNotePassword').value.trim();
-            const pwdNew = changeForm.querySelector('#newNotePassword').value.trim();
-            const confirm = changeForm.querySelector('#confirmNewNotePassword').value.trim();
+                // 3. Send to server
+                try {
+                    // 🆕 Sửa: bỏ headers, để browser tự set form-urlencoded
+                    const res = await fetch('note.php', {
+                        method: 'POST',
+                        body: new URLSearchParams({
+                            action: 'set_note_password',
+                            note_id: note.note_id,
+                            new_password: newPwd
+                        })
+                    });
+                    const data = await res.json();
 
-            if (!pwdOld || !pwdNew) return showMessage('Fill in all fields.');
-            if (pwdNew !== confirm) return showMessage('Passwords do not match.');
+                    if (data.success) {
+                        showMessage('Password created successfully!');
+                        // Hide the create form, flip our local state, update icons
+                        createForm.classList.add('hidden');
+                        hasPassword = true;
+                        iconState.locked = 1;
+                        updateIcons();
+                        // Re-fetch notes so that has_password comes back as 1
+                        await fetchNotes();
+                    } else {
+                        showMessage(data.error || 'Error creating password.');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    showMessage('Network error when creating password.');
+                }
 
-            const res = await fetch('note.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({
-                    action: 'set_note_password',
-                    note_id: note.note_id,
-                    new_password: pwdNew
-                })
+                // 4. Clear the inputs
+                newPwdInput.value = '';
+                confirmPwdInput.value = '';
             });
-            const data = await res.json();
 
-            if (data.success) {
-                showMessage('Password changed.');
-                changeForm.classList.add('hidden');
-                hasPassword = true;
-            } else {
-                showMessage(data.error || 'Error changing password.');
-            }
-            changeForm.querySelectorAll('input[type="password"]').forEach(i => i.value = '');
-        };
+        }
+
 
         //  Khi người dùng chọn Lock / Unlock Note
         if (lockUnlockBtn) {
@@ -767,6 +799,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!hasPassword) {
                     createForm.classList.remove('hidden');
                 } else {
+                    // Ngược lại gọi API toggle lock như cũ
                     try {
                         const res = await fetch('note.php', {
                             method: 'POST',
@@ -792,6 +825,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
 
+
         // AUTOSAVE
         let saveTimer = null;
         function autosaveModal() {
@@ -815,9 +849,11 @@ document.addEventListener('DOMContentLoaded', function () {
         titleInput.addEventListener('input', autosaveModal);
         contentDiv.addEventListener('input', autosaveModal);
 
+        // ĐÓNG 
         function hideEditModal() {
             popup.classList.add('hidden');
         }
+        //click ra ngoài để đóng
         popup.onclick = e => {
             if (e.target === popup) hideEditModal();
         };
@@ -825,169 +861,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     }
 
-
-    // Lock note
-    function createNoteOptionsPopup(iconEl, noteId, container, hasPassword) {
-        // nếu đã mở rồi thì đóng
-        const prev = container.querySelector('.note-options-popup');
-        if (prev) return prev.remove();
-
-        // tạo popup
-        const popup = document.createElement('div');
-        popup.className = 'note-options-popup';
-
-        // đặt vị trí ngay dưới icon
-        const { top, left, height } = iconEl.getBoundingClientRect();
-        const parentRect = iconEl.parentElement.getBoundingClientRect();
-
-        popup.innerHTML = `
-        <button
-            id="noteLockUnlockOption" data-action="toggle-lock">Lock / Unlock Note</button>
-        <button
-            id="noteChangePasswordOption" data-action="change-pass">Change Note Password</button>
-        `;
-
-        // sự kiện cho từng nút
-        popup.querySelector('[data-action="toggle-lock"]').onclick = async e => {
-            e.stopPropagation();
-            popup.remove();
-            if (!hasPassword) {
-                container.querySelector('#createNotePasswordForm').classList.remove('hidden');
-            } else {
-                // toggle lock
-                await fetch('note.php', { method: 'POST', body: new URLSearchParams({ action: 'toggle_icon', note_id: noteId, icon: 'lock' }) });
-                fetchNotes();
-            }
-        };
-
-        popup.querySelector('[data-action="change-pass"]').onclick = e => {
-            e.stopPropagation();
-            popup.remove();
-            if (!hasPassword) {
-                // tạo mật khẩu lần đầu
-                container.querySelector('#createNotePasswordForm').classList.remove('hidden');
-                container.querySelector('#confirmCreateNotePassword').value = '';
-                container.querySelector('#newCreateNotePassword').value = '';
-            } else {
-                // đổi mật khẩu reset
-                const changeF = container.querySelector('#changeNotePasswordForm');
-                changeF.querySelector('#oldNotePassword').value = '';
-                changeF.querySelector('#newNotePassword').value = '';
-                changeF.querySelector('#confirmNewNotePassword').value = '';
-                changeF.classList.remove('hidden');
-            }
-        };
-        iconEl.parentElement.appendChild(popup);
-    }
-
-    function showEnterPasswordForm(noteId) {
-        const popup = document.getElementById('popup-modal');
-        const iconsBar = popup.querySelector('.icons');
-        const enterForm = document.getElementById('enterNotePasswordForm');
-        const titleInput = document.getElementById('modal-title');
-        const contentDiv = document.getElementById('modal-content');
-        const popupWrapper = document.getElementById('popup-modal');
-        popupWrapper.classList.remove('hidden');
-
-        // Ẩn title, content & icons
-        titleInput.style.display = 'none';
-        contentDiv.style.display = 'none';
-        iconsBar.style.display = 'none';
-        enterForm.classList.remove('hidden');
-        document.getElementById('enterNotePassword').value = '';
-        document.getElementById('enterPasswordError').textContent = '';
-
-
-        // cancel
-        document.getElementById('cancelEnterNotePassword').onclick = e => {
-            enterForm.classList.add('hidden');
-            popupWrapper.classList.add('hidden');
-            titleInput.style.display = '';
-            contentDiv.style.display = '';
-            iconsBar.style.display = '';
-        };
-
-        // Submit
-        document.getElementById('submitEnterNotePassword').onclick = async e => {
-            e.preventDefault();
-            const pwd = document.getElementById('enterNotePassword').value.trim();
-            if (!pwd) {
-                document.getElementById('enterPasswordError').textContent = 'Enter password';
-                return;
-            }
-            const res = await fetch('note.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({
-                    action: 'verify_note_password',
-                    note_id: noteId,
-                    password: pwd
-                })
-            });
-            const data = await res.json();
-            if (data.success) {
-                enterForm.classList.add('hidden');
-                popupWrapper.classList.add('hidden');
-                titleInput.style.display = '';
-                contentDiv.style.display = '';
-                iconsBar.style.display = '';
-                const note = await fetchNoteById(noteId);
-                showNoteModal(note);
-            } else {
-                document.getElementById('enterPasswordError').textContent = data.error;
-            }
-        };
-    }
-
-    // Dùng event delegation trên .notes
-    document.querySelector('.notes').addEventListener('click', async e => {
-        const noteEl = e.target.closest('.note');
-        if (!noteEl) return;
-        if (e.target.closest('.icons')) return;
-
-        const noteId = noteEl.getAttribute('data-note-id');
-        const note = await fetchNoteById(noteId);
-        if (note.locked == 1) {
-            showEnterPasswordForm(noteId);
-        } else {
-            showNoteModal(note);
-        }
-    });
-
-
-
-    async function fetchNoteById(id) {
-        const notes = await fetch('note.php').then(r => r.json());
-        return notes.find(n => n.note_id == id);
-    }
-
-    // Chỉ gắn 1 lần cho .notes
-    const notesContainer = document.querySelector('.notes');
-    notesContainer.addEventListener('click', async e => {
-        // Tìm .note cha gần nhất
-        const noteEl = e.target.closest('.note');
-        if (!noteEl) return;
-        if (e.target.closest('.icons')) return;
-
-        const noteId = noteEl.getAttribute('data-note-id');
-        console.log('Clicked note', noteId);
-
-        //  Lấy note chi tiết
-        const note = await fetchNoteById(noteId);
-        if (!note) {
-            console.error('Note not found', noteId);
-            return;
-        }
-
-        //  Nếu locked, show mật khẩu, ngược lại show modal
-        if (note.locked == 1) {
-            console.log('Note locked, ask password');
-            showEnterPasswordForm(noteId);
-        } else {
-            console.log('Note unlocked, open modal');
-            showNoteModal(note);
-        }
-    });
 
 
     function renderNotes(notes) {
@@ -1030,21 +903,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     function generateNoteHTML(note) {
-        if (note.locked == 1) {
-            return `
-                <div class="note locked" data-note-id="${note.note_id}" style="background-color:${note.color || '#fff'}">
-                    <div class="icons">
-                    ${generateCardIconsHTML(note)}
-                    </div>
-                    <div class="content">
-                    <div class="title">${note.title || ''}</div>
-                    <div class="lock-placeholder" style="text-align:center; padding:20px 0;">
-                        <i class="bi bi-lock-fill" style="font-size:2rem;color:#999"></i>
-                    </div>
-                    </div>
-                </div>`;
-        }
-
         let labelHtml = '';
         if (note.labels && Array.isArray(note.labels) && note.labels.length > 0) {
             labelHtml += `<div class="note-labels" style="margin-top: 8px;">`;
@@ -1095,10 +953,6 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
         `;
         }
-
-
-
-
     }
     window.generateNoteHTML = generateNoteHTML;
 
@@ -1158,7 +1012,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     })
                 })
                     .then(r => r.json())
-                    .then(() => fetchNotes());
+                    .then(() => fetchNotes()); // fetch lại để render đúng trạng thái, class
             }
         });
     }
@@ -1167,21 +1021,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function attachNoteClickEvents() {
         document.querySelectorAll('.note').forEach(el => {
-            el.addEventListener('click', async function (e) {
+            el.addEventListener('click', function (e) {
                 if (e.target.closest('.icons')) return;
                 const noteId = el.getAttribute('data-note-id');
-                const notes = await fetch('note.php').then(r => r.json());
-                const note = notes.find(n => n.note_id == noteId);
-                if (!note) return;
-
-                // Nếu note đã khóa, show form nhập pass trước
-                if (note.locked == 1) {
-                    showEnterPasswordForm(noteId);
-                    return;
-                }
-
-                // ngược lại mới mở modal chỉnh sửa
-                showNoteModal(note);
+                fetch('note.php')
+                    .then(r => r.json())
+                    .then(notes => {
+                        const note = notes.find(n => n.note_id == noteId);
+                        if (note) showNoteModal(note);
+                    });
             });
         });
     }
@@ -1207,8 +1055,6 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('deleteConfirmModal').classList.remove('show');
     };
 
-
-
     // Change Password
     document.getElementById("saveResetBtn").addEventListener("click", async () => {
         const oldPassword = document.getElementById("oldPassword").value;
@@ -1230,6 +1076,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 headers: {
                     "Content-Type": "application/json"
                 },
+                // credentials: "include",
                 body: JSON.stringify({
                     action: "reset",
                     oldPassword,
@@ -1254,6 +1101,73 @@ document.addEventListener('DOMContentLoaded', function () {
             showMessage("Unexpected error occurred. Please try again.");
         }
     });
+
+
+
+    // Lock note
+    function createNoteOptionsPopup(iconEl, noteId, container, hasPassword) {
+        // nếu đã mở rồi thì đóng
+        const prev = container.querySelector('.note-options-popup');
+        if (prev) return prev.remove();
+
+        // tạo popup
+        const popup = document.createElement('div');
+        popup.className = 'note-options-popup';
+
+        // đặt vị trí ngay dưới icon
+        const { top, left, height } = iconEl.getBoundingClientRect();
+        const parentRect = iconEl.parentElement.getBoundingClientRect();
+
+
+        popup.innerHTML = `
+        <button
+            id="noteLockUnlockOption" data-action="toggle-lock">Lock / Unlock Note</button>
+        <button
+            id="noteChangePasswordOption" data-action="change-pass">Change Note Password</button>
+        `;
+
+        // sự kiện cho từng nút
+        popup.querySelector('[data-action="toggle-lock"]').onclick = e => {
+            e.stopPropagation();
+            popup.remove();
+            if (!hasPassword) {
+                // nếu chưa có password ⇒ mở form tạo mật khẩu
+                container.querySelector('#createNotePasswordForm').classList.remove('hidden');
+                return;
+            }
+            // ngược lại mới gọi API toggle
+            fetch('note.php', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    action: 'toggle_icon',
+                    note_id: noteId,
+                    icon: 'lock'
+                })
+            })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        iconEl.className = data.locked ? 'bi bi-lock-fill active' : 'bi bi-lock';
+                    } else {
+                        showMessage('Failed to toggle lock.');
+                    }
+                });
+        };
+
+        popup.querySelector('[data-action="change-pass"]').onclick = e => {
+            e.stopPropagation();
+            popup.remove();
+            // nếu chưa có mật khẩu ⇒ mở form TẠO, ngược lại mở form ĐỔI
+            if (!hasPassword) {
+                container.querySelector('#createNotePasswordForm').classList.remove('hidden');
+            } else {
+                container.querySelector('#changeNotePasswordForm').classList.remove('hidden');
+            }
+        };
+
+        iconEl.parentElement.appendChild(popup);
+    }
+
 
 
     // Change note color
@@ -1336,6 +1250,27 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
+    function insertImageAtCursor(src, container) {
+        const sel = window.getSelection();
+        const range = sel.rangeCount ? sel.getRangeAt(0) : document.createRange();
+        range.deleteContents();
+
+        const img = document.createElement('img');
+        img.src = src;
+        img.style.maxWidth = '100%';
+        img.style.display = 'block';
+        img.style.margin = '8px 0';
+        img.style.borderRadius = '4px';
+
+        range.insertNode(img);
+        range.setStartAfter(img);
+        sel.removeAllRanges();
+        sel.addRange(range);
+
+        container.focus();
+    }
+
+
 
     // Hàm upload lên server rồi preview
     async function uploadImagesInline(noteId, files, container) {
@@ -1382,6 +1317,10 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Load images error', err);
         }
     }
+
+
+
+
 
 
     // Lấy danh sách note từ API

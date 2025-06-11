@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // 1. Hàm render 
-
     const renderLabels = () => {
         labelList.innerHTML = '';
         labels.forEach((labelObj, index) => {
@@ -223,7 +222,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             try {
                 const response = await deleteLabel(labelObj.label_id);
                 if (response.success) {
-                    // Load lại nhãn (sidebar + modal)
                     await loadLabelsFromDB();
                     renderFilterLabels();  // cập nhật sidebar
                     renderLabels();        // cập nhật modal edit nhãn

@@ -1929,7 +1929,7 @@ body.dark-mode .radio-options label {
 
 
 
-/* ===== FONT SIZE CHO NOTE CONTENT THEO size_type ===== */
+/*FONT SIZE CHO NOTE CONTENT THEO size_type  */
 
 /* Ẩn popup mặc định */
 .size-type-popup {
@@ -1981,7 +1981,7 @@ body.dark-mode .radio-options label {
     border-left: 1px solid #eee;
 }
 
-/* Class để áp cỡ chữ (nếu cần) */
+/* Class để áp cỡ chữ */
 textarea.size-h1,
 .body.size-h1 {
     font-size: 1.42rem;
@@ -1996,6 +1996,7 @@ textarea.size-h3,
 .body.size-h3 {
     font-size: 0.9rem;
 }
+
 
 /* Change password */
 .password-field {
@@ -2045,42 +2046,16 @@ textarea.size-h3,
 
 
 /* image */
-/* .images-container img {
-    max-width: 100%;
-    height: auto;
-    object-fit: cover;
-}
-
-#image-preview {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin: 12px 0;
-    justify-content: flex-start;
-}
-
-#image-preview img {
-    max-width: 100%;
-    object-fit: contain;
-    height: auto;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-} */
-
-
-/* Vùng contenteditable: bỏ viền, nền trong suốt để hiện màu popup */
+/* Vùng contenteditable */
 .contenteditable {
     min-height: 150px;
     padding: 8px;
     outline: none;
     overflow-y: auto;
     background: transparent;
-    /* thay #fff => trong suốt */
     border: none;
-    /* bỏ viền xám */
 }
 
-/* Cho textarea cũ (nếu còn dùng) và div mới */
 .note-content-input {
     width: 100%;
     box-sizing: border-box;
@@ -2090,12 +2065,9 @@ textarea.size-h3,
     vertical-align: top;
     overflow-y: auto;
     background: transparent;
-    /* nền trong suốt */
     border: none;
-    /* bỏ viền */
 }
 
-/* CHANGED: ép ảnh trong contenteditable co max 100% chiều ngang */
 #modal-content img {
     max-width: 100%;
     height: auto;
@@ -2104,3 +2076,126 @@ textarea.size-h3,
     /* căn giữa nếu muốn */
 }
 
+
+/* Lock note */
+.popup-modal .popup-content {
+    position: relative;
+}
+
+/*--- Popup chọn Change/Lock dưới icon ---*/
+.note-options-popup {
+    position: absolute;
+    top: 40px;
+    left: 200px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    min-width: 165px;
+}
+
+.note-options-popup.hidden {
+    display: none;
+}
+
+/* Style cho các button bên trong */
+.note-options-popup button {
+    display: block;
+    width: 100%;
+    padding: 6px 10px;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 0.85rem;
+    color: #333;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+/*--- Form đổi / tạo password cho note ---*/
+.reset-note-password-form {
+    position: absolute;
+    top: 4.5rem;
+    width: 350px;
+    background: #fff;
+    padding: 1rem;
+    border: 2px solid #ccc;
+    border-radius: 6px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    z-index: 20;
+
+}
+
+.reset-note-password-form.hidden {
+    display: none;
+}
+
+/* thứ tự các input + icon "see" */
+.reset-note-password-form .password-field {
+    position: relative;
+    margin-bottom: 0.75rem;
+}
+
+.reset-note-password-form .password-field input {
+    width: 100%;
+    padding: 0.5rem 2rem 0.5rem 0.5rem;
+    box-sizing: border-box;
+}
+
+.reset-note-password-form .password-field .toggle-password {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+/* Nút Cancel / Save */
+.note-personal-info-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+
+
+.popup-modal .popup-content .icons {
+    position: relative;
+}
+
+
+.note-options-popup button:hover {
+    background-color: #beceffe7;
+    color: #2935dc;
+}
+
+.popup-modal .popup-content .icons {
+    position: relative;
+}
+
+
+.reset-note-password-form .form-header {
+    border-bottom: 1px solid #f48fb1;
+}
+
+
+.reset-note-password-form .form-title {
+    color: #e65585;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Note hiển thị khi bị khóa */
+.note.locked .content .lock-placeholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}

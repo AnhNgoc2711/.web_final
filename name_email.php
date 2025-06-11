@@ -3,8 +3,6 @@ session_start();
 header('Content-Type: application/json');
 require 'db.php';
 
-// $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
 
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);

@@ -277,8 +277,67 @@ $is_active = $_SESSION['is_active'] ?? 0;
                 data-placeholder="Content..."></div>
 
             <div id="selected-labels" style="margin-top:10px; display:none;"></div>
-            <div class="icons">
+            <div class="icons"></div>
+
+            <!-- Change Note Password Form -->
+            <div id="changeNotePasswordForm" class="reset-note-password-form hidden">
+                <div class="form-header">
+                    <h3 class="form-title">Change Note Password</h3>
+                </div>
+                <div class="password-field">
+                    <input type="password" id="oldNotePassword" placeholder="Enter old note password" />
+                    <i class="bi bi-eye-slash toggle-password"></i>
+                </div>
+                <div class="password-field">
+                    <input type="password" id="newNotePassword" placeholder="Enter new note password" />
+                    <i class="bi bi-eye-slash toggle-password"></i>
+                </div>
+                <div class="password-field">
+                    <input type="password" id="confirmNewNotePassword" placeholder="Re-enter new note password" />
+                    <i class="bi bi-eye-slash toggle-password"></i>
+                </div>
+                <div class="note-personal-info-buttons">
+                    <button class="btn-outline-pink" id="cancelChangeNotePassword">Cancel</button>
+                    <button class="btn-filled-pink" id="saveChangeNotePassword">Save</button>
+                </div>
             </div>
+
+            <!-- Create/Lock Note Password Form -->
+            <div id="createNotePasswordForm" class="reset-note-password-form hidden">
+                <div class="form-header">
+                    <h3 class="form-title">Create Note Password</h3>
+                </div>
+                <div class="password-field">
+                    <input type="password" id="newCreateNotePassword" placeholder="Enter new note password" />
+                    <i class="bi bi-eye-slash toggle-password"></i>
+                </div>
+                <div class="password-field">
+                    <input type="password" id="confirmCreateNotePassword" placeholder="Re-enter new note password" />
+                    <i class="bi bi-eye-slash toggle-password"></i>
+                </div>
+                <div class="note-personal-info-buttons">
+                    <button class="btn-outline-pink" id="cancelCreateNotePassword">Cancel</button>
+                    <button class="btn-filled-pink" id="saveCreateNotePassword">Save</button>
+                </div>
+            </div>
+
+            <!-- Enter Note Password Form -->
+            <div id="enterNotePasswordForm" class="reset-note-password-form hidden">
+                <div class="form-header">
+                    <h3 class="form-title">Enter Note Password</h3>
+                </div>
+                <div class="password-field">
+                    <input type="password" id="enterNotePassword" placeholder="Enter note password" />
+                    <i class="bi bi-eye-slash toggle-password"></i>
+                </div>
+                <div class="note-personal-info-buttons">
+                    <button class="btn-outline-pink" id="cancelEnterNotePassword">Cancel</button>
+                    <button class="btn-filled-pink" id="submitEnterNotePassword">Submit</button>
+                </div>
+                <div id="enterPasswordError" class="error"></div>
+            </div>
+
+
             <div id="label-popup"
                 style="display:none; position:absolute; background:#fff; border:1px solid #ccc; padding:8px; border-radius:4px; z-index:1000;">
                 <strong>Labels</strong>
@@ -305,20 +364,18 @@ $is_active = $_SESSION['is_active'] ?? 0;
                 <button id="cancelDeleteBtn" class="btn btn-secondary">Cancel</button>
             </div>
         </div>
+    </div>
 
 
-
-        <!-- <script src="js/script.js"></script> -->
-        <script src="js/login.js"></script>
-        <script src="js/home.js"></script>
-        <script src="js/search.js"></script>
-        <script src="js/filterNotesByLabel.js"></script>
-        <script src="js/labels.js"></script>
-        <script src="js/note_label.js"></script>
-        <script src="js/avatar.js"></script>
-        <script src="js/name_email.js"></script>
-
-
+    <!-- <script src="js/script.js"></script> -->
+    <script src="js/login.js"></script>
+    <script src="js/home.js"></script>
+    <script src="js/search.js"></script>
+    <script src="js/filterNotesByLabel.js"></script>
+    <script src="js/labels.js"></script>
+    <script src="js/note_label.js"></script>
+    <script src="js/avatar.js"></script>
+    <script src="js/name_email.js"></script>
 
 
 </body>

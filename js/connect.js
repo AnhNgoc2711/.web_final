@@ -1,6 +1,6 @@
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('service-worker.js') // KHÔNG thêm slash /
+    navigator.serviceWorker.register('service-worker.js') 
       .then(reg => console.log('Service Worker registered:', reg))
       .catch(err => console.error('Service Worker failed:', err));
   });
@@ -8,6 +8,6 @@ if ('serviceWorker' in navigator) {
 
 Notification.requestPermission().then(permission => {
   if (permission === "granted") {
-    console.log("🔔 Notification permission granted.");
+    console.log("Notification permission granted.");
   }
 });
