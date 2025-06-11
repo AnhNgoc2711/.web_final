@@ -81,36 +81,36 @@
             </div>
         </div>
     </div>
-<!-- Modal chi tiết ghi chú -->
-<div id="noteModal" class="modal hidden">
-    <div class="note-box">
-        <div class="note-header">
-            <div>
-                <h3 id="note-title">Note Title</h3>
-                <p id="note-from" class="note-meta"></p>
-                <p id="note-date" class="note-meta"></p>
+    <!-- Modal chi tiết ghi chú -->
+    <div id="noteModal" class="modal hidden">
+        <div class="note-box">
+            <div class="note-header">
+                <div>
+                    <h3 id="note-title">Note Title</h3>
+                    <p id="note-from" class="note-meta"></p>
+                    <p id="note-date" class="note-meta"></p>
+                </div>
+
+                <!-- Bên phải -->
+                <div class="note-actions">
+                    <span class="note-permission can-view">Can view</span>
+                    <i class="bi bi-clock-history history-icon" title="History"></i>
+                </div>
             </div>
 
-            <!-- Bên phải -->
-            <div class="note-actions">
-                <span class="note-permission can-view">Can view</span>
-                <i class="bi bi-clock-history history-icon" title="History"></i>
+            <div class="note-content-wrap">
+                <div class="note-body">
+                    <p id="note-text"></p>
+                </div>
             </div>
+
+            <span class="close-btn">&times;</span>
         </div>
-
-        <div class="note-content-wrap">
-            <div class="note-body">
-                <p id="note-text"></p>
-            </div>
+        <div class="note-history-panel hidden" id="note-history">
+            <h4>Edit History</h4>
+            <ul class="history-list" id="history-list"></ul>
         </div>
-
-        <span class="close-btn">&times;</span>
     </div>
-    <div class="note-history-panel hidden" id="note-history">
-        <h4>Edit History</h4>
-        <ul class="history-list" id="history-list"></ul>
-    </div>
-</div>
 
 
     <!-- Sidebar người dùng -->
@@ -152,7 +152,7 @@
                         <button class="btn-outline-pink" id="cancelEditBtn">Cancel</button>
                         <button class="btn-filled-pink" id="saveEditBtn">Save</button>
                     </div>
-                    <!-- Form đổi mật khẩu  -->
+                    <!-- Form đổi mật khẩu (ẩn mặc định) -->
                     <div class="reset-password-form hidden" id="resetPasswordForm">
                         <input type="password" id="oldPassword" placeholder="Nhập mật khẩu cũ" />
                         <input type="password" id="newPassword" placeholder="Nhập mật khẩu mới" />

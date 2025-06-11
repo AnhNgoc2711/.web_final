@@ -13,14 +13,14 @@ if (isset($_POST['action']) && $_POST['action'] === 'verify_otp') {
         echo json_encode(['success' => false, 'message' => 'Missing email or OTP.']);
         exit;
     }
-    $stmt = $pdo->prepare("SELECT user_id FROM USER WHERE email=?");
+    $stmt = $pdo->prepare("SELECT user_id FROM user WHERE email=?");
     $stmt->execute([$email]);
     $user = $stmt->fetch();
     if (!$user) {
         echo json_encode(['success' => false, 'message' => 'Email not found.']);
         exit;
     }
-    $stmt = $pdo->prepare("SELECT * FROM TOKEN WHERE user_id=? AND token=? AND type='reset' AND expires_at > NOW()");
+    $stmt = $pdo->prepare("SELECT * FROM token WHERE user_id=? AND token=? AND type='reset' AND expires_at > NOW()");
     $stmt->execute([$user['user_id'], $otp]);
     $row = $stmt->fetch();
     if ($row) {
@@ -45,14 +45,14 @@ if (isset($_POST['action']) && $_POST['action'] === 'reset_password') {
     }
     // Xác nhận theo otp hoặc token
     if ($otp) {
-        $stmt = $pdo->prepare("SELECT user_id FROM USER WHERE email=?");
+        $stmt = $pdo->prepare("SELECT user_id FROM user WHERE email=?");
         $stmt->execute([$email]);
         $user = $stmt->fetch();
         if (!$user) {
             echo json_encode(['success' => false, 'message' => 'Invalid email.']);
             exit;
         }
-        $stmt = $pdo->prepare("SELECT * FROM TOKEN WHERE user_id=? AND token=? AND type='reset' AND expires_at > NOW()");
+        $stmt = $pdo->prepare("SELECT * FROM token WHERE user_id=? AND token=? AND type='reset' AND expires_at > NOW()");
         $stmt->execute([$user['user_id'], $otp]);
         $row = $stmt->fetch();
         if (!$row) {
@@ -61,16 +61,16 @@ if (isset($_POST['action']) && $_POST['action'] === 'reset_password') {
         }
         // Đặt lại mật khẩu mới (hash)
         $hashed = password_hash($new_password, PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("UPDATE USER SET password=? WHERE user_id=?");
+        $stmt = $pdo->prepare("UPDATE user SET password=? WHERE user_id=?");
         $stmt->execute([$hashed, $user['user_id']]);
         // Xóa OTP khỏi bảng token
-        $stmt = $pdo->prepare("DELETE FROM TOKEN WHERE token=? AND user_id=?");
+        $stmt = $pdo->prepare("DELETE FROM token WHERE token=? AND user_id=?");
         $stmt->execute([$otp, $user['user_id']]);
         echo json_encode(['success' => true, 'message' => 'Password has been reset!']);
         exit;
     }
     if ($token) {
-        $stmt = $pdo->prepare("SELECT * FROM TOKEN WHERE token=? AND type='reset' AND expires_at > NOW()");
+        $stmt = $pdo->prepare("SELECT * FROM token WHERE token=? AND type='reset' AND expires_at > NOW()");
         $stmt->execute([$token]);
         $row = $stmt->fetch();
         if (!$row) {
@@ -79,10 +79,10 @@ if (isset($_POST['action']) && $_POST['action'] === 'reset_password') {
         }
         $user_id = $row['user_id'];
         $hashed = password_hash($new_password, PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("UPDATE USER SET password=? WHERE user_id=?");
+        $stmt = $pdo->prepare("UPDATE user SET password=? WHERE user_id=?");
         $stmt->execute([$hashed, $user_id]);
         // Xóa token
-        $stmt = $pdo->prepare("DELETE FROM TOKEN WHERE token=?");
+        $stmt = $pdo->prepare("DELETE FROM token WHERE token=?");
         $stmt->execute([$token]);
         echo json_encode(['success' => true, 'message' => 'Password has been reset!']);
         exit;
@@ -99,7 +99,7 @@ if (!$email) {
     echo json_encode(['success' => false, 'message' => 'Please enter your email.']);
     exit;
 }
-$stmt = $pdo->prepare("SELECT user_id FROM USER WHERE email = ?");
+$stmt = $pdo->prepare("SELECT user_id FROM user WHERE email = ?");
 $stmt->execute([$email]);
 $user = $stmt->fetch();
 
@@ -111,7 +111,7 @@ if (!$user) {
 if ($method === 'otp') {
     $otp = random_int(100000, 999999);
     $expires = date('Y-m-d H:i:s', strtotime('+15 minutes'));
-    $stmt = $pdo->prepare("INSERT INTO TOKEN (user_id, token, type, created_at, expires_at) VALUES (?, ?, 'reset', NOW(), ?)");
+    $stmt = $pdo->prepare("INSERT INTO token (user_id, token, type, created_at, expires_at) VALUES (?, ?, 'reset', NOW(), ?)");
 
 
     $stmt->execute([$user['user_id'], $otp, $expires]);
@@ -142,7 +142,7 @@ if ($method === 'otp') {
 if ($method === 'link') {
     $token = bin2hex(random_bytes(16));
     $expires = date('Y-m-d H:i:s', strtotime('+30 minutes'));
-    $stmt = $pdo->prepare("INSERT INTO TOKEN (user_id, token, type, expires_at) VALUES (?, ?, 'reset', ?)");
+    $stmt = $pdo->prepare("INSERT INTO token (user_id, token, type, expires_at) VALUES (?, ?, 'reset', ?)");
     $stmt->execute([$user['user_id'], $token, $expires]);
     $resetLink = "http://localhost/.web_final/reset_password.html?token=$token";
     $subject = "SkyNote - Your Password Reset Link";

@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
     }
 
-    $stmt = $pdo->prepare("SELECT * FROM USER WHERE email = ?");
+    $stmt = $pdo->prepare("SELECT * FROM user WHERE email = ?");
     $stmt->execute([$email]);
     if ($stmt->fetch()) {
         $_SESSION['register_error'] = "This email has already been registered.";
@@ -45,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // Tạo user mới
     $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-    $stmt = $pdo->prepare("INSERT INTO USER (email, name, password, is_active) VALUES (?, ?, ?, 0)");
+    $stmt = $pdo->prepare("INSERT INTO user (email, name, password, is_active) VALUES (?, ?, ?, 0)");
     $stmt->execute([$email, $name, $hashedPassword]);
 
     $userId = $pdo->lastInsertId();
@@ -53,7 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // Tạo token cho xác thực email
     $token = bin2hex(random_bytes(16));
     $expiresAt = date('Y-m-d H:i:s', strtotime('+1 day')); // token hết hạn sau 1 ngày
-    $stmt = $pdo->prepare("INSERT INTO TOKEN (user_id, token, type, used, expires_at) VALUES (?, ?, 'activation', 0, ?)");
+    $stmt = $pdo->prepare("INSERT INTO token (user_id, token, type, used, expires_at) VALUES (?, ?, 'activation', 0, ?)");
     $stmt->execute([$userId, $token, $expiresAt]);
 
     // Đăng nhập tự động sau khi đăng ký 

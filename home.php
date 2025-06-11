@@ -175,6 +175,44 @@ $is_active = $_SESSION['is_active'] ?? 0;
         </div>
     </div>
 
+
+    <!-- Model phân quyền chia sẽ note -->
+    <div id="shareModal" class="modal-share hidden">
+        <div>
+            <h3>Share Note With</h3>
+
+            <div class="input-row">
+                <input type="email" id="emailInput" placeholder="Enter email address">
+                <select id="permissionSelect">
+                    <option value="view">View only</option>
+                    <option value="edit">Can edit</option>
+                </select>
+                <button class="btn" onclick="addUser()">Add</button>
+            </div>
+
+            <!-- Shared user list -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Permission</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <!-- Rendered by JS -->
+                </tbody>
+            </table>
+
+            <!-- Footer -->
+            <div class="footer">
+                <button class="btn-outline-submit" onclick="closeModal()">Cancel</button>
+                <button class="btn-submit" onclick="saveShareSettings()">Done</button>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Sidebar người dùng -->
     <div class="user-dropdown-container">
         <div class="user-dropdown" id="userDropdown">

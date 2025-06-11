@@ -18,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   if (empty($email) || empty($password)) {
     $errorMsg = 'Please enter both email and password.';
   } else {
-    $stmt = $pdo->prepare("SELECT user_id, email, name, password, is_active FROM `USER` WHERE email = ?");
+    $stmt = $pdo->prepare("SELECT user_id, email, name, password, is_active FROM `user` WHERE email = ?");
     $stmt->execute([$email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 

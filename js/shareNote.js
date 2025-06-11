@@ -30,4 +30,3 @@ function renderUsers() {
       `;
   });
 }
-document.getElementById("saveShareSettingsBtn").addEventListener("click", saveShareSettings);

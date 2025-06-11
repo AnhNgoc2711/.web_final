@@ -8,7 +8,7 @@ $success = false;
 
 if ($email && $token) {
     // 1. Tìm user theo email
-    $stmtUser = $pdo->prepare("SELECT user_id, is_active FROM `USER` WHERE email = ?");
+    $stmtUser = $pdo->prepare("SELECT user_id, is_active FROM `user` WHERE email = ?");
     $stmtUser->execute([$email]);
     $user = $stmtUser->fetch();
 
@@ -17,8 +17,8 @@ if ($email && $token) {
             $message = "Your account is already activated!";
             $success = true;
         } else {
-            // 2. Kiểm tra token có hợp lệ trong bảng TOKEN
-            $stmtToken = $pdo->prepare("SELECT token_id, used, expires_at FROM TOKEN WHERE user_id = ? AND token = ? AND type = 'activation'");
+            // 2. Kiểm tra token có hợp lệ trong bảng token
+            $stmtToken = $pdo->prepare("SELECT token_id, used, expires_at FROM token WHERE user_id = ? AND token = ? AND type = 'activation'");
             $stmtToken->execute([$user['user_id'], $token]);
             $tokenRow = $stmtToken->fetch();
 
@@ -33,10 +33,10 @@ if ($email && $token) {
                         // 3. Cập nhật active user và đánh dấu token đã dùng
                         $pdo->beginTransaction();
 
-                        $stmtUpdateUser = $pdo->prepare("UPDATE `USER` SET is_active = 1 WHERE user_id = ?");
+                        $stmtUpdateUser = $pdo->prepare("UPDATE `user` SET is_active = 1 WHERE user_id = ?");
                         $stmtUpdateUser->execute([$user['user_id']]);
 
-                        $stmtUpdateToken = $pdo->prepare("UPDATE TOKEN SET used = 1 WHERE token_id = ?");
+                        $stmtUpdateToken = $pdo->prepare("UPDATE token SET used = 1 WHERE token_id = ?");
                         $stmtUpdateToken->execute([$tokenRow['token_id']]);
 
                         $pdo->commit();
